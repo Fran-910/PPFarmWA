@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="PPFarmWA.BD/PPFarmWA.BD.csproj" />
+  <Project Path="PPFarmWA.Repositorio/PPFarmWA.Repositorio.csproj" />
+  <Project Path="PPFarmWA.Server/PPFarmWA.Server.csproj" />
+  <Project Path="PPFarmWA.Servicios/PPFarmWA.Servicios.csproj" />
+  <Project Path="PPFarmWA.Shared/PPFarmWA.Shared.csproj" />
+  <Project Path="PPFramWA.Client/PPFramWA.Client.csproj" />
+</Solution>
