@@ -1,0 +1,13 @@
+﻿
+.huerta-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.huerta-celda {
+    text-align: center;
+    width: 100px;
+    height: auto;
+    background-color: #808080;
+}

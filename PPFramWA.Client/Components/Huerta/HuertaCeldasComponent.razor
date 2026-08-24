@@ -1,0 +1,14 @@
+﻿<h3>Huerta</h3>
+
+<div class="huerta-container">
+    @for (int i = 1; i <= NumeroCeldas; i++)
+    {
+        <div class="huerta-celda">
+            <CultivoComponent></CultivoComponent>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int NumeroCeldas { get; set; } = 3;
+}
