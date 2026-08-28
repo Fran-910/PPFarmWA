@@ -1,10 +1,47 @@
-﻿<h3 @onclick="OnClick">Cultivo</h3>
+﻿@inject JugadorState jugadorState
+<button class="cultivo" @onclick="OnClick">
+    <img class="cultivo-image @estado" src="images/cultivo1t.png" alt="Cultivo" />
+    
+    @if (mostrarPopup)
+    {
+        <div class="cosecha-popup">
+            <p class="xp-txt">+@cultivo.xp XP</p>
+            <p class="points-txt">+@cultivo.points PP</p>
+        </div>
+    }
+</button>
 
 @code {
 
+    public Cultivo? cultivo;
+    public CultivoState estado = CultivoState.listo;
+    public bool mostrarPopup { get; set; } = false;
 
-    private void OnClick()
+    protected override void OnInitialized()
     {
-        
+        cultivo = new(jugadorState.__jugador!);
+    }
+
+    public async Task OnClick()
+    {
+
+        if(estado == CultivoState.listo)
+        {
+            estado = CultivoState.cultivado;
+
+            cultivo.Cosechado();
+            mostrarPopup = true; 
+
+            StateHasChanged();
+
+            await cultivo.CooldownCultivo();
+
+            estado = CultivoState.listo;
+            mostrarPopup = false;
+        }
+        else
+        {
+            Console.WriteLine("Nothing");
+        }
     }
 }

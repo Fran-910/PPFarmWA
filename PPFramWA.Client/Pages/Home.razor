@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@inject JugadorState jugadorState
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
@@ -38,3 +38,21 @@
 Welcome to your new app.
 
 <HuertaCeldasComponent></HuertaCeldasComponent>
+
+@code {
+    public Jugador jugador;
+
+    protected override void OnInitialized()
+    {
+        jugador = new Jugador()
+        {
+            Id = 20,
+            experiencia = 0,
+            level = 11,
+            points = 10,
+            ppCoins = 10,
+        };
+
+        jugadorState.EstablecerJugador(jugador);
+    }
+}

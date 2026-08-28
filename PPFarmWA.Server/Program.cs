@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PPFarmWA.Repositorio;
 using PPFarmWA.BD.Datos;
+using PPFarmWA.Repositorio;
 using PPFarmWA.Repositorio.Repositorios;
+using PPFramWA.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,9 @@ builder.Services.AddScoped<IVentaRepositorio, VentaRepositorio>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddRazorComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
