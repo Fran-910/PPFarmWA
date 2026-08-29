@@ -1,0 +1,70 @@
+﻿@page "/internet"
+
+<div class="internet-container">
+
+    <div class="main-section">
+
+        <div class="sidebar">
+            <button class="nav-btn @(vistaActual == "Convertir" ? "active" : "")"
+                    @onclick='() => CambiarVista("Convertir")'>
+                Convertir
+            </button>
+            <button class="nav-btn @(vistaActual == "Intercambiar" ? "active" : "")"
+                    @onclick='() => CambiarVista("Intercambiar")'>
+                Intercambiar
+            </button>
+        </div>
+
+        <div class="content-area">
+            @if (vistaActual == "Convertir")
+            {
+                <div class="convertir-view">
+                    <h2>Convertir a Ppcoin</h2>
+                    <p>Intercambia tus monedas de la granja por Ppcoin real.</p>
+
+                    <div class="form-group">
+                        <label>Monedas de la Granja:</label>
+                        <input type="number" placeholder="Ej: 1000" />
+                    </div>
+                    <div class="form-group">
+                        <label>Equivalente en Ppcoin:</label>
+                        <input type="text" disabled placeholder="0.00000000" />
+                    </div>
+                    <button class="action-btn">Confirmar Conversión</button>
+                </div>
+            }
+            else if (vistaActual == "Intercambiar")
+            {
+                <div class="intercambiar-view">
+                    <h2>Mercado de Intercambio</h2>
+                    <p>Aquí podrás intercambiar objetos con otros jugadores (Próximamente online).</p>
+
+                    <ul class="item-list">
+                        <li>⛏️ 1x Pico de Diamante</li>
+                        <li>🪏 1x Pala de Bronce</li>
+                        <li>🌙 1x Hoz Dorada</li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="farm-icon" title="Detalle 1">🚜</div>
+        <div class="farm-icon" title="Detalle 2">🌻</div>
+        <div class="farm-icon" title="Detalle 3">🐓</div>
+        <div class="farm-icon" title="Detalle 4">🍎</div>
+    </div>
+
+</div>
+
+@code {
+    // Variable para controlar qué pantalla se muestra
+    private string vistaActual = "Convertir";
+
+    // Método que se llama al hacer clic en los botones laterales
+    private void CambiarVista(string nuevaVista)
+    {
+        vistaActual = nuevaVista;
+    }
+}
