@@ -1,0 +1,23 @@
+﻿@inject JugadorState jugadorState
+<h3>Huerta</h3>
+
+<div class="huerta-container">
+    @for (int i = 1; i <= NumeroCeldas; i++)
+    {
+        <div class="huerta-celda">
+            <CultivoComponent></CultivoComponent>
+        </div>
+    }
+</div>
+
+@code {
+    public int NumeroCeldas { get; set; } = 3;
+    public Huerta? huerta { get; set; }
+
+    protected override void OnInitialized()
+    {
+        huerta = new Huerta(jugadorState.__jugador!);
+        NumeroCeldas = huerta.cantCultivos();
+
+    }
+}

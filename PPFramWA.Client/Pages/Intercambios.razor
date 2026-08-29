@@ -1,0 +1,246 @@
+﻿@page "/intercambios"
+
+<PageTitle>Intercambios</PageTitle>
+
+<div class="intercambios">
+
+    <h1>Intercambios</h1>
+
+    <!-- PUBLICAR INTERCAMBIO -->
+    <div class="publicar">
+
+        <h2>Publicar intercambio</h2>
+
+        <div class="campo">
+            <label>Recurso</label>
+
+            <select>
+                <option>Seleccionar recurso</option>
+                <option>Madera</option>
+                <option>Piedra</option>
+                <option>Semillas</option>
+                <option>Hierro</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <label>Cantidad</label>
+
+            <input type="number"
+                   min="1"
+                   placeholder="Cantidad" />
+        </div>
+
+        <div class="campo">
+            <label>Precio</label>
+
+            <input type="number"
+                   min="0"
+                   placeholder="PP Coins" />
+        </div>
+
+        <button class="btn-publicar">
+            Publicar intercambio
+        </button>
+
+    </div>
+
+
+    <!-- INTERCAMBIOS DISPONIBLES -->
+    <div class="disponibles">
+
+        <h2>Intercambios disponibles</h2>
+
+        <div class="lista-intercambios">
+
+            <!-- INTERCAMBIO 1 -->
+            <div class="intercambio">
+
+                <h3>Juan</h3>
+
+                <p>
+                    <strong>Recurso:</strong> Madera
+                </p>
+
+                <p>
+                    <strong>Cantidad:</strong> 10
+                </p>
+
+                <p>
+                    <strong>Precio:</strong> 50 PP Coins
+                </p>
+
+                <button class="btn-comprar">
+                    Comprar
+                </button>
+
+            </div>
+
+
+            <!-- INTERCAMBIO 2 -->
+            <div class="intercambio">
+
+                <h3>Pedro</h3>
+
+                <p>
+                    <strong>Recurso:</strong> Semillas
+                </p>
+
+                <p>
+                    <strong>Cantidad:</strong> 5
+                </p>
+
+                <p>
+                    <strong>Precio:</strong> 30 PP Coins
+                </p>
+
+                <button class="btn-comprar">
+                    Comprar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* CONTENEDOR PRINCIPAL */
+
+    .intercambios {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+
+        /* TITULO */
+
+        .intercambios h1 {
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 40px;
+        }
+
+
+    /* PUBLICAR */
+
+    .publicar {
+        max-width: 600px;
+        margin: 0 auto 40px auto;
+        padding: 25px;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+    }
+
+        .publicar h2 {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+
+    /* CAMPOS */
+
+    .campo {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 18px;
+    }
+
+        .campo label {
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        .campo input,
+        .campo select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+            font-size: 15px;
+        }
+
+
+    /* BOTON PUBLICAR */
+
+    .btn-publicar {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+
+    /* DISPONIBLES */
+
+    .disponibles h2 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+
+    /* LISTA */
+
+    .lista-intercambios {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+
+    /* TARJETA */
+
+    .intercambio {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+    }
+
+        .intercambio h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .intercambio p {
+            margin: 8px 0;
+        }
+
+
+    /* BOTON COMPRAR */
+
+    .btn-comprar {
+        width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+
+    /* CELULAR */
+
+    @@media (max-width: 700px) {
+
+    {
+
+        .lista-intercambios {
+            grid-template-columns: 1fr;
+        }
+
+        .intercambios {
+            padding: 15px;
+        }
+    }
+
+</style>
