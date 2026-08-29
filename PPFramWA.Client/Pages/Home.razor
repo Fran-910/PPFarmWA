@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject JugadorState jugadorState
+@inject NavigationManager navigationManager
 <PageTitle>Home</PageTitle>
 
 <div class="home-content">
@@ -11,10 +12,10 @@
                 <li>XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
                 <li>PP @(jugadorState?.__jugador?.points ?? 0)</li>
                 <li>PC @(jugadorState?.__jugador?.ppCoins ?? 0)</li>
-                <li><button>Store</button></li>
-                <li><button>Mochila</button></li>
-                <li><button>Configuración</button></li>
-                <li><button>Computadora</button></li>
+                <li><CustomButton onclick="IrATienda" Label="Tienda"></CustomButton></li>
+                <li><CustomButton onclick="IrAMochila" Label="Mochila"></CustomButton></li>
+                <li><CustomButton onclick="IrAComputadora" Label="Computadora"></CustomButton></li>
+                <li><CustomButton onclick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
             </ul>
         </nav>
     </div>
@@ -45,5 +46,24 @@
     public void Actualizar()
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    //NAVEGACIÓN
+
+    public void IrATienda()
+    {
+        navigationManager.NavigateTo("/tienda");
+    }
+    public void IrAMochila()
+    {
+        navigationManager.NavigateTo("/inventario");
+    }
+    public void IrAComputadora()
+    {
+        navigationManager.NavigateTo("/");
+    }
+    public void IrAConfiguracion()
+    {
+        navigationManager.NavigateTo("/");
     }
 }
