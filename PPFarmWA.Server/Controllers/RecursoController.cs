@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Shared.DTO;
 
@@ -79,6 +80,32 @@ namespace PPFarmWA.Server.Controllers
             };
 
             return Ok(dto);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<RecursoDTO>> Post(RecursoDTO dto)
+        {
+            var recurso = new Recurso
+            {
+                nombre = dto.nombre,
+                descripcion = dto.descripcion,
+                eficiencia = dto.eficiencia,
+                durabilidad = dto.durabilidad,
+                valor = dto.valor,
+                deTienda = dto.deTienda,
+                tipo = dto.tipo,
+                idRareza = dto.idRareza
+            };
+
+            var creado = await _repositorio.AddAsync(recurso);
+
+            dto.Id = creado.Id;
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = creado.Id },
+                dto
+            );
         }
     }
 }

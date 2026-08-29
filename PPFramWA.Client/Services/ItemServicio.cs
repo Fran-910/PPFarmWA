@@ -17,11 +17,11 @@ namespace PPFramWA.Client.Services
                 "api/Item") ?? new List<ItemDTO>();
         }
 
-        public async Task<List<ItemDTO>> ObtenerInventario(int idJugador)
+        public async Task<List<InventarioDTO>> ObtenerInventario(int idJugador)
         {
-            return await _api.GetAsync<List<ItemDTO>>(
+            return await _api.GetAsync<List<InventarioDTO>>(
                 $"api/Item/jugador/{idJugador}")
-                ?? new List<ItemDTO>();
+                ?? new List<InventarioDTO>();
         }
 
         public async Task<ItemDTO?> ObtenerPorId(int id)

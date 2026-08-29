@@ -1,8 +1,7 @@
 ﻿@inject JugadorState jugadorState
-<h3>Huerta</h3>
 
 <div class="huerta-container">
-    @for (int i = 1; i <= NumeroCeldas; i++)
+    @for (int i = 1; i <= huerta!.cantCeldas; i++)
     {
         <div class="huerta-celda">
             <CultivoComponent></CultivoComponent>
@@ -11,13 +10,16 @@
 </div>
 
 @code {
-    public int NumeroCeldas { get; set; } = 3;
     public Huerta? huerta { get; set; }
 
     protected override void OnInitialized()
     {
-        huerta = new Huerta(jugadorState.__jugador!);
-        NumeroCeldas = huerta.cantCultivos();
+        huerta = new Huerta(jugadorState);
+        jugadorState.__jugador!.OnSubioNivel += ActualizarCeldas;
+    }
 
+    public void ActualizarCeldas()
+    {
+        InvokeAsync(StateHasChanged);
     }
 }

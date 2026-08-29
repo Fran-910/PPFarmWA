@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Shared.DTO;
 
@@ -64,6 +65,36 @@ namespace PPFarmWA.Server.Controllers
             };
 
             return Ok(dto);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<JugadorDTO>> Post(JugadorDTO dto)
+        {
+            var jugador = new Jugador
+            {
+                userName = dto.userName,
+                password = dto.password,
+                email = dto.email,
+                ppCoins = dto.ppCoins,
+                points = dto.points,
+                level = dto.level,
+                experiencia = dto.experiencia,
+                esTienda = dto.esTienda,
+                esAdmin = dto.esAdmin,
+                idUltimaHerramienta = dto.idUltimaHerramienta,
+                idUltimoDispositivo = dto.idUltimoDispositivo,
+                idUltimoPotenciador = dto.idUltimoPotenciador
+            };
+
+            var creado = await _repositorio.AddAsync(jugador);
+
+            dto.Id = creado.Id;
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = creado.Id },
+                dto
+            );
         }
 
         [HttpPut("{id}/coins")]

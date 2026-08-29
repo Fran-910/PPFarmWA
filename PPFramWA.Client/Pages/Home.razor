@@ -1,43 +1,28 @@
 ﻿@page "/"
 @inject JugadorState jugadorState
+@inject NavigationManager navigationManager
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-<nav>
-    <ul>
-        <li>PEPE</li>
-        <li>NIVEL</li>
-        <li>XP</li>
-        <li>PP</li>
-        <li>P</li>
-        <li><button>Store</button></li>
-        <li><button>Mochila</button></li>
-        <li><button>Configuración</button></li>
-        <li><button>Computadora</button></li>
-    </ul>
-</nav>
-
-<style>
-    nav{
-        background-color: grey;
-        width: 200px;
-    }
-    ul{
-        padding: 2px;
-    }
-    li{
-        margin: 20px;
-        list-style: none;
-        display: flex;
-        flex-flow: column;
-    }
-    button{
-        background-color: transparent;
-    }
-</style>
-Welcome to your new app.
-
-<HuertaCeldasComponent></HuertaCeldasComponent>
+<div class="home-content">
+    <div class="barra-lateral">
+        <nav>
+            <ul>
+                <li>PEPE</li>
+                <li>NIVEL @(jugadorState?.__jugador?.level ?? 0)</li>
+                <li>XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
+                <li>PP @(jugadorState?.__jugador?.points ?? 0)</li>
+                <li>PC @(jugadorState?.__jugador?.ppCoins ?? 0)</li>
+                <li><CustomButton onclick="IrATienda" Label="Tienda"></CustomButton></li>
+                <li><CustomButton onclick="IrAMochila" Label="Mochila"></CustomButton></li>
+                <li><CustomButton onclick="IrAComputadora" Label="Computadora"></CustomButton></li>
+                <li><CustomButton onclick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="game-container">
+        <HuertaCeldasComponent></HuertaCeldasComponent>
+    </div>
+</div>
 
 @code {
     public Jugador jugador;
@@ -48,11 +33,37 @@ Welcome to your new app.
         {
             Id = 20,
             experiencia = 0,
-            level = 11,
+            level = 1,
             points = 10,
             ppCoins = 10,
         };
 
         jugadorState.EstablecerJugador(jugador);
+
+        jugadorState.OnChange += Actualizar;
+    }
+
+    public void Actualizar()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    //NAVEGACIÓN
+
+    public void IrATienda()
+    {
+        navigationManager.NavigateTo("/tienda");
+    }
+    public void IrAMochila()
+    {
+        navigationManager.NavigateTo("/inventario");
+    }
+    public void IrAComputadora()
+    {
+        navigationManager.NavigateTo("/");
+    }
+    public void IrAConfiguracion()
+    {
+        navigationManager.NavigateTo("/");
     }
 }
