@@ -1,0 +1,120 @@
+﻿.tienda-header {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.titulo-tienda {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.subtitulo-tienda {
+    font-size: 18px;
+    margin-bottom: 35px;
+}
+
+.tienda-prueba {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.producto-prueba {
+    background: #f8fff3;
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    border: 2px solid #c8dfb8;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+    .producto-prueba:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+    }
+
+.producto-icono {
+    font-size: 65px;
+    margin-bottom: 15px;
+}
+
+.producto-prueba h2 {
+    margin-bottom: 10px;
+}
+
+.descripcion-producto {
+    min-height: 45px;
+    margin-bottom: 15px;
+}
+
+.estadisticas-producto {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.estadistica {
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #f3f7ef;
+}
+
+    .estadistica strong {
+        font-size: 14px;
+    }
+
+    .estadistica span:last-child {
+        font-weight: bold;
+    }
+
+.producto-precio {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.boton-comprar {
+    margin-top: 15px;
+    padding: 11px 25px;
+    border: none;
+    border-radius: 10px;
+    background-color: #6aaa45;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+    .boton-comprar:hover {
+        transform: scale(1.08);
+    }
+
+.rareza-comun {
+    border: 2px solid #bdbdbd;
+}
+
+.rareza-rara {
+    border: 2px solid #4d8cff;
+    box-shadow: 0 0 15px rgba(77, 140, 255, 0.35);
+}
+
+.rareza-epica {
+    border: 2px solid #9b59b6;
+    box-shadow: 0 0 18px rgba(155, 89, 182, 0.4);
+}
+
+.rareza-legendaria {
+    border: 2px solid #f0a500;
+    box-shadow: 0 0 22px rgba(240, 165, 0, 0.5);
+}

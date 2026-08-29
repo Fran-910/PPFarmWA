@@ -1,0 +1,158 @@
+﻿@page "/tienda"
+
+@using PPFarmWA.Shared.DTO
+@using PPFarmWA.Shared.Enum
+@using PPFramWA.Client.Services
+
+@inject RecursoServicio RecursoService
+
+<div class="tienda-header">
+
+    <h1 class="titulo-tienda">
+        🌱 Tienda de la Huerta 🛒
+    </h1>
+
+    <p class="subtitulo-tienda">
+        Conseguí todo lo necesario para hacer crecer tu huerta.
+    </p>
+
+</div>
+
+@if (recursos == null)
+{
+    <div class="mensaje-tienda">
+        <p>🌱 Cargando recursos...</p>
+    </div>
+}
+else if (recursos.Count == 0)
+{
+    <div class="mensaje-tienda">
+        <p>🌾 No hay recursos disponibles en la tienda.</p>
+    </div>
+}
+else
+{
+    <div class="tienda-prueba">
+
+        @foreach (var recurso in recursos)
+        {
+            <div class="producto-prueba @ObtenerClaseRareza(recurso.idRareza)">
+
+                <div class="producto-icono">
+                    @ObtenerIcono(recurso.nombre)
+                </div>
+
+                <h2>@recurso.nombre</h2>
+
+                <p>@recurso.descripcion</p>
+
+                <div class="estadisticas-producto">
+
+                    <div class="estadistica">
+                        <span>⚡</span>
+                        <strong>Eficiencia</strong>
+                        <span>@recurso.eficiencia</span>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>🛡️</span>
+                        <strong>Durabilidad</strong>
+                        <span>@recurso.durabilidad</span>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>🔨</span>
+                        <strong>Tipo</strong>
+                        <span>@ObtenerTipo(recurso.tipo)</span>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>💎</span>
+                        <strong>Rareza</strong>
+                        <span>@ObtenerRareza(recurso.idRareza)</span>
+                    </div>
+
+                </div>
+
+                <p class="producto-precio">
+                    💰 @recurso.valor PP Coins
+                </p>
+
+                <button class="boton-comprar">
+                    Comprar
+                </button>
+
+            </div>
+        }
+
+    </div>
+}
+
+@code {
+
+    private string ObtenerRareza(RarezaEnum rareza)
+    {
+        return rareza switch
+        {
+            RarezaEnum.Comun => "Comun",
+            RarezaEnum.Raro => "Rara",
+            RarezaEnum.Epico => "Epica",
+            RarezaEnum.Legendario => "Legendaria"
+        };
+    }
+
+    private string ObtenerClaseRareza(RarezaEnum rareza)
+    {
+        return rareza switch
+        {
+            RarezaEnum.Comun => "rareza-comun",
+            RarezaEnum.Raro => "rareza-rara",
+            RarezaEnum.Epico => "rareza-epica",
+            RarezaEnum.Legendario => "rareza-legendaria",
+            _ => "rareza-comun"
+        };
+    }
+
+
+    private string ObtenerTipo(TipoItemEnum tipo)
+    {
+        return tipo switch
+        {
+            TipoItemEnum.Herramienta => "Herramienta",
+            TipoItemEnum.Dispositivo => "Dispositivo",
+            TipoItemEnum.Potenciador => "Potenciador"
+        };
+    }
+
+    private string ObtenerIcono(string nombre)
+    {
+        nombre = nombre.ToLower();
+
+        if (nombre.Contains("pala"))
+            return "🪏";
+
+        if (nombre.Contains("regadera"))
+            return "💧";
+
+        if (nombre.Contains("tomate"))
+            return "🍅";
+
+        if (nombre.Contains("zanahoria"))
+            return "🥕";
+
+        if (nombre.Contains("maiz"))
+            return "🌽";
+
+        if (nombre.Contains("semilla"))
+            return "🌱";
+
+        return "📦";
+    }
+
+    private List<RecursoDTO>? recursos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recursos = await RecursoService.ObtenerRecursosTienda();
+    }
+}

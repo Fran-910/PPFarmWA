@@ -43,7 +43,7 @@ namespace PPFarmWA.BD.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Items");
+                    b.ToTable("Items", (string)null);
                 });
 
             modelBuilder.Entity("PPFarmWA.BD.Datos.Entity.Jugador", b =>
@@ -97,7 +97,7 @@ namespace PPFarmWA.BD.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Jugadores");
+                    b.ToTable("Jugadores", (string)null);
                 });
 
             modelBuilder.Entity("PPFarmWA.BD.Datos.Entity.Recurso", b =>
@@ -138,7 +138,7 @@ namespace PPFarmWA.BD.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Recursos");
+                    b.ToTable("Recursos", (string)null);
                 });
 
             modelBuilder.Entity("PPFarmWA.BD.Datos.Entity.Venta", b =>
@@ -163,7 +163,7 @@ namespace PPFarmWA.BD.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ventas");
+                    b.ToTable("Ventas", (string)null);
                 });
 #pragma warning restore 612, 618
         }

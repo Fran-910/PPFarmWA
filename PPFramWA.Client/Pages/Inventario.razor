@@ -1,0 +1,178 @@
+﻿@page "/inventario"
+
+@using PPFarmWA.Shared.DTO
+@using PPFarmWA.Shared.Enum
+@using PPFramWA.Client.Services
+
+@inject ItemServicio ItemService
+@inject HttpClient Http
+
+<h1 class="titulo-inventario">🌱 Mi Inventario</h1>
+
+<p class="subtitulo-inventario">
+    Todos los recursos que tenés disponibles para tu huerta.
+</p>
+
+@if (items == null)
+{
+    <div class="mensaje-inventario">
+        <div class="mensaje-icono">🌱</div>
+        <h2>Cargando inventario...</h2>
+        <p>Estamos buscando tus recursos.</p>
+    </div>
+}
+else if (items.Count == 0)
+{
+    <div class="mensaje-inventario">
+        <div class="mensaje-icono">📦</div>
+        <h2>Tu inventario está vacío</h2>
+        <p>Comprá algunos recursos en la tienda para comenzar.</p>
+    </div>
+}
+else
+{
+  <div class="inventario-container">
+       @foreach (var item in items)
+    
+       {
+        <div class="item-card @ObtenerClaseRareza(item.idRareza)">
+
+            <div class="item-icono">
+                @ObtenerIcono(item.nombre)
+            </div>
+
+            <div class="item-contenido">
+
+                <h2>@item.nombre</h2>
+
+                <p>@item.descripcion</p>
+
+                <div class="estadisticas-inventario">
+
+                    <div class="estadistica">
+                        <span>⚡</span>
+                        <strong>Eficiencia</strong>
+                        <span>@item.eficiencia</span>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>🛡️</span>
+                        <strong>Durabilidad</strong>
+                        <span>@item.durabilidad</span>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>🔨</span>
+                        <strong>Tipo</strong>
+                        <span>@ObtenerTipo(item.tipo)</span>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>💎</span>
+                        <strong>Rareza</strong>
+                        <span>@ObtenerRareza(item.idRareza)</span>
+                    </div>
+
+                </div>
+
+                <div class="cantidad-item">
+                    📦 Cantidad: <strong>@item.cantidad</strong>
+                </div>
+
+                    <div class="acciones-item">
+
+                        <button class="boton-equipar"
+                                @onclick="() => EquiparItem(item.Id)">
+                            @(itemsEquipados.Contains(item.Id) ? "✅ Equipado" : "⚔️ Equipar")
+                        </button>
+
+                        <button class="boton-vender">
+                            💰 Vender
+                        </button>
+
+                    </div>
+
+            </div>
+
+        </div>
+        }
+   </div>
+}
+
+    @code {
+
+    private HashSet<int> itemsEquipados = new();
+
+    private void EquiparItem(int idItem)
+    {
+        itemsEquipados.Add(idItem);
+    }
+
+    private string ObtenerTipo(TipoItemEnum tipo)
+    {
+        return tipo switch
+        {
+            TipoItemEnum.Herramienta => "Herramienta",
+            TipoItemEnum.Dispositivo => "Dispositivo",
+            TipoItemEnum.Potenciador => "Potenciador"
+        };
+    }
+
+    private string ObtenerClaseRareza(RarezaEnum rareza)
+    {
+        return rareza switch
+        {
+            RarezaEnum.Comun => "rareza-comun",
+            RarezaEnum.Raro => "rareza-rara",
+            RarezaEnum.Epico => "rareza-epica",
+            RarezaEnum.Legendario => "rareza-legendaria",
+            _ => ""
+        };
+    }
+
+    private string ObtenerRareza(RarezaEnum rareza)
+    {
+        return rareza switch
+        {
+            RarezaEnum.Comun => "Comun",
+            RarezaEnum.Raro => "Rara",
+            RarezaEnum.Epico => "Epica",
+            RarezaEnum.Legendario => "Legendaria",
+            _ => "Desconocida"
+        };
+    }
+
+    private int idJugador = 3;
+
+    private List<InventarioDTO> items;
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await ItemService.ObtenerInventario(idJugador);
+    }
+
+    private string ObtenerIcono(string nombre)
+    {
+        nombre = nombre.ToLower();
+
+        if (nombre.Contains("pala"))
+            return "🪏";
+
+        if (nombre.Contains("regadera"))
+            return "💧";
+
+        if (nombre.Contains("tomate"))
+            return "🍅";
+
+        if (nombre.Contains("zanahoria"))
+            return "🥕";
+
+        if (nombre.Contains("maiz"))
+            return "🌽";
+
+        if (nombre.Contains("semilla"))
+            return "🌱";
+
+        return "📦";
+    }
+}
