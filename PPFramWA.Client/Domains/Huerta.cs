@@ -1,26 +1,25 @@
 ﻿using PPFarmWA.Shared.Catalogos;
+using PPFramWA.Client.Services;
 using System.Numerics;
 namespace PPFramWA.Client.Domains
 {
     public class Huerta
     {
-        public Jugador __jugador;
+        public int cantCeldas { get; set; }
+        public JugadorState jugadorStateHuerta;
 
-        public Huerta(Jugador jugador)
+        public Huerta(JugadorState jugadorState)
         {
-            __jugador = jugador;
+            jugadorStateHuerta = jugadorState;
+            jugadorStateHuerta.__jugador!.OnSubioNivel += calcularCultivos;
+            calcularCultivos();
         }
-
-        public int cantCultivos()
+        
+        public void calcularCultivos()
         {
-            var cantCeldas = 0;
-
-            var umbralDeNivelActual = CeldasHuerta.values.Where(x => x.Key > __jugador.level).MinBy(x => x.Value).Key;
+            var umbralDeNivelActual = CeldasHuerta.values.Where(x => x.Key > jugadorStateHuerta.__jugador!.level).MinBy(x => x.Value).Key;
 
             cantCeldas = CeldasHuerta.values[umbralDeNivelActual];
-
-            return cantCeldas ;
         }
-
     }
 }

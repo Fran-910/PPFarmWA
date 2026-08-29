@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using PPFramWA.Client.Services;
+using System.Runtime.CompilerServices;
 
 namespace PPFramWA.Client.Domains
 {
@@ -8,17 +9,16 @@ namespace PPFramWA.Client.Domains
         public int xp { get; set; }
         public int points { get; set; }
 
-        public Jugador __jugador;
+        public JugadorState jugadorStateCultivo;
 
         //Valores base
         public float VIDA_BASE { get; set; } = 10f;
         public float ESCALA { get; set; } = 5f;
 
-        public Cultivo(Jugador jugador)
+        public Cultivo(JugadorState jugadorState)
         {
-            __jugador = jugador;
-
-            int vidaCalculada = (int)MathF.Round(VIDA_BASE + MathF.Pow(__jugador.level - 1, 2) * ESCALA);
+            jugadorStateCultivo = jugadorState;
+            int vidaCalculada = (int)MathF.Round(VIDA_BASE + MathF.Pow(jugadorStateCultivo.__jugador!.level - 1, 2) * ESCALA);
 
             vida = vidaCalculada;
         }
@@ -33,19 +33,22 @@ namespace PPFramWA.Client.Domains
 
         public void Cosechado()
         {
-            var xpGain = __jugador.level * 5;
-            var pointsGain = __jugador.level * 2;
+            var xpGain = jugadorStateCultivo.__jugador!.level * 5;
+            var pointsGain = jugadorStateCultivo.__jugador!.level * 2;
 
             xp = xpGain;
             points = pointsGain;
 
-            __jugador.experiencia = __jugador.experiencia + xpGain;
-            __jugador.points = __jugador.points + pointsGain;
+            jugadorStateCultivo.__jugador!.experiencia = jugadorStateCultivo.__jugador!.experiencia + xpGain;
+            jugadorStateCultivo.__jugador!.points = jugadorStateCultivo.__jugador!.points + pointsGain;
+
+            jugadorStateCultivo.NotificarCambios();
+            jugadorStateCultivo.__jugador!.SubirDeNivel();
         }
 
         public async Task CooldownCultivo()
         {
-            double cooldown = 10 / (1 + (__jugador.level - 1) * 0.1);
+            double cooldown = 10 / (1 + (jugadorStateCultivo.__jugador!.level - 1) * 0.1);
 
             await Task.Delay(TimeSpan.FromSeconds(cooldown));
         }
