@@ -28,9 +28,9 @@ namespace PPFarmWA.Server.Controllers
             {
                 Id = i.Id,
                 cantidad = i.cantidad,
-                idJugador = i.idJugador,
-                idRecurso = i.idRecurso,
-                idVenta = i.idVenta
+                idJugador = i.JugadorId,
+                idRecurso = i.RecursoId,
+                idVenta = i.VentaId
             });
 
             return Ok(resultado);
@@ -44,14 +44,14 @@ namespace PPFarmWA.Server.Controllers
             var resultado = items
                 .Join(
                     _context.Recursos,
-                    item => item.idRecurso,
+                    item => item.RecursoId,
                     recurso => recurso.Id,
                     (item, recurso) => new InventarioDTO
                     {
                         Id = item.Id,
                         cantidad = item.cantidad,
-                        idJugador = item.idJugador,
-                        idRecurso = item.idRecurso,
+                        idJugador = item.JugadorId,
+                        idRecurso = item.RecursoId,
 
                         nombre = recurso.nombre,
                         descripcion = recurso.descripcion,
@@ -80,9 +80,9 @@ namespace PPFarmWA.Server.Controllers
             {
                 Id = item.Id,
                 cantidad = item.cantidad,
-                idJugador = item.idJugador,
-                idRecurso = item.idRecurso,
-                idVenta = item.idVenta
+                idJugador = item.JugadorId,
+                idRecurso = item.RecursoId,
+                idVenta = item.VentaId
             };
 
             return Ok(dto);
@@ -94,9 +94,9 @@ namespace PPFarmWA.Server.Controllers
             var item = new Item
             {
                 cantidad = dto.cantidad,
-                idJugador = dto.idJugador,
-                idRecurso = dto.idRecurso,
-                idVenta = dto.idVenta
+                JugadorId = dto.idJugador,
+                RecursoId = dto.idRecurso,
+                VentaId = (dto.idVenta.HasValue && dto.idVenta.Value > 0) ? dto.idVenta : null
             };
 
             var creado = await _repositorio.AddAsync(item);

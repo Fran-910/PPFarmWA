@@ -58,7 +58,7 @@ namespace PPFarmWA.Server.Controllers
                 .GetInventarioJugadorAsync(dto.idJugador);
 
             var itemExistente = inventario
-                .FirstOrDefault(i => i.idRecurso == dto.idRecurso);
+                .FirstOrDefault(i => i.RecursoId == dto.idRecurso);
 
             // 8. Descontar PP Coins
             var coinsModificadas = await _jugadorRepositorio
@@ -80,9 +80,9 @@ namespace PPFarmWA.Server.Controllers
                 var nuevoItem = new Item
                 {
                     cantidad = dto.cantidad,
-                    idJugador = dto.idJugador,
-                    idRecurso = dto.idRecurso,
-                    idVenta = 0
+                    JugadorId = dto.idJugador,
+                    RecursoId = dto.idRecurso,
+                    VentaId = 0
                 };
 
                 await _itemRepositorio.AddAsync(nuevoItem);

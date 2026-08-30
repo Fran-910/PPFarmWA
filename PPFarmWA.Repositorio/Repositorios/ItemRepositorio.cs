@@ -17,7 +17,7 @@ namespace PPFarmWA.Repositorio.Repositorios
         public async Task<IEnumerable<Item>> GetInventarioJugadorAsync(int idJugador)
         {
             return await _dbSet
-                .Where(i => i.idJugador == idJugador)
+                .Where(i => i.JugadorId == idJugador)
                 .ToListAsync();
         }
     }

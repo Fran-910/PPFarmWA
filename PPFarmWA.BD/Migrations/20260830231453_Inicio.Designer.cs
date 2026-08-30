@@ -11,7 +11,7 @@ using PPFarmWA.BD.Datos;
 namespace PPFarmWA.BD.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260822022948_Inicio")]
+    [Migration("20260830231453_Inicio")]
     partial class Inicio
     {
         /// <inheritdoc />
@@ -32,19 +32,25 @@ namespace PPFarmWA.BD.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("JugadorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecursoId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VentaId")
+                        .HasColumnType("int");
+
                     b.Property<int>("cantidad")
                         .HasColumnType("int");
 
-                    b.Property<int>("idJugador")
-                        .HasColumnType("int");
-
-                    b.Property<int>("idRecurso")
-                        .HasColumnType("int");
-
-                    b.Property<int>("idVenta")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("JugadorId");
+
+                    b.HasIndex("RecursoId");
+
+                    b.HasIndex("VentaId");
 
                     b.ToTable("Items");
                 });
@@ -167,6 +173,31 @@ namespace PPFarmWA.BD.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ventas");
+                });
+
+            modelBuilder.Entity("PPFarmWA.BD.Datos.Entity.Item", b =>
+                {
+                    b.HasOne("PPFarmWA.BD.Datos.Entity.Jugador", "Jugador")
+                        .WithMany()
+                        .HasForeignKey("JugadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPFarmWA.BD.Datos.Entity.Recurso", "Recurso")
+                        .WithMany()
+                        .HasForeignKey("RecursoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPFarmWA.BD.Datos.Entity.Venta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("VentaId");
+
+                    b.Navigation("Jugador");
+
+                    b.Navigation("Recurso");
+
+                    b.Navigation("Venta");
                 });
 #pragma warning restore 612, 618
         }

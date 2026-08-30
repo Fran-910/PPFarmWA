@@ -27,6 +27,5 @@ namespace PPFarmWA.BD.Datos.Entity
         public int idUltimaHerramienta { get; set; }
         public int idUltimoDispositivo { get; set; }
         public int idUltimoPotenciador { get; set; }
-
     }
 }

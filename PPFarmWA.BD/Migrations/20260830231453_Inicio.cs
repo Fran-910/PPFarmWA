@@ -11,22 +11,6 @@ namespace PPFarmWA.BD.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Items",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    cantidad = table.Column<int>(type: "int", nullable: false),
-                    idJugador = table.Column<int>(type: "int", nullable: false),
-                    idRecurso = table.Column<int>(type: "int", nullable: false),
-                    idVenta = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Items", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Jugadores",
                 columns: table => new
                 {
@@ -85,6 +69,54 @@ namespace PPFarmWA.BD.Migrations
                 {
                     table.PrimaryKey("PK_Ventas", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Items",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    cantidad = table.Column<int>(type: "int", nullable: false),
+                    JugadorId = table.Column<int>(type: "int", nullable: false),
+                    RecursoId = table.Column<int>(type: "int", nullable: false),
+                    VentaId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Items", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Items_Jugadores_JugadorId",
+                        column: x => x.JugadorId,
+                        principalTable: "Jugadores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Items_Recursos_RecursoId",
+                        column: x => x.RecursoId,
+                        principalTable: "Recursos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Items_Ventas_VentaId",
+                        column: x => x.VentaId,
+                        principalTable: "Ventas",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_JugadorId",
+                table: "Items",
+                column: "JugadorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_RecursoId",
+                table: "Items",
+                column: "RecursoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_VentaId",
+                table: "Items",
+                column: "VentaId");
         }
 
         /// <inheritdoc />

@@ -14,6 +14,6 @@ namespace PPFarmWA.Shared.DTO
 
         public int idRecurso { get; set; }
 
-        public int idVenta { get; set; }
+        public int? idVenta { get; set; }
     }
 }

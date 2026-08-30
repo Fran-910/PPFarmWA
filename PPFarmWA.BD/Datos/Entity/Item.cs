@@ -9,8 +9,11 @@ namespace PPFarmWA.BD.Datos.Entity
     public class Item : EntityBase
     {
         public int cantidad { get; set; } = 1;
-        public int idJugador { get; set; }
-        public int idRecurso { get; set; }
-        public int idVenta { get; set; }
+        public int JugadorId { get; set; }
+        public Jugador Jugador { get; set; }
+        public int RecursoId { get; set; }
+        public Recurso Recurso {  get; set; }
+        public int? VentaId { get; set; }
+        public Venta? Venta { get; set; }
     }
 }
