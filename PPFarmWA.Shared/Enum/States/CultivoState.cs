@@ -7,6 +7,8 @@ namespace PPFarmWA.Shared.Enum.States
     public enum CultivoState
     {
         listo,
-        cultivado,
+        cosechado,
+        hit,
+        standby,
     }
 }

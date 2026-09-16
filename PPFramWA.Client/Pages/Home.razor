@@ -1,9 +1,11 @@
 ﻿@page "/"
 @inject JugadorState jugadorState
+@inject CatalogoRecursos catalogoRecursos
 @inject NavigationManager navigationManager
 <PageTitle>Home</PageTitle>
 
-<div class="home-content">
+<div style="cursor: @cursorActual;" @onmousedown="CambiarAClick" @onmouseup="RestablecerAMain" @onmouseover="RestablecerAMain" @onmouseleave="RestablecerAMain"
+     class="home-content">
     <div class="barra-lateral">
         <nav>
             <ul>
@@ -19,15 +21,28 @@
             </ul>
         </nav>
     </div>
-    <div class="game-container">
-        <HuertaCeldasComponent></HuertaCeldasComponent>
-    </div>
-</div>
-
-@code {
+    @if (recursos is not null)
+    {
+        <div class="game-container">
+            <HuertaCeldasComponent></HuertaCeldasComponent>
+            <div style="background-image: " class="equipped-frame">
+                <img src="/images/ui/equipped-frame/EquippedItemFrame.png" />
+                <div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        //LOADING
+    }
+    @code {
     public Jugador jugador;
+    public List<RecursoDTO> recursos;
+    string cursorActual;
+    string currentToolImg;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         jugador = new Jugador()
         {
@@ -36,17 +51,53 @@
             level = 1,
             points = 10,
             ppCoins = 10,
+            idUltimaHerramienta = 1,
         };
 
         jugadorState.EstablecerJugador(jugador);
 
         jugadorState.OnChange += Actualizar;
+        jugador.OnCambioUltimaHerramienta += SetUpTool;
+
+        recursos = await catalogoRecursos.ObtenerRecursosAsync();
+
+        SetUpTool();
     }
 
     public void Actualizar()
     {
         InvokeAsync(StateHasChanged);
     }
+
+    public void SetUpTool()
+    {
+        RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.idUltimoRecurso).FirstOrDefault() ??
+        new RecursoDTO()
+        {
+            Id = 0,
+            nombre = "Ninguna",
+            descripcion = "No hay herramienta equipada",
+            eficiencia = 10,
+            durabilidad = 10,
+            valor = 0,
+            deTienda = false,
+            tipo = PPFarmWA.Shared.Enum.TipoItemEnum.Herramienta,
+            idRareza = PPFarmWA.Shared.Enum.RarezaEnum.Comun,
+        };
+
+        jugadorState.__jugador.recurso = dataHerramienta;
+    }
+
+    public void CambiarAClick()
+    {
+        cursorActual = $"url('/images/tools/default/Click.png'), auto";
+    }
+
+    public void RestablecerAMain()
+    {
+        cursorActual = $"url('/images/tools/default/Main.png'), auto";
+    }
+
 
     //NAVEGACIÓN
 

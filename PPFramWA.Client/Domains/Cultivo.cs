@@ -6,6 +6,7 @@ namespace PPFramWA.Client.Domains
     public class Cultivo
     {
         public int vida { get; set; }
+        public int vidaMaxima { get; set; }
         public int xp { get; set; }
         public int points { get; set; }
 
@@ -18,17 +19,30 @@ namespace PPFramWA.Client.Domains
         public Cultivo(JugadorState jugadorState)
         {
             jugadorStateCultivo = jugadorState;
+            ResetCultivo();
+        }
+        public void ResetCultivo()
+        {
             int vidaCalculada = (int)MathF.Round(VIDA_BASE + MathF.Pow(jugadorStateCultivo.__jugador!.level - 1, 2) * ESCALA);
-
             vida = vidaCalculada;
+            vidaMaxima = vidaCalculada;
+            xp = 0;
+            points = 0;
         }
 
         //Logica de hit para reducir la vida de los cultivos y ejecutar cosechado
         public void Golpeado(int damage)
         {
+            if (vida > 0)
+            {
+                vida -= damage;
 
-
-
+                if (vida <= 0)
+                {
+                    vida = 0;
+                    Cosechado();
+                }
+            }
         }
 
         public void Cosechado()
@@ -51,6 +65,12 @@ namespace PPFramWA.Client.Domains
             double cooldown = 10 / (1 + (jugadorStateCultivo.__jugador!.level - 1) * 0.1);
 
             await Task.Delay(TimeSpan.FromSeconds(cooldown));
+            ResetCultivo();
+        }
+
+        public async Task HitCooldown()
+        {
+            await Task.Delay(350);
         }
     }
 }
