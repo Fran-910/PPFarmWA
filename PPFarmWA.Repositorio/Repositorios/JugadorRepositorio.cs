@@ -1,5 +1,7 @@
-﻿using PPFarmWA.BD.Datos;
+﻿using Microsoft.EntityFrameworkCore;
+using PPFarmWA.BD.Datos;
 using PPFarmWA.BD.Datos.Entity;
+using PPFarmWA.Shared.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,5 +25,6 @@ namespace PPFarmWA.Repositorio.Repositorios
             await _context.SaveChangesAsync();
             return true;
         }
+        
     }
 }

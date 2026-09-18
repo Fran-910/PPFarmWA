@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Shared.DTO;
@@ -15,7 +16,7 @@ namespace PPFarmWA.Server.Controllers
         {
             _repositorio = repositorio;
         }
-
+       
         [HttpGet]
         public async Task<ActionResult<IEnumerable<JugadorDTO>>> Get()
         {
