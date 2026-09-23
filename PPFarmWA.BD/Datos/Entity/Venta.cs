@@ -9,8 +9,8 @@ namespace PPFarmWA.BD.Datos.Entity
     {
         [Required]
         public int idJugadorVendedor { get; set; }
-        [Required]
-        public int idJugadorComprador { get; set; }
+
+        public int? idJugadorComprador { get; set; }
         [Required]
         public int cantidadVenta { get; set; }
         [Required]

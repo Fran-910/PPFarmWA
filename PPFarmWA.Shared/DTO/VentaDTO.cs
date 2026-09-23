@@ -10,7 +10,7 @@ namespace PPFarmWA.Shared.DTO
 
         public int idJugadorVendedor { get; set; }
 
-        public int idJugadorComprador { get; set; }
+        public int? idJugadorComprador { get; set; }
 
         public int cantidadVenta { get; set; }
 
