@@ -25,10 +25,8 @@
     {
         <div class="game-container">
             <HuertaCeldasComponent></HuertaCeldasComponent>
-            <div style="background-image: " class="equipped-frame">
-                <img src="/images/ui/equipped-frame/EquippedItemFrame.png" />
-                <div>
-                </div>
+            <div style="background-image: url(/images/ui/equipped-frame/EquippedItemFrame.png)" class="equipped-frame">
+                <img src="/images/tools/@jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")/Main.png" />
             </div>
         </div>
     }
@@ -36,7 +34,8 @@
     {
         //LOADING
     }
-    @code {
+</div>
+@code {
     public Jugador jugador;
     public List<RecursoDTO> recursos;
     string cursorActual;
@@ -71,6 +70,7 @@
 
     public void SetUpTool()
     {
+        //obtener idUltimoRecurso a partir de la lista de ITEMS del jugador.
         RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.idUltimoRecurso).FirstOrDefault() ??
         new RecursoDTO()
         {

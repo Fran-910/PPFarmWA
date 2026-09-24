@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PPFarmWA.BD.Datos;
 using PPFarmWA.Repositorio;
 using PPFarmWA.Repositorio.Repositorios;
+using PPFarmWA.Server;
 using PPFramWA.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,13 @@ builder.Services.AddSwaggerGen();
 #endregion
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    DbSeeder.Seed(db);
+}
 
 #region MiddleWare
 
