@@ -12,5 +12,8 @@ namespace PPFarmWA.Repositorio.Repositorios
 
         Task<bool> ExisteEmailOusuarioAsync(string emailOusuario);
         Task<SesionDTO> RegistrarJugadorAsync(RegistroDTO dto);
+        Task <SesionDTO> ObtenerSesionConItemsAsync(int idJugador);
+     
     }
 }
+ 
