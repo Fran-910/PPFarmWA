@@ -7,16 +7,14 @@ namespace PPFarmWA.Shared.DTO
 {
     public class RegistroDTO
     {
-        [Required(ErrorMessage = "La contraseña es obligatoria.")]
-        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+        [Required(ErrorMessage = "El usuario es obligatorio.")]
+        public string userName { get; set; }
 
-        public string password;
-
-        [Required(ErrorMessage = "El usuario o el email son obligatorios.")]
-        public string userName  { get; set;}
+        [Required(ErrorMessage = "El email es obligatorio.")]
         public string email { get; set; }
 
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
-        public string Nombre { get; set;}
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+        public string password { get; set; }
     }
 }

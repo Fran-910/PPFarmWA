@@ -1,3 +1,33 @@
 ﻿@page "/login"
-@inject NavigationManager navigationManager
+@inject NavigationManager Navigation
 
+<div>
+    <form class="formulario">
+
+
+        <h1>Iniciar sesion</h1>
+
+        
+        <div class="i">
+            <input type="email" required placeholder="Correo electrónico" />
+        </div>
+
+        <div class="i">
+            <input type="password" required placeholder="Contraseña" />
+        </div>
+
+        <div>
+            <button type="button" class="boton">Iniciar Sesión</button>
+
+            <button type="button" class="crear" @onclick="registar">Crear Cuenta</button>
+        </div>
+
+    </form>
+</div>
+
+@code {
+    private void registar()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}

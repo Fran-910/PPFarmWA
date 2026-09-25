@@ -17,8 +17,4 @@
     <ProjectReference Include="..\PPFarmWA.Shared\PPFarmWA.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\images\tools\pala-comun\" />
-  </ItemGroup>
-
 </Project>

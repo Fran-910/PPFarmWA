@@ -11,6 +11,7 @@ namespace PPFarmWA.Repositorio.Repositorios
         Task<bool> ModificarCoinsAsync(int idJugador, double cantidad);
 
         Task<bool> ExisteEmailOusuarioAsync(string emailOusuario);
+
         Task<SesionDTO> RegistrarJugadorAsync(RegistroDTO dto);
         Task <SesionDTO> ObtenerSesionConItemsAsync(int idJugador);
      
