@@ -15,5 +15,6 @@ builder.Services.AddScoped<JugadorServicio>();
 builder.Services.AddScoped<VentaServicio>();
 builder.Services.AddScoped<JugadorState>();
 builder.Services.AddScoped<CatalogoRecursos>();
+builder.Services.AddScoped<ComercioServicio>();
 
 await builder.Build().RunAsync();
