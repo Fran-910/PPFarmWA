@@ -1,0 +1,74 @@
+﻿@page "/register"
+@using System.Text.Json
+@using PPFarmWA.Shared.DTO
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<div>
+    <h1>Crear Cuenta</h1>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div>@mensajeError</div>
+    }
+
+    @if (cargando)
+    {
+        <p>Cargando...</p>
+    }
+    else
+    {
+        <form @onsubmit="ProcesarRegistro">
+
+            <div>
+                <input @bind="registro.userName" type="text" placeholder="Nombre de usuario" required />
+            </div>
+
+            <div>
+                <input @bind="registro.email" type="email" placeholder="Correo electrónico" required />
+            </div>
+
+            <div>
+                <input @bind="registro.password" type="password" placeholder="Contraseña" required />
+            </div>
+
+            <div>
+                <button type="submit">Crear cuenta</button>
+            </div>
+        </form>
+    }
+</div>
+
+@code {
+    private RegistroDTO registro = new();
+    private string mensajeError = string.Empty;
+    private bool cargando = false;
+
+    private async Task ProcesarRegistro()
+    {
+        cargando = true;
+        mensajeError = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/jugador/registrar", registro);
+
+            if (response.IsSuccessStatusCode)
+            {
+                registro.password = string.Empty;
+                return;
+            }
+
+            var errorApi = await response.Content.ReadAsStringAsync();
+            mensajeError = !string.IsNullOrWhiteSpace(errorApi) ? errorApi : "No se pudo registrar el usuario.";
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error de conexión: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+}

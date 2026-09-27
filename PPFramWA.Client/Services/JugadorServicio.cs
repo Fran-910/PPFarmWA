@@ -22,5 +22,12 @@ namespace PPFramWA.Client.Services
             return await _api.GetAsync<List<JugadorDTO>>(
                 "api/Jugador") ?? new List<JugadorDTO>();
         }
+
+        public async Task<HttpResponseMessage> GuardarPartida(JugadorDTO jugador)
+        {
+            return await _api.PutAsync<JugadorDTO>(
+                $"api/Jugador/{jugador.Id}", jugador);
+        }
+
     }
 }

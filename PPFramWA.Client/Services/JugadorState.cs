@@ -14,5 +14,9 @@ namespace PPFramWA.Client.Services
         {
             OnChange?.Invoke();
         }
+
+        // Guardado del estado del jugador
+
+        // Método de guardado automático del estado del jugador
     }
 }

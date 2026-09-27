@@ -1,7 +1,11 @@
 ﻿@page "/internet"
 
-<div class="internet-container">
+@* Inyectamos los servicios *@
+@inject JugadorServicio JugadorService
+@inject JugadorState JugadorState
+@inject ComercioServicio ComercioService
 
+<div class="internet-container">
     <div class="main-section">
 
         <div class="sidebar">
@@ -16,29 +20,62 @@
         </div>
 
         <div class="content-area">
+
+            <!-- Indicador de saldos reales -->
+            <div style="background-color: #f1f8ff; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                <strong>Tus saldos:</strong> 🪙 @saldoPoints Points | 💰 @saldoPPCoints.ToString("0.##") PP Coins
+            </div>
+
+            <!-- Mensajes del sistema -->
+            @if (!string.IsNullOrWhiteSpace(mensaje))
+            {
+                <p class="@claseMensaje" style="padding: 10px; border-radius: 5px; margin-bottom: 15px; font-weight: bold;">
+                    @mensaje
+                </p>
+            }
+
             @if (vistaActual == "Convertir")
             {
                 <div class="convertir-view">
-                    <h2>Convertir a Ppcoin</h2>
-                    <p>Intercambia tus monedas de la granja por Ppcoin real.</p>
+                    <h2>Convertir Points a PP Coins</h2>
 
                     <div class="form-group">
-                        <label>Monedas de la Granja:</label>
-                        <input type="number" placeholder="Ej: 1000" />
+                        <label>Points a convertir:</label>
+                        <input type="number" @bind="PuntosAConvertir" @bind:event="oninput" placeholder="Ej: 1000" min="0" max="@saldoPoints" />
                     </div>
                     <div class="form-group">
-                        <label>Equivalente en Ppcoin:</label>
-                        <input type="text" disabled placeholder="0.00000000" />
+                        <label>Equivalente en PP Coins:</label>
+                        <input type="text" disabled value="@EquivalentePPCoints" />
                     </div>
-                    <button class="action-btn">Confirmar Conversión</button>
+
+                    <button class="action-btn"
+                            disabled="@(ocupado || PuntosAConvertir <= 0 || PuntosAConvertir > saldoPoints)"
+                            @onclick="ConfirmarConversionAsync">
+                        @(ocupado ? "Procesando..." : "Confirmar Conversión")
+                    </button>
+
+                    <div style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 15px;">
+                        <h3>Últimas conversiones</h3>
+                        @if (historialConversiones.Count == 0)
+                        {
+                            <p style="color: #666;">No hay conversiones recientes.</p>
+                        }
+                        else
+                        {
+                            <ul class="item-list">
+                                @foreach (var conv in historialConversiones)
+                                {
+                                    <li>⏱️ @conv</li>
+                                }
+                            </ul>
+                        }
+                    </div>
                 </div>
             }
             else if (vistaActual == "Intercambiar")
             {
                 <div class="intercambiar-view">
                     <h2>Mercado de Intercambio</h2>
-                    <p>Aquí podrás intercambiar objetos con otros jugadores (Próximamente online).</p>
-
                     <ul class="item-list">
                         <li>⛏️ 1x Pico de Diamante</li>
                         <li>🪏 1x Pala de Bronce</li>
@@ -48,23 +85,97 @@
             }
         </div>
     </div>
-
-    <div class="bottom-bar">
-        <div class="farm-icon" title="Detalle 1">🚜</div>
-        <div class="farm-icon" title="Detalle 2">🌻</div>
-        <div class="farm-icon" title="Detalle 3">🐓</div>
-        <div class="farm-icon" title="Detalle 4">🍎</div>
-    </div>
-
 </div>
 
 @code {
-    // Variable para controlar qué pantalla se muestra
     private string vistaActual = "Convertir";
 
-    // Método que se llama al hacer clic en los botones laterales
+    private int idJugador = 2;
+    private double saldoPPCoints;
+    private double saldoPoints = 5000; // Puesto a mano temporalmente hasta que el backend envíe los points
+    private bool ocupado;
+    private string? mensaje;
+    private string claseMensaje = "mensaje-exito";
+
+    private int _puntosAConvertir;
+    private List<string> historialConversiones = new();
+
+    private const decimal TasaDeCambio = 10m;
+
+    public int PuntosAConvertir
+    {
+        get => _puntosAConvertir;
+        set => _puntosAConvertir = value;
+    }
+
+    public int EquivalentePPCoints => (int)(PuntosAConvertir / TasaDeCambio);
+
+    protected override async Task OnInitializedAsync()
+    {
+        idJugador = JugadorState.__jugador?.Id > 0
+            ? JugadorState.__jugador.Id
+            : 2;
+
+        await ActualizarSaldo();
+    }
+
+    private async Task ConfirmarConversionAsync()
+    {
+        ocupado = true;
+        mensaje = null;
+
+        try
+        {
+            // Llamamos a tu servicio de prueba (Mock)
+            var respuestaDelServidor = await ComercioService.ConvertirPoints(PuntosAConvertir);
+
+            mensaje = respuestaDelServidor.Mensaje;
+            claseMensaje = respuestaDelServidor.Exito ? "mensaje-exito" : "mensaje-error";
+
+            if (respuestaDelServidor.Exito)
+            {
+                saldoPoints -= PuntosAConvertir;
+                saldoPPCoints += EquivalentePPCoints;
+
+                historialConversiones.Insert(0, $"-{PuntosAConvertir} Points / +{EquivalentePPCoints} PP Coins");
+                PuntosAConvertir = 0;
+            }
+        }
+        catch (Exception)
+        {
+            mensaje = "Ocurrió un error de conexión.";
+            claseMensaje = "mensaje-error";
+        }
+        finally
+        {
+            ocupado = false;
+        }
+    }
+
+    private async Task ActualizarSaldo()
+    {
+        var jugador = await JugadorService.ObtenerPorId(idJugador);
+
+        if (jugador is null)
+        {
+            return;
+        }
+
+        saldoPPCoints = jugador.ppCoins;
+
+        JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
+        {
+            Id = jugador.Id
+        };
+
+        JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
+        JugadorState.NotificarCambios();
+    }
+
     private void CambiarVista(string nuevaVista)
     {
         vistaActual = nuevaVista;
+        PuntosAConvertir = 0;
+        mensaje = null;
     }
 }

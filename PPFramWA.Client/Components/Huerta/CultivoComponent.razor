@@ -1,10 +1,20 @@
 ﻿@inject JugadorState jugadorState
-<button class="cultivo" @onclick="OnClick">
-    <img class="cultivo-image @estado" src="images/cultivo1t.png" alt="Cultivo" />
+<button style="cursor: @cursorActual" @onmousedown="CambiarAClick" @onmouseup="RestablecerAMain" @onmouseover="RestablecerAMain" class="cultivo" @onclick="OnClick">
+
+    @if (estado != CultivoState.cosechado && cultivo.vida < cultivo.vidaMaxima)
+    {
+        <div class="life-bar-container">
+            <div class="life-bar-fill @ObtenerClaseColorBarra()"
+                 style="width: @PorcentajeVida%;">
+            </div>
+        </div>
+    }
+
+    <img class="cultivo-image @estado" src="images/cultivo1t.png" alt="Cultivo" draggable="false" />
     
     @if (mostrarPopup)
     {
-        <div class="cosecha-popup">
+        <div class="cosecha-popup" draggable="false">
             <p class="xp-txt">+@cultivo.xp XP</p>
             <p class="points-txt">+@cultivo.points PP</p>
         </div>
@@ -16,6 +26,8 @@
     public Cultivo? cultivo;
     public CultivoState estado = CultivoState.listo;
     public bool mostrarPopup { get; set; } = false;
+    private double PorcentajeVida;
+    string cursorActual;
 
     protected override void OnInitialized()
     {
@@ -25,23 +37,75 @@
     public async Task OnClick()
     {
 
-        if(estado == CultivoState.listo)
+        if (estado == CultivoState.listo || estado == CultivoState.standby)
         {
-            estado = CultivoState.cultivado;
+            cultivo.Golpeado(jugadorState.__jugador.recurso.eficiencia);
+            ActualizarPorcentajeVida();
 
-            cultivo.Cosechado();
-            mostrarPopup = true; 
-
-            StateHasChanged();
-
-            await cultivo.CooldownCultivo();
-
-            estado = CultivoState.listo;
-            mostrarPopup = false;
+            await hitAnim();
         }
         else
         {
             Console.WriteLine("Nothing");
         }
+    }
+
+    public async Task hitAnim()
+    {
+        estado = CultivoState.hit;
+        
+        if (cultivo.vida <= 0)
+        {
+            estado = CultivoState.cosechado;
+            mostrarPopup = true;
+            StateHasChanged();
+            await cultivo.CooldownCultivo();
+            mostrarPopup = false;
+            estado = CultivoState.listo;
+        }
+
+        StateHasChanged();
+        await cultivo.HitCooldown();
+        estado = CultivoState.standby;
+    }
+    
+    public void CambiarAClick()
+    {
+        cursorActual = $"url('/images/tools/{jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")}/Click.png'), auto";
+    }
+
+    public void RestablecerAMain()
+    {
+        cursorActual = $"url('/images/tools/{jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")}/Main.png'), auto";
+    }
+
+
+    private void ActualizarPorcentajeVida()
+    {
+        if (cultivo != null && cultivo.vidaMaxima > 0)
+        {
+            PorcentajeVida = (double)cultivo.vida / cultivo.vidaMaxima * 100;
+        }
+        else
+        {
+            PorcentajeVida = 0;
+        }
+    }
+
+    private string ObtenerClaseColorBarra()
+    {
+        if (PorcentajeVida > 50) return "hp-alta";
+        if (PorcentajeVida > 20) return "hp-media";
+        return "hp-baja";
+    }
+
+    private string ObtenerClaseEstado()
+    {
+        return estado switch
+        {
+            CultivoState.listo => "listo",
+            CultivoState.cosechado => "cultivado",
+            _ => ""
+        };
     }
 }
