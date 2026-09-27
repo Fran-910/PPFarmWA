@@ -24,7 +24,21 @@
     </div>
 </div>
 
+@if (mostrarTienda)
+{
+    <TiendaModal OnClose="CerrarModales" />
+}
+
+@if (mostrarInventario)
+{
+    <InventarioModal OnClose="CerrarModales" />
+}
+
 @code {
+
+    private bool mostrarTienda;
+    private bool mostrarInventario;
+
     public Jugador jugador;
 
     protected override void OnInitialized()
@@ -43,20 +57,28 @@
         jugadorState.OnChange += Actualizar;
     }
 
+    //NAVEGACIÓN
+
     public void Actualizar()
     {
         InvokeAsync(StateHasChanged);
     }
 
-    //NAVEGACIÓN
-
     public void IrATienda()
     {
-        navigationManager.NavigateTo("/tienda");
+        mostrarInventario = false;
+        mostrarTienda = true;
     }
     public void IrAMochila()
     {
-        navigationManager.NavigateTo("/inventario");
+         mostrarTienda = false;
+        mostrarInventario = true;
+    }
+
+    private void CerrarModales()
+    {
+        mostrarTienda = false;
+        mostrarInventario = false;
     }
     public void IrAComputadora()
     {
@@ -65,5 +87,10 @@
     public void IrAConfiguracion()
     {
         navigationManager.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        jugadorState.OnChange -= Actualizar;
     }
 }

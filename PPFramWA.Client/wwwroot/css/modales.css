@@ -1,0 +1,258 @@
+﻿.modal-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(15, 25, 18, 0.66);
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal-juego {
+    width: min(1040px, 100%);
+    max-height: min(88vh, 900px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid #8ccf75;
+    border-radius: 18px;
+    background: #fbfff7;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+}
+
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.modal-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.2rem 1.5rem;
+    color: white;
+    background: linear-gradient( 120deg, #296b37, #5c9e3d );
+}
+
+    .modal-cabecera h1 {
+        margin: 0;
+        font-size: 1.45rem;
+    }
+
+    .modal-cabecera p {
+        margin: 0.25rem 0 0;
+        opacity: 0.9;
+    }
+
+
+/* =========================================================
+   BOTÓN CERRAR
+   ========================================================= */
+
+.boton-cerrar {
+    border: 0;
+    background: transparent;
+    color: white;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   SALDO
+   ========================================================= */
+
+.saldo {
+    padding: 0.75rem 1.5rem;
+    color: #315928;
+    background: #e9f7df;
+}
+
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.modal-contenido {
+    overflow: auto;
+    padding: 1rem 1.25rem;
+}
+
+.estado-modal {
+    padding: 2rem;
+    text-align: center;
+}
+
+
+/* =========================================================
+   TARJETAS DE RECURSOS
+   ========================================================= */
+
+.tarjeta-recurso {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 0.85rem;
+    padding: 1rem;
+    border: 1px solid #d4e6ca;
+    border-left: 6px solid #75b85a;
+    border-radius: 12px;
+    background: white;
+}
+
+
+/* =========================================================
+   RAREZAS
+   ========================================================= */
+
+.rareza-raro {
+    border-left-color: #438ed5;
+}
+
+.rareza-epico {
+    border-left-color: #9a61cf;
+}
+
+.rareza-legendario {
+    border-left-color: #d69a27;
+}
+
+
+/* =========================================================
+   ICONO
+   ========================================================= */
+
+.icono-recurso {
+    font-size: 2.3rem;
+}
+
+
+/* =========================================================
+   INFORMACIÓN
+   ========================================================= */
+
+.detalle-recurso h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+}
+
+.detalle-recurso p {
+    margin: 0 0 0.55rem;
+    color: #566;
+}
+
+.estadisticas {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #435;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.acciones-tienda {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 130px;
+}
+
+    .acciones-tienda label {
+        display: grid;
+        gap: 0.15rem;
+        font-size: 0.78rem;
+        color: #435;
+    }
+
+    .acciones-tienda input {
+        width: 100%;
+        padding: 0.35rem;
+        border: 1px solid #b7cbb2;
+        border-radius: 6px;
+    }
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.boton-primario,
+.boton-secundario {
+    border: 0;
+    border-radius: 7px;
+    padding: 0.5rem 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.boton-primario {
+    color: white;
+    background: #397d38;
+}
+
+.boton-secundario {
+    color: #24502b;
+    background: #e1f1dd;
+}
+
+    .boton-primario:disabled,
+    .boton-secundario:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+
+/* =========================================================
+   MENSAJES
+   ========================================================= */
+
+.mensaje-exito,
+.mensaje-error {
+    margin: 0.75rem 1.5rem 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 7px;
+}
+
+.mensaje-exito {
+    color: #1e6025;
+    background: #dff4d8;
+}
+
+.mensaje-error {
+    color: #8c2020;
+    background: #ffe1e1;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .tarjeta-recurso {
+        grid-template-columns: auto 1fr;
+    }
+
+    .acciones-tienda {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .modal-fondo {
+        padding: 0;
+    }
+
+    .modal-juego {
+        max-height: 100vh;
+        border-radius: 0;
+    }
+}

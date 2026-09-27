@@ -1,0 +1,335 @@
+﻿@using PPFarmWA.Shared.DTO
+@using PPFarmWA.Shared.Enum
+@inject RecursoServicio RecursoService
+@inject JugadorServicio JugadorService
+@inject ComercioServicio ComercioService
+@inject JugadorState JugadorState
+
+<div class="modal-fondo" @onclick="Cerrar">
+
+    <section class="modal-juego"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Tienda"
+             @onclick:stopPropagation="true">
+
+        <!-- CABECERA DE LA TIENDA -->
+        <header class="modal-cabecera">
+
+            <div>
+                <h1>🌱 Tienda de la Huerta</h1>
+
+                <p>
+                    Conseguí recursos para tu huerta.
+                </p>
+            </div>
+
+            <!-- Botón para cerrar -->
+            <button class="boton-cerrar"
+                    @onclick="Cerrar"
+                    aria-label="Cerrar tienda">
+                ×
+            </button>
+
+        </header>
+
+
+        <!-- SALDO DEL JUGADOR -->
+        <div class="saldo">
+            💰 PP Coins:
+            <strong>
+                @saldo.ToString("0.##")
+            </strong>
+        </div>
+
+
+        <!-- MENSAJE DE COMPRA -->
+        @if (!string.IsNullOrWhiteSpace(mensaje))
+        {
+            <p class="@claseMensaje">
+                @mensaje
+            </p>
+        }
+
+
+        <!-- CONTENIDO PRINCIPAL DE LA TIENDA -->
+        <div class="modal-contenido">
+
+            @if (recursos is null)
+            {
+                <!-- Mientras se cargan los recursos -->
+                <p class="estado-modal">
+                    🌱 Cargando recursos...
+                </p>
+            }
+            else if (recursos.Count == 0)
+            {
+                <!-- Si no existen recursos -->
+                <p class="estado-modal">
+                    🌾 No hay recursos disponibles.
+                </p>
+            }
+            else
+            {
+                <!-- Recorre todos los recursos disponibles -->
+                @foreach (var recurso in recursos)
+                {
+                    // Obtiene la cantidad seleccionada.
+                    // Si todavía no existe, utiliza 1.
+                    var cantidad =
+                        cantidades.TryGetValue(
+                            recurso.Id,
+                            out var seleccionada
+                        )
+                            ? seleccionada
+                            : 1;
+
+
+                    <!-- TARJETA DEL RECURSO -->
+                    <article class="tarjeta-recurso @ClaseRareza(recurso.idRareza)">
+
+                        <!-- ICONO -->
+                        <div class="icono-recurso">
+                            @Icono(recurso.nombre)
+                        </div>
+
+
+                        <!-- INFORMACIÓN DEL RECURSO -->
+                        <div class="detalle-recurso">
+
+                            <h2>
+                                @recurso.nombre
+                            </h2>
+
+                            <p>
+                                @recurso.descripcion
+                            </p>
+
+
+                            <!-- ESTADÍSTICAS -->
+                            <div class="estadisticas">
+                                ⚡ @recurso.eficiencia
+                                ·
+                                🛡️ @recurso.durabilidad
+                                ·
+                                🔨 @Tipo(recurso.tipo)
+                                ·
+                                💎 @Rareza(recurso.idRareza)
+                            </div>
+
+
+                            <!-- PRECIO -->
+                            <strong>
+                                💰 @recurso.valor.ToString("0.##")
+                                PP Coins c/u
+                            </strong>
+
+                        </div>
+
+
+                        <!-- ACCIONES DE COMPRA -->
+                        <div class="acciones-tienda">
+
+                            <!-- SELECCIONAR CANTIDAD -->
+                            <label>
+                                Cantidad
+
+                                <input type="number"
+                                       min="1"
+                                       max="99"
+                                       value="@cantidad"
+                                       @onchange="e => CambiarCantidad(
+                                                       recurso.Id,
+                                                       e.Value?.ToString()
+                                                       )" />
+                            </label>
+
+
+                            <!-- BOTÓN COMPRAR -->
+                            <button class="boton-primario"
+                                    disabled="@(ocupado || saldo < recurso.valor * cantidad)"
+                                    @onclick="() => Comprar(recurso, cantidad)">
+
+                                @(ocupado
+                                    ? "Procesando..."
+                                    : "Comprar")
+
+                            </button>
+
+                        </div>
+
+                    </article>
+                }
+            }
+
+        </div>
+
+    </section>
+
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+
+    // Lista de recursos disponibles en la tienda
+    private List<RecursoDTO>? recursos;
+
+    // Guarda la cantidad seleccionada para cada recurso.
+    // La clave es el Id del recurso.
+    private readonly Dictionary<int, int> cantidades = new();
+
+    // Id del jugador actual
+    private int idJugador = 2;
+
+    // Saldo actual de PP Coins
+    private double saldo;
+
+    // Indica si hay una operación de compra en proceso
+    private bool ocupado;
+
+    // Mensaje que se muestra después de una operación
+    private string? mensaje;
+
+    // Clase CSS del mensaje
+    private string claseMensaje = "mensaje-exito";
+
+
+    // Se ejecuta cuando se inicia el componente
+    protected override async Task OnInitializedAsync()
+    {
+        // Obtiene el Id del jugador desde el estado de la aplicación.
+        // Si no existe un jugador válido, utiliza 2 como valor predeterminado.
+        idJugador = JugadorState.__jugador?.Id > 0
+            ? JugadorState.__jugador.Id
+            : 2;
+
+        // Obtiene los recursos disponibles en la tienda.
+        recursos = await RecursoService.ObtenerRecursosTienda();
+
+        // Obtiene y actualiza el saldo del jugador.
+        await ActualizarSaldo();
+    }
+
+
+    // Realiza la compra de un recurso
+    private async Task Comprar(RecursoDTO recurso, int cantidad)
+    {
+        // Evita realizar varias operaciones al mismo tiempo.
+        ocupado = true;
+
+        // Envía la compra al servidor.
+        var r = await ComercioService.Comprar(
+            new CompraDTO
+            {
+                idJugador = idJugador,
+                idRecurso = recurso.Id,
+                cantidad = cantidad
+            }
+        );
+
+        // La operación terminó.
+        ocupado = false;
+
+        // Guarda el mensaje recibido del servidor.
+        mensaje = r.Mensaje;
+
+        // Cambia la clase CSS dependiendo de si la compra fue exitosa.
+        claseMensaje = r.Exito
+            ? "mensaje-exito"
+            : "mensaje-error";
+
+        // Si la compra fue exitosa, actualiza el saldo.
+        if (r.Exito)
+        {
+            await ActualizarSaldo();
+        }
+    }
+
+
+    // Obtiene el saldo actualizado del jugador
+    private async Task ActualizarSaldo()
+    {
+        // Busca al jugador en el servidor.
+        var jugador = await JugadorService.ObtenerPorId(idJugador);
+
+        // Si no se encontró el jugador, termina el método.
+        if (jugador is null)
+        {
+            return;
+        }
+
+        // Actualiza el saldo local.
+        saldo = jugador.ppCoins;
+
+        // Si todavía no existe un jugador en el estado global,
+        // crea uno utilizando el Id obtenido.
+        JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
+        {
+            Id = jugador.Id
+        };
+
+        // Actualiza las PP Coins del jugador en el estado global.
+        JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
+
+        // Notifica al resto de componentes que hubo un cambio.
+        JugadorState.NotificarCambios();
+    }
+
+
+    // Cambia la cantidad seleccionada de un recurso
+    private void CambiarCantidad(int id, string? valor)
+    {
+        // Intenta convertir el valor recibido a número.
+        // Si no puede convertirlo, utiliza 1.
+        // Además, limita la cantidad entre 1 y 99.
+        cantidades[id] = int.TryParse(valor, out var cantidad)
+            ? Math.Clamp(cantidad, 1, 99)
+            : 1;
+    }
+
+
+    // Cierra la tienda
+    private Task Cerrar()
+    {
+        return OnClose.InvokeAsync();
+    }
+
+
+    // Obtiene el nombre del tipo de objeto
+    private static string Tipo(TipoItemEnum t)
+    {
+        return t.ToString();
+    }
+
+
+    // Obtiene el nombre de la rareza
+    private static string Rareza(RarezaEnum r)
+    {
+        return r.ToString();
+    }
+
+
+    // Genera la clase CSS correspondiente a la rareza
+    private static string ClaseRareza(RarezaEnum r)
+    {
+        return $"rareza-{r.ToString().ToLowerInvariant()}";
+    }
+
+
+    // Devuelve un emoji dependiendo del nombre del recurso
+    private static string Icono(string n)
+    {
+        return n.ToLowerInvariant() switch
+        {
+            var x when x.Contains("pala") => "🪏",
+            var x when x.Contains("regadera") => "💧",
+            var x when x.Contains("tomate") => "🍅",
+            var x when x.Contains("zanahoria") => "🥕",
+            var x when x.Contains("maiz") => "🌽",
+            var x when x.Contains("semilla") => "🌱",
+            _ => "📦"
+        };
+    }
+}

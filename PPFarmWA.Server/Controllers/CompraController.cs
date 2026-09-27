@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PPFarmWA.BD.Datos;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Shared.DTO;
@@ -9,35 +11,29 @@ namespace PPFarmWA.Server.Controllers
     [Route("api/[controller]")]
     public class CompraController : ControllerBase
     {
-        private readonly IJugadorRepositorio _jugadorRepositorio;
-        private readonly IRecursoRepositorio _recursoRepositorio;
-        private readonly IItemRepositorio _itemRepositorio;
+        private readonly AppDbContext _context;
 
         public CompraController(
-            IJugadorRepositorio jugadorRepositorio,
-            IRecursoRepositorio recursoRepositorio,
-            IItemRepositorio itemRepositorio)
+            AppDbContext context)
         {
-            _jugadorRepositorio = jugadorRepositorio;
-            _recursoRepositorio = recursoRepositorio;
-            _itemRepositorio = itemRepositorio;
+            _context = context;
         }
 
         [HttpPost]
         public async Task<IActionResult> Comprar(CompraDTO dto)
         {
             // 1. Validar cantidad
-            if (dto.cantidad < 1 || dto.cantidad > 3)
-                return BadRequest("La cantidad debe estar entre 1 y 3.");
+            if (dto.cantidad < 1)
+                return BadRequest("La cantidad debe ser mayor a cero.");
 
             // 2. Buscar jugador
-            var jugador = await _jugadorRepositorio.GetByIdAsync(dto.idJugador);
+            var jugador = await _context.Jugadores.FindAsync(dto.idJugador);
 
             if (jugador == null)
                 return NotFound("El jugador no existe.");
 
             // 3. Buscar recurso
-            var recurso = await _recursoRepositorio.GetByIdAsync(dto.idRecurso);
+            var recurso = await _context.Recursos.FindAsync(dto.idRecurso);
 
             if (recurso == null)
                 return NotFound("El recurso no existe.");
@@ -54,38 +50,34 @@ namespace PPFarmWA.Server.Controllers
                 return BadRequest("El jugador no tiene suficientes PP Coins.");
 
             // 7. Buscar si ya tiene ese recurso en el inventario
-            var inventario = await _itemRepositorio
-                .GetInventarioJugadorAsync(dto.idJugador);
-
-            var itemExistente = inventario
-                .FirstOrDefault(i => i.RecursoId == dto.idRecurso);
-
-            // 8. Descontar PP Coins
-            var coinsModificadas = await _jugadorRepositorio
-                .ModificarCoinsAsync(dto.idJugador, -precioTotal);
-
-            if (!coinsModificadas)
-                return BadRequest("No se pudieron modificar las PP Coins.");
-
-            // 9. Si ya tiene el recurso, aumentar cantidad
-            if (itemExistente != null)
+            await using var transaccion = await _context.Database.BeginTransactionAsync();
+            try
             {
-                itemExistente.cantidad += dto.cantidad;
+                var itemExistente = await _context.Items.FirstOrDefaultAsync(i =>
+                    i.JugadorId == dto.idJugador && i.RecursoId == dto.idRecurso);
 
-                await _itemRepositorio.UpdateAsync(itemExistente);
-            }
-            else
-            {
-                // Si no lo tiene, crear nuevo Item
-                var nuevoItem = new Item
+                jugador.ppCoins -= precioTotal;
+                if (itemExistente is null)
                 {
-                    cantidad = dto.cantidad,
-                    JugadorId = dto.idJugador,
-                    RecursoId = dto.idRecurso,
-                    VentaId = 0
-                };
+                    _context.Items.Add(new Item
+                    {
+                        cantidad = dto.cantidad,
+                        JugadorId = dto.idJugador,
+                        RecursoId = dto.idRecurso
+                    });
+                }
+                else
+                {
+                    itemExistente.cantidad += dto.cantidad;
+                }
 
-                await _itemRepositorio.AddAsync(nuevoItem);
+                await _context.SaveChangesAsync();
+                await transaccion.CommitAsync();
+            }
+            catch
+            {
+                await transaccion.RollbackAsync();
+                return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo completar la compra.");
             }
 
             return Ok(new

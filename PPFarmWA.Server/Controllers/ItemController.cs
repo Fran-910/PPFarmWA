@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PPFarmWA.BD.Datos;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Shared.DTO;
+using PPFarmWA.Shared.Enum;
 
 namespace PPFarmWA.Server.Controllers
 {
@@ -108,6 +110,54 @@ namespace PPFarmWA.Server.Controllers
                 new { id = creado.Id },
                 dto
             );
+        }
+
+        [HttpPost("vender")]
+        public async Task<IActionResult> Vender(VenderItemDTO dto)
+        {
+            if (dto.cantidad < 1 || dto.precioVenta < 0)
+                return BadRequest("La cantidad y el precio de venta no son válidos.");
+
+            var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == dto.idItem && i.JugadorId == dto.idJugador);
+            if (item is null)
+                return NotFound("El item no pertenece al jugador.");
+            if (item.cantidad < dto.cantidad)
+                return BadRequest("No tenés esa cantidad disponible.");
+
+            var jugador = await _context.Jugadores.FindAsync(dto.idJugador);
+            if (jugador is null)
+                return NotFound("El jugador no existe.");
+
+            await using var transaccion = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                item.cantidad -= dto.cantidad;
+                jugador.ppCoins += dto.precioVenta;
+                _context.Ventas.Add(new Venta
+                {
+                    idJugadorVendedor = dto.idJugador,
+                    idJugadorComprador = 0,
+                    cantidadVenta = dto.cantidad,
+                    precioVenta = dto.precioVenta
+                });
+
+                if (item.cantidad == 0)
+                {
+                    if (jugador.idUltimaHerramienta == item.Id) jugador.idUltimaHerramienta = 0;
+                    if (jugador.idUltimoDispositivo == item.Id) jugador.idUltimoDispositivo = 0;
+                    if (jugador.idUltimoPotenciador == item.Id) jugador.idUltimoPotenciador = 0;
+                    _context.Items.Remove(item);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaccion.CommitAsync();
+                return Ok("Venta realizada correctamente.");
+            }
+            catch
+            {
+                await transaccion.RollbackAsync();
+                return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo completar la venta.");
+            }
         }
     }
 }

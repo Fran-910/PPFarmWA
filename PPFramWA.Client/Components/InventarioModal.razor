@@ -1,0 +1,377 @@
+﻿@using PPFarmWA.Shared.DTO
+@using PPFarmWA.Shared.Enum
+
+@inject ItemServicio ItemService
+@inject JugadorServicio JugadorService
+@inject ComercioServicio ComercioService
+@inject JugadorState JugadorState
+
+<div class="modal-fondo" @onclick="Cerrar">
+
+    <section class="modal-juego"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Inventario"
+             @onclick:stopPropagation="true">
+
+        <!-- CABECERA -->
+
+        <header class="modal-cabecera">
+
+            <div>
+                <h1>🎒 Mi Inventario</h1>
+                <p>Equipá o vendé tus recursos.</p>
+            </div>
+
+            <button class="boton-cerrar"
+                    @onclick="Cerrar"
+                    aria-label="Cerrar inventario">
+                ×
+            </button>
+
+        </header>
+
+
+        <!-- SALDO -->
+
+        <div class="saldo">
+            💰 PP Coins:
+            <strong>@saldo.ToString("0.##")</strong>
+        </div>
+
+
+        <!-- MENSAJE -->
+
+        @if (!string.IsNullOrWhiteSpace(mensaje))
+        {
+            <p class="@claseMensaje">
+                @mensaje
+            </p>
+        }
+
+
+        <!-- CONTENIDO -->
+
+        <div class="modal-contenido">
+
+            @if (items is null)
+            {
+                <p class="estado-modal">
+                    🌱 Cargando inventario...
+                </p>
+            }
+            else if (items.Count == 0)
+            {
+                <p class="estado-modal">
+                    📦 Tu inventario está vacío.
+                </p>
+            }
+            else
+            {
+                @foreach (var item in items)
+                {
+                    var cantidad = cantidades.TryGetValue(
+                        item.Id,
+                        out var seleccionada)
+                        ? seleccionada
+                        : 1;
+
+                    <article class="tarjeta-recurso @ClaseRareza(item.idRareza)">
+
+                        <!-- ICONO -->
+
+                        <div class="icono-recurso">
+                            @Icono(item.nombre)
+                        </div>
+
+
+                        <!-- INFORMACIÓN -->
+
+                        <div class="detalle-recurso">
+
+                            <h2>
+                                @item.nombre
+                            </h2>
+
+                            <p>
+                                @item.descripcion
+                            </p>
+
+                            <div class="estadisticas">
+
+                                ⚡ @item.eficiencia
+
+                                ·
+
+                                🛡️ @item.durabilidad
+
+                                ·
+
+                                🔨 @Tipo(item.tipo)
+
+                                ·
+
+                                💎 @Rareza(item.idRareza)
+
+                            </div>
+
+                            <strong>
+                                📦 Cantidad: @item.cantidad
+                            </strong>
+
+                        </div>
+
+
+                        <!-- ACCIONES -->
+
+                        <div class="acciones-tienda">
+
+                                <label>
+                                Vender cantidad
+
+                                <input type="number"
+                                       min="1"
+                                       max="@item.cantidad"
+                                       value="@cantidad"
+                                       @onchange="e =>
+                                           CambiarCantidad(
+                                               item.Id,
+                                               item.cantidad,
+                                               e.Value?.ToString())" />
+                            </label>
+
+
+                            <label>
+                                Precio total
+
+                                <input type="number"
+                                       min="0"
+                                       step="0.01"
+                                       value="@(Precios.TryGetValue(item.Id, out var precio)
+                                           ? precio
+                                           : item.valor * cantidad)"
+                                       @onchange="e =>
+                                           CambiarPrecio(
+                                               item.Id,
+                                               e.Value?.ToString())" />
+                            </label>
+
+
+                            <button class="boton-primario"
+                                    disabled="@ocupado"
+                                    @onclick="() => Vender(item, cantidad)">
+                                💰 Vender
+                            </button>
+
+                        </div>
+
+                    </article>
+                }
+            }
+
+        </div>
+
+    </section>
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+
+    // =========================================================
+    // VARIABLES
+    // =========================================================
+
+    private List<InventarioDTO>? items;
+
+    private readonly Dictionary<int, int> cantidades = new();
+
+    private readonly Dictionary<int, double> Precios = new();
+
+    private int idJugador = 2;
+
+    private double saldo;
+
+    private bool ocupado;
+
+    private string? mensaje;
+
+    private string claseMensaje = "mensaje-exito";
+
+
+    // =========================================================
+    // INICIALIZACIÓN
+    // =========================================================
+
+    protected override async Task OnInitializedAsync()
+    {
+        idJugador = JugadorState.__jugador?.Id > 0
+            ? JugadorState.__jugador.Id
+            : 2;
+
+        await Recargar();
+    }
+
+
+    // =========================================================
+    // RECARGAR INVENTARIO
+    // =========================================================
+
+    private async Task Recargar()
+    {
+        items = await ItemService.ObtenerInventario(idJugador);
+
+        var jugador = await JugadorService.ObtenerPorId(idJugador);
+
+        if (jugador is not null)
+        {
+            saldo = jugador.ppCoins;
+
+            JugadorState.__jugador ??=
+                new PPFramWA.Client.Domains.Jugador
+                {
+                    Id = jugador.Id
+                };
+
+            JugadorState.__jugador.ppCoins =
+                (int)jugador.ppCoins;
+
+            JugadorState.NotificarCambios();
+        }
+    }
+
+    // =========================================================
+    // VENDER ITEM
+    // =========================================================
+
+    private async Task Vender(
+        InventarioDTO item,
+        int cantidad)
+    {
+        ocupado = true;
+
+        var precio = Precios.TryGetValue(
+            item.Id,
+            out var p)
+            ? p
+            : item.valor * cantidad;
+
+        var resultado = await ComercioService.Vender(
+            new VenderItemDTO
+            {
+                idJugador = idJugador,
+                idItem = item.Id,
+                cantidad = cantidad,
+                precioVenta = precio
+            });
+
+        ocupado = false;
+
+        mensaje = resultado.Mensaje;
+
+        claseMensaje = resultado.Exito
+            ? "mensaje-exito"
+            : "mensaje-error";
+
+        if (resultado.Exito)
+        {
+            await Recargar();
+        }
+    }
+
+
+    // =========================================================
+    // CAMBIAR CANTIDAD
+    // =========================================================
+
+    private void CambiarCantidad(
+        int id,
+        int maximo,
+        string? valor)
+    {
+        cantidades[id] =
+            int.TryParse(valor, out var cantidad)
+                ? Math.Clamp(cantidad, 1, maximo)
+                : 1;
+    }
+
+
+    // =========================================================
+    // CAMBIAR PRECIO
+    // =========================================================
+
+    private void CambiarPrecio(
+        int id,
+        string? valor)
+    {
+        Precios[id] =
+            double.TryParse(
+                valor,
+                System.Globalization.NumberStyles.Number,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out var precio)
+                    ? Math.Max(0, precio)
+                    : 0;
+    }
+
+
+    // =========================================================
+    // CERRAR MODAL
+    // =========================================================
+
+    private Task Cerrar()
+    {
+        return OnClose.InvokeAsync();
+    }
+
+
+    // =========================================================
+    // INFORMACIÓN DE ITEMS
+    // =========================================================
+
+    private static string Tipo(TipoItemEnum tipo)
+    {
+        return tipo.ToString();
+    }
+
+
+    private static string Rareza(RarezaEnum rareza)
+    {
+        return rareza.ToString();
+    }
+
+
+    private static string ClaseRareza(RarezaEnum rareza)
+    {
+        return $"rareza-{rareza.ToString().ToLowerInvariant()}";
+    }
+
+
+    // =========================================================
+    // ICONOS
+    // =========================================================
+
+    private static string Icono(string nombre)
+    {
+        return nombre.ToLowerInvariant() switch
+        {
+            var x when x.Contains("pala") => "🪏",
+
+            var x when x.Contains("regadera") => "💧",
+
+            var x when x.Contains("tomate") => "🍅",
+
+            var x when x.Contains("zanahoria") => "🥕",
+
+            var x when x.Contains("maiz") => "🌽",
+
+            var x when x.Contains("semilla") => "🌱",
+
+            _ => "📦"
+        };
+    }
+}

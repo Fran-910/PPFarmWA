@@ -13,6 +13,7 @@ builder.Services.AddScoped<RecursoServicio>();
 builder.Services.AddScoped<ItemServicio>();
 builder.Services.AddScoped<JugadorServicio>();
 builder.Services.AddScoped<VentaServicio>();
+builder.Services.AddScoped<ComercioServicio>();
 builder.Services.AddScoped<JugadorState>();
 
 await builder.Build().RunAsync();
