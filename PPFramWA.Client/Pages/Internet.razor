@@ -3,7 +3,7 @@
 @* Inyectamos los servicios *@
 @inject JugadorServicio JugadorService
 @inject JugadorState JugadorState
-@inject ComercioServicio ComercioService
+@inject ComercioServicio ComercioServicio
 
 <div class="internet-container">
     <div class="main-section">
@@ -126,8 +126,8 @@
 
         try
         {
-            // Llamamos a tu servicio de prueba (Mock)
-            var respuestaDelServidor = await ComercioService.ConvertirPoints(PuntosAConvertir);
+            
+            var respuestaDelServidor = await ComercioServicio.convertirpoints(PuntosAConvertir);
 
             mensaje = respuestaDelServidor.Mensaje;
             claseMensaje = respuestaDelServidor.Exito ? "mensaje-exito" : "mensaje-error";
