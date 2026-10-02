@@ -1,4 +1,5 @@
-﻿using PPFarmWA.Shared.DTO;
+﻿using PPFramWA.Client.Domains;
+using PPFarmWA.Shared.DTO;
 
 namespace PPFramWA.Client.Services
 {
@@ -27,6 +28,33 @@ namespace PPFramWA.Client.Services
         {
             return await _api.PutAsync<JugadorDTO>(
                 $"api/Jugador/{jugador.Id}", jugador);
+        }
+
+        public async Task<(bool Exito, string Mensaje)> GuardarPartida(Jugador jugador)
+        {
+            var dto = new JugadorDTO
+            {
+                Id = jugador.Id,
+                userName = jugador.userName,
+                level = jugador.level,
+                experiencia = jugador.experiencia,
+                ppCoins = jugador.ppCoins,
+                points = jugador.points,
+                idUltimaHerramienta = jugador.idUltimaHerramienta
+            };
+
+            var respuesta = await _api.PutAsync<JugadorDTO>(
+                $"api/Jugador/{dto.Id}", dto);
+
+            if (!respuesta.IsSuccessStatusCode)
+            {
+                var detalle = await respuesta.Content.ReadAsStringAsync();
+                return (false, string.IsNullOrWhiteSpace(detalle)
+                    ? "No se pudo guardar la partida."
+                    : detalle.Trim('"'));
+            }
+
+            return (true, "Partida guardada.");
         }
 
     }

@@ -34,7 +34,7 @@
                 </p>
             }
 
-            @* @if (vistaActual == "Convertir")
+            @if (vistaActual == "Convertir")
             {
                 <div class="convertir-view">
                     <h2>Convertir Points a PP Coins</h2>
@@ -71,7 +71,7 @@
                         }
                     </div>
                 </div>
-            } *@
+            }
             else if (vistaActual == "Intercambiar")
             {
                 <div class="intercambiar-view">
@@ -119,38 +119,38 @@
         await ActualizarSaldo();
     }
 
-    // private async Task ConfirmarConversionAsync()
-    // {
-    //     ocupado = true;
-    //     mensaje = null;
+    private async Task ConfirmarConversionAsync()
+    {
+        ocupado = true;
+        mensaje = null;
 
         try
         {
             
             var respuestaDelServidor = await ComercioServicio.convertirpoints(PuntosAConvertir);
 
-    //         mensaje = respuestaDelServidor.Mensaje;
-    //         claseMensaje = respuestaDelServidor.Exito ? "mensaje-exito" : "mensaje-error";
+            mensaje = respuestaDelServidor.Mensaje;
+            claseMensaje = respuestaDelServidor.Exito ? "mensaje-exito" : "mensaje-error";
 
-    //         if (respuestaDelServidor.Exito)
-    //         {
-    //             saldoPoints -= PuntosAConvertir;
-    //             saldoPPCoints += EquivalentePPCoints;
+            if (respuestaDelServidor.Exito)
+            {
+                saldoPoints -= PuntosAConvertir;
+                saldoPPCoints += EquivalentePPCoints;
 
-    //             historialConversiones.Insert(0, $"-{PuntosAConvertir} Points / +{EquivalentePPCoints} PP Coins");
-    //             PuntosAConvertir = 0;
-    //         }
-    //     }
-    //     catch (Exception)
-    //     {
-    //         mensaje = "Ocurrió un error de conexión.";
-    //         claseMensaje = "mensaje-error";
-    //     }
-    //     finally
-    //     {
-    //         ocupado = false;
-    //     }
-    // }
+                historialConversiones.Insert(0, $"-{PuntosAConvertir} Points / +{EquivalentePPCoints} PP Coins");
+                PuntosAConvertir = 0;
+            }
+        }
+        catch (Exception)
+        {
+            mensaje = "Ocurrió un error de conexión.";
+            claseMensaje = "mensaje-error";
+        }
+        finally
+        {
+            ocupado = false;
+        }
+    }
 
     private async Task ActualizarSaldo()
     {
@@ -163,10 +163,12 @@
 
         saldoPPCoints = jugador.ppCoins;
 
-        JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
-        {
-            Id = jugador.Id
-        };
+        //solucionar esto
+        
+        //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
+        //{
+            //Id = jugador.Id
+        //};
 
         JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
         JugadorState.NotificarCambios();

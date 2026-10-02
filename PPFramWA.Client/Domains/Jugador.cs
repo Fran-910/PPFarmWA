@@ -5,10 +5,12 @@ namespace PPFramWA.Client.Domains
     public class Jugador
     {
         public int Id { get; set; }
+        public string userName { get; set; }
         public int level { get; set; }
         public int experiencia { get; set; }
-        public int ppCoins { get; set; }
+        public double ppCoins { get; set; }
         public int points { get; set; }
+        public List<ItemDTO> items { get; set; } = new List<ItemDTO>();
         private int _idUltimaHerramienta;
         public int idUltimaHerramienta 
         { 
@@ -22,7 +24,7 @@ namespace PPFramWA.Client.Domains
                 }
             }
         }
-        public int idUltimoRecurso { get; set; } = 1;
+        public int idUltimoRecurso { get; set; }
         public event Action? OnCambioUltimaHerramienta;
         public int experienciaParaSubir { get; set; }
 
@@ -31,8 +33,16 @@ namespace PPFramWA.Client.Domains
         // RECURSODTO
 
         public RecursoDTO recurso { get; set; }
-        public Jugador() // Posiblemente acá venga un DTO que llene los datos de la clase
+        public Jugador(SesionDTO dto) // Posiblemente acá venga un DTO que llene los datos de la clase
         {
+            Id = dto.JugadorId;
+            userName = dto.userName;
+            level = dto.level;
+            experiencia = dto.experiencia;
+            ppCoins = dto.ppCoins;
+            points = dto.points;
+            idUltimaHerramienta = dto.IdUltimaHerramienta;
+            items = dto.Items;
             calcularExpNecesaria();
         }
 
