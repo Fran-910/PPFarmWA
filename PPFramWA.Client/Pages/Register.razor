@@ -35,6 +35,9 @@
             <div>
                 <button type="submit">Crear cuenta</button>
             </div>
+            <div>
+                 <button type="button" class="volver" @onclick="Volver">Volver Al Login</button>
+            </div>
         </form>
     }
 </div>
@@ -70,5 +73,10 @@
         {
             cargando = false;
         }
+    }
+
+    private void Volver()
+    {
+        Navigation.NavigateTo("/login");
     }
 }

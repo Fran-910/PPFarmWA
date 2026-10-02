@@ -17,18 +17,6 @@ namespace PPFarmWA.Server.Controllers
             _repositorio = repositorio;
         }
 
-        [HttpPost("registrar")]
-        public async Task<ActionResult<SesionDTO>> RegistrarJugador(RegistroDTO dto)
-        {
-
-            if (await _repositorio.ExisteEmailOusuarioAsync(dto.userName) || await _repositorio.ExisteEmailOusuarioAsync(dto.email))
-            {
-                return BadRequest("El email o el nombre de usuario ya están en uso.");
-            }
-            var sesion = await _repositorio.RegistrarJugadorAsync(dto);
-            return Ok(sesion);
-        }
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<JugadorDTO>>> Get()
         {
@@ -122,17 +110,19 @@ namespace PPFarmWA.Server.Controllers
 
             return Ok();
         }
+
         [HttpPost("registrar")]
         public async Task<ActionResult<SesionDTO>> RegistrarJugador(RegistroDTO dto)
         {
-            // Verificar si el email o el nombre de usuario ya existen
-            if (await _repositorio.ExisteEmailOusuarioAsync(dto.email))
+
+            if (await _repositorio.ExisteEmailOusuarioAsync(dto.userName) || await _repositorio.ExisteEmailOusuarioAsync(dto.email))
             {
                 return BadRequest("El email o el nombre de usuario ya están en uso.");
             }
             var sesion = await _repositorio.RegistrarJugadorAsync(dto);
             return Ok(sesion);
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<SesionDTO>> ObtenerSesionConItems(LoginDTO dto)
         {

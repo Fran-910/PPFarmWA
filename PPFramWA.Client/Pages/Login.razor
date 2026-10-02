@@ -17,17 +17,23 @@
         </div>
 
         <div>
-            <button type="button" class="boton">Iniciar Sesión</button>
+            <button type="button" class="iniciar" @onclick="IniciarSesion">Iniciar Sesion</button>
 
-            <button type="button" class="crear" @onclick="registar">Crear Cuenta</button>
+            <button type="button" class="crear" @onclick="Registrar">Crear Cuenta</button>
         </div>
 
     </form>
 </div>
 
 @code {
-    private void registar()
+    private void Registrar()
     {
         Navigation.NavigateTo("/register");
     }
+
+    private void IniciarSesion()
+    {
+        Navigation.NavigateTo("/");    
+    }
+
 }

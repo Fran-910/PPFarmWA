@@ -14,8 +14,8 @@
                 <li>XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
                 <li>PP @(jugadorState?.__jugador?.points ?? 0)</li>
                 <li>PC @(jugadorState?.__jugador?.ppCoins ?? 0)</li>
-                <li><CustomButton onclick="IrATienda" Label="Tienda"></CustomButton></li>
-                <li><CustomButton onclick="IrAMochila" Label="Mochila"></CustomButton></li>
+                <li><CustomButton OnClick="IrATienda" Label="Tienda"></CustomButton></li>
+                <li><CustomButton OnClick="IrAMochila" Label="Mochila"></CustomButton></li>
                 <li><CustomButton onclick="IrAComputadora" Label="Computadora"></CustomButton></li>
                 <li><CustomButton onclick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
             </ul>
@@ -30,10 +30,17 @@
             </div>
         </div>
     }
-    else
+
+    @if (mostrarTienda)
     {
-        //LOADING
+    <TiendaModal OnClose="CerrarModales" />
     }
+
+    @if (mostrarInventario)
+    {
+    <InventarioModal OnClose="CerrarModales" />
+    }
+    
 </div>
 @code {
 
@@ -76,8 +83,8 @@
 
     public void SetUpTool()
     {
-        //obtener idUltimoRecurso a partir de la lista de ITEMS del jugador.
-        RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.idUltimoRecurso).FirstOrDefault() ??
+        //obtener idUltimaHerramienta a partir de la lista de ITEMS del jugador.
+        RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.idUltimaHerramienta).FirstOrDefault() ??
         new RecursoDTO()
         {
             Id = 0,
@@ -114,7 +121,7 @@
     }
     public void IrAMochila()
     {
-         mostrarTienda = false;
+        mostrarTienda = false;
         mostrarInventario = true;
     }
 
@@ -136,4 +143,9 @@
     {
         jugadorState.OnChange -= Actualizar;
     }
+
+    //se solucionaron los errores de q no aparecian las ventanas desplazantes de tienda y inventario
+    //ahora tengo q comprobar por que me sale error cuando habro los modales sera por validaciones o por q el modal tiene algo raro en la parte del render.
+    // por otra parte ya poner a prueba la bd y verificar q no haiga errores y q se carguen las cosas
+    //correctamente.
 }
