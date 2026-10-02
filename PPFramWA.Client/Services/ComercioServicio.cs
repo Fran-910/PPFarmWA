@@ -22,6 +22,12 @@ namespace PPFramWA.Client.Services
             var respuesta = await _api.PostAsync("api/Item/vender", venta);
             return (respuesta.IsSuccessStatusCode, await LeerMensaje(respuesta));
         }
+
+        public async Task <(bool Exito, string Mensaje)> convertirpoints(int puntosconvertidos)
+        {
+            await Task.Delay(1000);
+            return (true, $"Se han convertido {puntosconvertidos} puntos a PP Coins.");
+        }
         private static async Task<string> LeerMensaje(HttpResponseMessage respuesta)
         {
             var texto = await respuesta.Content.ReadAsStringAsync();
