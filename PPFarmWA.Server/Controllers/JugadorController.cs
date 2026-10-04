@@ -133,6 +133,43 @@ namespace PPFarmWA.Server.Controllers
             }
             return Ok(sesion);
         }
+        [HttpPost("login1")]
+        public async Task<ActionResult<SesionDTO>> ObtenerSesionConItemsPorEmailAsync([FromBody] Login1DTO dto)
+        {
+            // 1. Validar que el DTO o el Username no vengan vacíos
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return BadRequest("El mail es obligatorio.");
+            }
+
+            // 2. Consultar el repositorio por email
+            var sesion = await _repositorio.ObtenerSesionConItemsPorEmailAsync(dto.Email);
+
+            // 3. Si no existe el email
+            if (sesion == null)
+            {
+                return NotFound("Usuario o contraseña no válidos.");
+            }
+
+            return Ok(sesion);
+        }
+        [HttpPost("loginmailpass")]
+        public async Task<ActionResult<SesionDTO>> ObtenerSesionConItemsPorEmailYPasswordAsync([FromBody] Login1DTO dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
+            {
+                return BadRequest("El correo electrónico y la contraseña son obligatorios.");
+            }
+
+            var sesion = await _repositorio.ObtenerSesionConItemsPorEmailYPasswordAsync(dto.Email, dto.Password);
+
+            if (sesion == null)
+            {
+                return NotFound("Correo electrónico o contraseña incorrectos.");
+            }
+
+            return Ok(sesion);
+        }
         [HttpGet ("existe-email-usuario")]
         public async Task<ActionResult<bool>> ExisteEmailOusuario([FromQuery] string emailOusuario)
         {

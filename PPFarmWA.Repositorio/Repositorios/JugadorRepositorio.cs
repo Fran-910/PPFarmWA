@@ -88,5 +88,90 @@ namespace PPFarmWA.Repositorio.Repositorios
                 Items = item
             };
         }
+        public async Task<SesionDTO> ObtenerSesionConItemsPorEmailYPasswordAsync(string email, string password)
+        {
+            // 1. Buscamos el jugador que coincida en EMAIL Y CONTRASEÑA
+            var jugador = await _context.Jugadores
+                .FirstOrDefaultAsync(j => j.email.ToLower() == email.ToLower()
+                                       && j.password == password);
+
+            // Si las credenciales son incorrectas (no existe la combinación), devolvemos null
+            if (jugador == null)
+                return null;
+
+            // 2. Traemos sus ítems
+            var items = await _context.Items
+                .Where(i => i.JugadorId == jugador.Id)
+                .ToListAsync();
+
+            List<ItemDTO> item = new List<ItemDTO>();
+            foreach (var i in items)
+            {
+                item.Add(new ItemDTO
+                {
+                    Id = i.Id,
+                    cantidad = i.cantidad,
+                    idJugador = i.JugadorId,
+                    idRecurso = i.RecursoId,
+                    idVenta = i.VentaId
+                });
+            }
+
+            // 3. Mapeamos y devolvemos la sesión
+            return new SesionDTO
+            {
+                userName = jugador.userName,
+                email = jugador.email,
+                ppCoins = jugador.ppCoins,
+                points = jugador.points,
+                level = jugador.level,
+                experiencia = jugador.experiencia,
+                IdUltimaHerramienta = jugador.idUltimaHerramienta,
+                Items = item
+            };
+        }
+
+        public async Task<SesionDTO> ObtenerSesionConItemsPorEmailAsync(string email)
+        {
+            // 1. Buscamos el jugador por su email (ignorando mayúsculas/minúsculas)
+            var jugador = await _context.Jugadores
+                .FirstOrDefaultAsync(j => j.email.ToLower() == email.ToLower());
+
+            // Si no existe el email, retornamos null
+            if (jugador == null)
+                return null;
+
+            // 2. Traemos sus ítems usando el Id que obtuvimos del jugador
+            var items = await _context.Items
+                .Where(i => i.JugadorId == jugador.Id)
+                .ToListAsync();
+
+            List<ItemDTO> item = new List<ItemDTO>();
+            foreach (var i in items)
+            {
+                item.Add(new ItemDTO
+                {
+                    Id = i.Id,
+                    cantidad = i.cantidad,
+                    idJugador = i.JugadorId,
+                    idRecurso = i.RecursoId,
+                    idVenta = i.VentaId
+                });
+            }
+
+            // 3. Mapeamos y devolvemos la SesionDTO con los datos requeridos
+            return new SesionDTO
+            {
+                userName = jugador.userName,
+                email = jugador.email,
+                ppCoins = jugador.ppCoins,
+                points = jugador.points,
+                level = jugador.level,
+                experiencia = jugador.experiencia,
+                IdUltimaHerramienta = jugador.idUltimaHerramienta,
+                Items = item
+            };
+        }
+
     }
 }

@@ -14,7 +14,10 @@ namespace PPFarmWA.Repositorio.Repositorios
 
         Task<SesionDTO> RegistrarJugadorAsync(RegistroDTO dto);
         Task <SesionDTO> ObtenerSesionConItemsAsync(int idJugador);
-     
+        Task<SesionDTO> ObtenerSesionConItemsPorEmailAsync(string email);
+
+        Task<SesionDTO> ObtenerSesionConItemsPorEmailYPasswordAsync(string email, string password);
+
     }
 }
  

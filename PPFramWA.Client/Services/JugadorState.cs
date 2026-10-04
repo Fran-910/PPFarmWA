@@ -9,6 +9,7 @@ namespace PPFramWA.Client.Services
         public void EstablecerJugador(Jugador? jugador)
         {
             __jugador = jugador;
+            NotificarCambios();
         }
         public void NotificarCambios()
         {

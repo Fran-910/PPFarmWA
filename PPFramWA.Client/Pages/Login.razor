@@ -1,23 +1,36 @@
 ﻿@page "/login"
+@using PPFarmWA.Shared.DTO
+@using Domains
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject JugadorState jugadorState
 
 <div>
     <form class="formulario">
 
+        <h1>Iniciar sesión</h1>
 
-        <h1>Iniciar sesion</h1>
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger" style="color: red; margin-bottom: 10px;">
+                @mensajeError
+            </div>
+        }
 
-        
         <div class="i">
-            <input type="email" required placeholder="Correo electrónico" />
+            <!-- Mapeo directo a login.Email -->
+            <input type="email" required placeholder="Correo electrónico" @bind="login.Email" />
         </div>
 
         <div class="i">
-            <input type="password" required placeholder="Contraseña" />
+            <!-- Mapeo directo a login.Password -->
+            <input type="password" required placeholder="Contraseña" @bind="login.Password" />
         </div>
 
         <div>
-            <button type="button" class="iniciar" @onclick="IniciarSesion">Iniciar Sesion</button>
+            <button type="button" class="iniciar" @onclick="IniciarSesion" disabled="@cargando">
+                @(cargando ? "Cargando..." : "Iniciar Sesión")
+            </button>
 
             <button type="button" class="crear" @onclick="Registrar">Crear Cuenta</button>
         </div>
@@ -26,14 +39,73 @@
 </div>
 
 @code {
+    private Login1DTO login = new();
+    private string mensajeError = string.Empty;
+    private bool cargando = false;
+
     private void Registrar()
     {
         Navigation.NavigateTo("/register");
     }
 
-    private void IniciarSesion()
+    private async Task IniciarSesion()
     {
-        Navigation.NavigateTo("/");    
-    }
+        cargando = true;
+        mensajeError = string.Empty;
 
+        try
+        {
+            // 1. Enviamos Login1DTO (Email y Password) a la API
+            var response = await Http.PostAsJsonAsync("api/jugador/loginmailpass", login);
+
+            if (response.IsSuccessStatusCode)
+            {
+                
+                // 2. Leemos el SesionDTO devuelto por la API
+                var sesion = await response.Content.ReadFromJsonAsync<SesionDTO>();
+                
+                if (sesion != null)
+                {
+                    // 1. Creamos la entidad del cliente (PPFramWA.Client.Domains.Jugador)
+                    //var jugadorCargado = new PPFramWA.Client.Domains.Jugador
+                    Jugador jugadorCargado = new Jugador
+                    {
+                        //userName = sesion.userName,
+                        //email = sesion.email,
+                        level = sesion.level,
+                        experiencia = sesion.experiencia,
+                        points = sesion.points,
+                        ppCoins = (int)sesion.ppCoins,
+                        //ppCoins = sesion.ppCoins,
+                        idUltimaHerramienta = sesion.IdUltimaHerramienta
+                    };
+
+                    jugadorState.EstablecerJugador(jugadorCargado);
+
+                    // 4. Redirigimos al Home (/)
+                    Navigation.NavigateTo("/");
+                    return;
+                }
+               
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+                response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                mensajeError = "Correo electrónico o contraseña incorrectos.";
+            }
+            else
+            {
+                mensajeError = "Ocurrió un error al procesar la solicitud. Intente nuevamente.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error de conexión: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
 }
