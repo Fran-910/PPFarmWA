@@ -68,7 +68,7 @@ namespace PPFarmWA.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<JugadorDTO>> Actualizar(int id, JugadorDTO dto)
+        public async Task<ActionResult<JugadorPutDTO>> Actualizar(int id, JugadorPutDTO dto)
         {
             var jugador = await _repositorio.GetByIdAsync(id);
 
@@ -82,8 +82,6 @@ namespace PPFarmWA.Server.Controllers
             jugador.ppCoins = dto.ppCoins;
             jugador.points = dto.points;
             jugador.idUltimaHerramienta = dto.idUltimaHerramienta;
-            jugador.idUltimoDispositivo = dto.idUltimoDispositivo;
-            jugador.idUltimoPotenciador = dto.idUltimoPotenciador;
 
             await _repositorio.UpdateAsync(jugador);
 

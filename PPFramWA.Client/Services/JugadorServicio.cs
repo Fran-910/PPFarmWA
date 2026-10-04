@@ -32,10 +32,9 @@ namespace PPFramWA.Client.Services
 
         public async Task<(bool Exito, string Mensaje)> GuardarPartida(Jugador jugador)
         {
-            var dto = new JugadorDTO
+            var dto = new JugadorPutDTO
             {
                 Id = jugador.Id,
-                userName = jugador.userName,
                 level = jugador.level,
                 experiencia = jugador.experiencia,
                 ppCoins = jugador.ppCoins,
@@ -43,7 +42,7 @@ namespace PPFramWA.Client.Services
                 idUltimaHerramienta = jugador.idUltimaHerramienta
             };
 
-            var respuesta = await _api.PutAsync<JugadorDTO>(
+            var respuesta = await _api.PutAsync<JugadorPutDTO>(
                 $"api/Jugador/{dto.Id}", dto);
 
             if (!respuesta.IsSuccessStatusCode)

@@ -8,11 +8,9 @@ namespace PPFarmWA.Shared.DTO
     {
         public int Id { get; set; }
         public double ppCoins { get; set; }
-
         public int points { get; set; }
-
         public int level { get; set; }
-
         public int experiencia { get; set; }
+        public int idUltimaHerramienta { get; set; }
     }
 }
