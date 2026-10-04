@@ -163,10 +163,12 @@
 
         saldoPPCoints = jugador.ppCoins;
 
-        JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
-        {
-            Id = jugador.Id
-        };
+        //solucionar esto
+        
+        //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
+        //{
+            //Id = jugador.Id
+        //};
 
         JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
         JugadorState.NotificarCambios();

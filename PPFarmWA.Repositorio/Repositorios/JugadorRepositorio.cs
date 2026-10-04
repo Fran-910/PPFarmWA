@@ -44,15 +44,44 @@ namespace PPFarmWA.Repositorio.Repositorios
                 esAdmin = false
             };
             _dbSet.Add(jugador);
+
             await _context.SaveChangesAsync();
+
+            Item itemInicial = new Item
+            {
+                cantidad = 1,
+                JugadorId = jugador.Id,
+                RecursoId = 1
+            };  
+
+            _context.Items.Add(itemInicial);
+
+            await _context.SaveChangesAsync();
+
+            jugador.idUltimaHerramienta = itemInicial.Id;
+
+            await _context.SaveChangesAsync();
+
+            var items = await _context.Items.Where(i => i.JugadorId == jugador.Id).ToListAsync();
+
             return new SesionDTO
             {
+                JugadorId = jugador.Id,
                 userName = jugador.userName,
                 email = jugador.email,
                 ppCoins = jugador.ppCoins,
                 points = jugador.points,
                 level = jugador.level,
-                experiencia = jugador.experiencia
+                experiencia = jugador.experiencia,
+                IdUltimaHerramienta = jugador.idUltimaHerramienta,
+                Items = items.Select(i => new ItemDTO
+                {
+                    Id = i.Id,
+                    cantidad = i.cantidad,
+                    idJugador = i.JugadorId,
+                    idRecurso = i.RecursoId,
+                    idVenta = i.VentaId
+                }).ToList()
             };
         }
         public async Task<SesionDTO> ObtenerSesionConItemsAsync(int idJugador)

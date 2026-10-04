@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject JugadorState jugadorState
+@inject JugadorServicio jugadorServicio
 @inject CatalogoRecursos catalogoRecursos
 @inject NavigationManager navigationManager
 <PageTitle>Home</PageTitle>
@@ -9,7 +10,7 @@
     <div class="barra-lateral">
         <nav>
             <ul>
-                <li>PEPE</li>
+                <li>@(jugadorState?.__jugador?.userName ?? "Jugador")</li>
                 <li>NIVEL @(jugadorState?.__jugador?.level ?? 0)</li>
                 <li>XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
                 <li>PP @(jugadorState?.__jugador?.points ?? 0)</li>
@@ -17,7 +18,12 @@
                 <li><CustomButton OnClick="IrAMochila" Label="Mochila"></CustomButton></li>
                 <li><CustomButton onclick="IrAComputadora" Label="Computadora"></CustomButton></li>
                 <li><CustomButton onclick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
+                <li><CustomButton OnClick="GuardarPartidaAsync" Label="@LabelGuardar" Color="#2e7d32"></CustomButton></li>
             </ul>
+            @if (!string.IsNullOrEmpty(mensajeGuardado))
+            {
+                <p class="@ClaseMensajeGuardado">@mensajeGuardado</p>
+            }
         </nav>
     </div>
     @if (recursos is not null)
@@ -46,27 +52,26 @@
     private bool mostrarTienda;
     private bool mostrarInventario;
 
-    public Jugador jugador;
-    public List<RecursoDTO> recursos;
-    string cursorActual;
-    string currentToolImg;
+    private string? mensajeGuardado;
+    private bool exitoGuardado;
+    private bool guardando;
+
+    private string LabelGuardar => guardando ? "Guardando..." : "Guardar partida";
+    private string ClaseMensajeGuardado => exitoGuardado ? "mensaje-guardado ok" : "mensaje-guardado error";
+
+    public List<RecursoDTO>? recursos;
+    string? cursorActual;
+    string? currentToolImg;
 
     protected override async Task OnInitializedAsync()
     {
-        jugador = new Jugador()
+        if (jugadorState.__jugador is null)
         {
-            Id = 20,
-            experiencia = 0,
-            level = 1,
-            points = 10,
-            ppCoins = 10,
-            idUltimaHerramienta = 1,
-        };
-
-        jugadorState.EstablecerJugador(jugador);
-
+            navigationManager.NavigateTo("/login");
+            return;
+        }
         jugadorState.OnChange += Actualizar;
-        jugador.OnCambioUltimaHerramienta += SetUpTool;
+        jugadorState.__jugador.OnCambioUltimaHerramienta += SetUpTool;
 
         recursos = await catalogoRecursos.ObtenerRecursosAsync();
 
@@ -83,14 +88,15 @@
     public void SetUpTool()
     {
         //obtener idUltimaHerramienta a partir de la lista de ITEMS del jugador.
-        RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.idUltimaHerramienta).FirstOrDefault() ??
+
+        RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.items.Where(i => i.idRecurso == x.Id).Select(i => i.idRecurso).FirstOrDefault()).FirstOrDefault() ??
         new RecursoDTO()
         {
             Id = 0,
             nombre = "Ninguna",
             descripcion = "No hay herramienta equipada",
             eficiencia = 10,
-            durabilidad = 10,
+            durabilidad = -1,
             valor = 0,
             deTienda = false,
             tipo = PPFarmWA.Shared.Enum.TipoItemEnum.Herramienta,
@@ -136,6 +142,38 @@
     public void IrAConfiguracion()
     {
         navigationManager.NavigateTo("/");
+    }
+
+    //GUARDAR PARTIDA
+
+    public async Task GuardarPartidaAsync()
+    {
+        var jugador = jugadorState.__jugador;
+
+        if (jugador is null)
+        {
+            exitoGuardado = false;
+            mensajeGuardado = "No hay jugador en sesión.";
+            return;
+        }
+
+        guardando = true;
+        try
+        {
+            var (exito, mensaje) = await jugadorServicio.GuardarPartida(jugador);
+
+            exitoGuardado = exito;
+            mensajeGuardado = mensaje;
+        }
+        catch (Exception ex)
+        {
+            exitoGuardado = false;
+            mensajeGuardado = $"Error de conexión: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
     }
 
     public void Dispose()

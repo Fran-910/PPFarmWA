@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
@@ -22,23 +23,7 @@ namespace PPFarmWA.Server.Controllers
         {
             var jugadores = await _repositorio.GetAllAsync();
 
-            var resultado = jugadores.Select(j => new JugadorDTO
-            {
-                Id = j.Id,
-                userName = j.userName,
-                email = j.email,
-                ppCoins = j.ppCoins,
-                points = j.points,
-                level = j.level,
-                experiencia = j.experiencia,
-                esTienda = j.esTienda,
-                esAdmin = j.esAdmin,
-                idUltimaHerramienta = j.idUltimaHerramienta,
-                idUltimoDispositivo = j.idUltimoDispositivo,
-                idUltimoPotenciador = j.idUltimoPotenciador
-            });
-
-            return Ok(resultado);
+            return Ok(jugadores.Select(Proyectar));
         }
 
         [HttpGet("{id}")]
@@ -49,23 +34,7 @@ namespace PPFarmWA.Server.Controllers
             if (jugador == null)
                 return NotFound();
 
-            var dto = new JugadorDTO
-            {
-                Id = jugador.Id,
-                userName = jugador.userName,
-                email = jugador.email,
-                ppCoins = jugador.ppCoins,
-                points = jugador.points,
-                level = jugador.level,
-                experiencia = jugador.experiencia,
-                esTienda = jugador.esTienda,
-                esAdmin = jugador.esAdmin,
-                idUltimaHerramienta = jugador.idUltimaHerramienta,
-                idUltimoDispositivo = jugador.idUltimoDispositivo,
-                idUltimoPotenciador = jugador.idUltimoPotenciador
-            };
-
-            return Ok(dto);
+            return Ok(Proyectar(jugador));
         }
 
         [HttpPost]
@@ -96,6 +65,29 @@ namespace PPFarmWA.Server.Controllers
                 new { id = creado.Id },
                 dto
             );
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<JugadorDTO>> Actualizar(int id, JugadorDTO dto)
+        {
+            var jugador = await _repositorio.GetByIdAsync(id);
+
+            if (jugador == null)
+                return NotFound();
+
+            // Solo se persisten los datos de partida.
+            // userName, email y password son identidad: no se tocan desde acá.
+            jugador.level = dto.level;
+            jugador.experiencia = dto.experiencia;
+            jugador.ppCoins = dto.ppCoins;
+            jugador.points = dto.points;
+            jugador.idUltimaHerramienta = dto.idUltimaHerramienta;
+            jugador.idUltimoDispositivo = dto.idUltimoDispositivo;
+            jugador.idUltimoPotenciador = dto.idUltimoPotenciador;
+
+            await _repositorio.UpdateAsync(jugador);
+
+            return Ok(Proyectar(jugador));
         }
 
         [HttpPut("{id}/coins")]
@@ -175,6 +167,25 @@ namespace PPFarmWA.Server.Controllers
         {
             var existe = await _repositorio.ExisteEmailOusuarioAsync(emailOusuario);
             return Ok(existe);
+        }
+
+        private static JugadorDTO Proyectar(Jugador j)
+        {
+            return new JugadorDTO
+            {
+                Id = j.Id,
+                userName = j.userName,
+                email = j.email,
+                ppCoins = j.ppCoins,
+                points = j.points,
+                level = j.level,
+                experiencia = j.experiencia,
+                esTienda = j.esTienda,
+                esAdmin = j.esAdmin,
+                idUltimaHerramienta = j.idUltimaHerramienta,
+                idUltimoDispositivo = j.idUltimoDispositivo,
+                idUltimoPotenciador = j.idUltimoPotenciador
+            };
         }
 
     }
