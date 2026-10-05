@@ -106,7 +106,8 @@ namespace PPFarmWA.Repositorio.Repositorios
                 return null;
 
             return new SesionDTO
-            {   
+            {
+                JugadorId = jugador.Id,
                 userName = jugador.userName,
                 email = jugador.email,
                 ppCoins = jugador.ppCoins,
@@ -149,6 +150,7 @@ namespace PPFarmWA.Repositorio.Repositorios
             // 3. Mapeamos y devolvemos la sesión
             return new SesionDTO
             {
+                JugadorId = jugador.Id,
                 userName = jugador.userName,
                 email = jugador.email,
                 ppCoins = jugador.ppCoins,
@@ -191,6 +193,7 @@ namespace PPFarmWA.Repositorio.Repositorios
             // 3. Mapeamos y devolvemos la SesionDTO con los datos requeridos
             return new SesionDTO
             {
+                JugadorId = jugador.Id,
                 userName = jugador.userName,
                 email = jugador.email,
                 ppCoins = jugador.ppCoins,

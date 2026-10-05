@@ -1,41 +1,103 @@
 ﻿@page "/login"
 @using PPFarmWA.Shared.DTO
-@using Domains
 @inject NavigationManager Navigation
 @inject HttpClient Http
 @inject JugadorState jugadorState
 
-<div>
-    <form class="formulario">
+<div class="pf-auth terrain-bg">
+    <div class="pf-title">PP FARM</div>
 
-        <h1>Iniciar sesión</h1>
+    <div class="pf-frame">
+        <!-- Acentos de esquina (formas del diseno original, paleta Terraria) -->
+        <div class="pf-corner pf-corner-tl"></div>
+        <div class="pf-corner pf-corner-tr"></div>
+        <div class="pf-corner pf-corner-bl"></div>
+        <div class="pf-corner pf-corner-br"></div>
 
-        @if (!string.IsNullOrEmpty(mensajeError))
-        {
-            <div class="alert alert-danger" style="color: red; margin-bottom: 10px;">
-                @mensajeError
+        <form class="formulario pf-panel">
+
+            <!-- CABECERA -->
+            <header class="pf-cabecera">
+                <div class="pf-pips">
+                    <span class="pf-pip"></span>
+                    <span class="pf-pip-sm"></span>
+                </div>
+
+                <h1>Iniciar Sesión</h1>
+
+                <div class="pf-pips">
+                    <span class="pf-pip-sm"></span>
+                    <span class="pf-pip"></span>
+                </div>
+            </header>
+
+            <!-- CUERPO DEL FORMULARIO -->
+            <div class="pf-body">
+
+                @if (!string.IsNullOrEmpty(mensajeError))
+                {
+                    <div class="pf-error" id="errorBox">
+                        <span>⚠</span>
+                        <span id="errorMessage">@mensajeError</span>
+                    </div>
+                }
+
+                <div class="pf-field">
+                    <label for="emailInput">
+                        <span>📧</span>
+                        <span>Correo electrónico</span>
+                    </label>
+                    <div class="pf-input">
+                        <input id="emailInput"
+                               type="email"
+                               required
+                               autocomplete="username"
+                               placeholder="Correo electrónico"
+                               @bind="login.Email" />
+                    </div>
+                </div>
+
+                <div class="pf-field">
+                    <label for="passwordInput">
+                        <span>🔑</span>
+                        <span>Contraseña</span>
+                    </label>
+                    <div class="pf-input">
+                        <input id="passwordInput"
+                               type="password"
+                               required
+                               autocomplete="current-password"
+                               placeholder="Contraseña"
+                               @bind="login.Password" />
+                    </div>
+                </div>
+
+                <div class="pf-actions">
+                    <button type="button"
+                            class="boton-primario iniciar"
+                            disabled="@cargando"
+                            @onclick="IniciarSesion">
+                        <span>🔓</span>
+                        <span>@(cargando ? "Cargando..." : "Iniciar Sesión")</span>
+                    </button>
+
+                    <button type="button"
+                            class="custom-btn crear"
+                            @onclick="Registrar">
+                        <span>👤</span>
+                        <span>Crear Cuenta</span>
+                    </button>
+                </div>
+
             </div>
-        }
 
-        <div class="i">
-            <!-- Mapeo directo a login.Email -->
-            <input type="email" required placeholder="Correo electrónico" @bind="login.Email" />
-        </div>
+            <!-- PIE -->
+            <footer class="pf-footer">
+                <span class="pf-footer-right">PP-FARM-OS</span>
+            </footer>
 
-        <div class="i">
-            <!-- Mapeo directo a login.Password -->
-            <input type="password" required placeholder="Contraseña" @bind="login.Password" />
-        </div>
-
-        <div>
-            <button type="button" class="iniciar" @onclick="IniciarSesion" disabled="@cargando">
-                @(cargando ? "Cargando..." : "Iniciar Sesión")
-            </button>
-
-            <button type="button" class="crear" @onclick="Registrar">Crear Cuenta</button>
-        </div>
-
-    </form>
+        </form>
+    </div>
 </div>
 
 @code {
@@ -60,33 +122,19 @@
 
             if (response.IsSuccessStatusCode)
             {
-                
+
                 // 2. Leemos el SesionDTO devuelto por la API
                 var sesion = await response.Content.ReadFromJsonAsync<SesionDTO>();
-                
+
                 if (sesion != null)
                 {
-                    // 1. Creamos la entidad del cliente (PPFramWA.Client.Domains.Jugador)
-                    //var jugadorCargado = new PPFramWA.Client.Domains.Jugador
-                    Jugador jugadorCargado = new Jugador
-                    {
-                        //userName = sesion.userName,
-                        //email = sesion.email,
-                        level = sesion.level,
-                        experiencia = sesion.experiencia,
-                        points = sesion.points,
-                        ppCoins = (int)sesion.ppCoins,
-                        //ppCoins = sesion.ppCoins,
-                        idUltimaHerramienta = sesion.IdUltimaHerramienta
-                    };
-
-                    jugadorState.EstablecerJugador(jugadorCargado);
+                    jugadorState.EstablecerJugador(sesion);
 
                     // 4. Redirigimos al Home (/)
                     Navigation.NavigateTo("/");
                     return;
                 }
-               
+
             }
 
             if (response.StatusCode == System.Net.HttpStatusCode.BadRequest ||

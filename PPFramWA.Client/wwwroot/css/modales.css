@@ -1,30 +1,45 @@
-﻿.modal-fondo {
+﻿/* ============================================================================
+   PP FARM — Modales (TiendaModal / InventarioModal)
+   Pixel Terraria. Portado del bloque <style> de:
+     DesingFiles/stitch_ppfarm_design_system/pp_farm_tienda_de_la_huerta_tiendamodal.razor/code.html
+
+   El markup de TiendaModal.razor e InventarioModal.razor ya coincide 1:1 con
+   el diseno, por lo que este archivo solo define el estilo de las clases que
+   ambos componentes usan.
+   ============================================================================ */
+
+/* =========================================================
+   FONDO
+   ========================================================= */
+
+.modal-fondo {
     position: fixed;
     inset: 0;
     z-index: 2000;
-    display: grid;
-    place-items: center;
-    padding: 1rem;
-    background: rgba(15, 25, 18, 0.66);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.65);
 }
-
 
 /* =========================================================
    MODAL
    ========================================================= */
 
 .modal-juego {
-    width: min(1040px, 100%);
-    max-height: min(88vh, 900px);
+    position: relative;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 680px;
+    max-height: 94vh;
+    background: #382419;
+    border: 4px solid #140b07;
+    box-shadow: inset 4px 4px 0px #5c3c28, inset -4px -4px 0px #22140c, 0 8px 0px rgba(0, 0, 0, 0.8), 0 0 0 2px #000000;
+    color: #f7eed7;
     overflow: hidden;
-    border: 2px solid #8ccf75;
-    border-radius: 18px;
-    background: #fbfff7;
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
 }
-
 
 /* =========================================================
    CABECERA
@@ -32,183 +47,89 @@
 
 .modal-cabecera {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 1.2rem 1.5rem;
-    color: white;
-    background: linear-gradient( 120deg, #296b37, #5c9e3d );
+    gap: 10px;
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: #23160e;
+    border-bottom: 4px solid #140b07;
+    box-shadow: inset 0 -2px 0 #3a2214;
 }
 
-    .modal-cabecera h1 {
-        margin: 0;
-        font-size: 1.45rem;
-    }
+.modal-cabecera h1 {
+    margin: 0;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+    color: #ffd84d;
+    text-shadow: 2px 2px 0 #000;
+}
 
-    .modal-cabecera p {
-        margin: 0.25rem 0 0;
-        opacity: 0.9;
-    }
-
+.modal-cabecera p {
+    margin: 3px 0 0;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2px;
+    color: #bfa588;
+}
 
 /* =========================================================
-   BOTÓN CERRAR
+   BOTON CERRAR
    ========================================================= */
 
 .boton-cerrar {
-    border: 0;
-    background: transparent;
-    color: white;
-    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: #b92b27;
+    color: #ffffff;
+    border: 2px solid #520e0c;
+    box-shadow: inset 2px 2px 0 #e65c58, inset -2px -2px 0 #6e1513, 1px 1px 0 #000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
     line-height: 1;
+    text-shadow: 1px 1px 0 #000;
     cursor: pointer;
+    transition: none;
 }
 
+.boton-cerrar:hover {
+    background: #d43531;
+}
+
+.boton-cerrar:active {
+    box-shadow: inset 2px 2px 0 #6e1513, inset -2px -2px 0 #e65c58;
+    transform: translateY(1px);
+}
 
 /* =========================================================
    SALDO
    ========================================================= */
 
 .saldo {
-    padding: 0.75rem 1.5rem;
-    color: #315928;
-    background: #e9f7df;
-}
-
-
-/* =========================================================
-   CONTENIDO
-   ========================================================= */
-
-.modal-contenido {
-    overflow: auto;
-    padding: 1rem 1.25rem;
-}
-
-.estado-modal {
-    padding: 2rem;
-    text-align: center;
-}
-
-
-/* =========================================================
-   TARJETAS DE RECURSOS
-   ========================================================= */
-
-.tarjeta-recurso {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 1rem;
+    display: flex;
     align-items: center;
-    margin-bottom: 0.85rem;
-    padding: 1rem;
-    border: 1px solid #d4e6ca;
-    border-left: 6px solid #75b85a;
-    border-radius: 12px;
-    background: white;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 6px 14px;
+    background: #180e09;
+    border-bottom: 2px solid #2b180d;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: 'Silkscreen', monospace;
+    font-size: 9px;
+    color: #fce570;
 }
 
-
-/* =========================================================
-   RAREZAS
-   ========================================================= */
-
-.rareza-raro {
-    border-left-color: #438ed5;
+.saldo strong {
+    color: #55ff99;
+    letter-spacing: 0.5px;
 }
-
-.rareza-epico {
-    border-left-color: #9a61cf;
-}
-
-.rareza-legendario {
-    border-left-color: #d69a27;
-}
-
-
-/* =========================================================
-   ICONO
-   ========================================================= */
-
-.icono-recurso {
-    font-size: 2.3rem;
-}
-
-
-/* =========================================================
-   INFORMACIÓN
-   ========================================================= */
-
-.detalle-recurso h2 {
-    margin: 0 0 0.25rem;
-    font-size: 1.1rem;
-}
-
-.detalle-recurso p {
-    margin: 0 0 0.55rem;
-    color: #566;
-}
-
-.estadisticas {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #435;
-}
-
-
-/* =========================================================
-   ACCIONES
-   ========================================================= */
-
-.acciones-tienda {
-    display: grid;
-    gap: 0.45rem;
-    min-width: 130px;
-}
-
-    .acciones-tienda label {
-        display: grid;
-        gap: 0.15rem;
-        font-size: 0.78rem;
-        color: #435;
-    }
-
-    .acciones-tienda input {
-        width: 100%;
-        padding: 0.35rem;
-        border: 1px solid #b7cbb2;
-        border-radius: 6px;
-    }
-
-
-/* =========================================================
-   BOTONES
-   ========================================================= */
-
-.boton-primario,
-.boton-secundario {
-    border: 0;
-    border-radius: 7px;
-    padding: 0.5rem 0.7rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.boton-primario {
-    color: white;
-    background: #397d38;
-}
-
-.boton-secundario {
-    color: #24502b;
-    background: #e1f1dd;
-}
-
-    .boton-primario:disabled,
-    .boton-secundario:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-    }
-
 
 /* =========================================================
    MENSAJES
@@ -216,43 +137,296 @@
 
 .mensaje-exito,
 .mensaje-error {
-    margin: 0.75rem 1.5rem 0;
-    padding: 0.6rem 0.8rem;
-    border-radius: 7px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 6px 14px;
+    border-bottom: 2px solid;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    letter-spacing: 0.3px;
+    text-shadow: 1px 1px 0 #000;
 }
 
 .mensaje-exito {
-    color: #1e6025;
-    background: #dff4d8;
+    background: #1b3d22;
+    border-bottom-color: #0d2212;
+    box-shadow: inset 2px 2px 0 #2a5f35;
+    color: #7aff9b;
 }
 
+/* Derivado de la familia roja de .boton-cerrar */
 .mensaje-error {
-    color: #8c2020;
-    background: #ffe1e1;
+    background: #4a1512;
+    border-bottom-color: #2a0a08;
+    box-shadow: inset 2px 2px 0 #6e1513;
+    color: #ff9d97;
 }
 
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.modal-contenido {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 380px;
+    background: #2c1b12;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+.estado-modal {
+    padding: 24px;
+    text-align: center;
+    font-family: 'Silkscreen', monospace;
+    font-size: 9px;
+    color: #bfa588;
+}
+
+/* --- Scrollbar pixelada --- */
+
+.modal-contenido::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-contenido::-webkit-scrollbar-track {
+    background: #170d08;
+}
+
+.modal-contenido::-webkit-scrollbar-thumb {
+    background: #5c3c28;
+    border: 2px solid #170d08;
+}
+
+.modal-contenido::-webkit-scrollbar-thumb:hover {
+    background: #7a5036;
+}
+
+/* =========================================================
+   TARJETA DE RECURSO
+   ========================================================= */
+
+.tarjeta-recurso {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: #1e130c;
+    border: 3px solid #100905;
+    box-shadow: inset 2px 2px 0 #3a2517, inset -2px -2px 0 #0c0603, 1px 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* --- Bordes por rareza --- */
+
+.rareza-comun {
+    border-left: 5px solid #a3a3a3;
+}
+
+.rareza-raro {
+    border-left: 5px solid #38bdf8;
+}
+
+.rareza-epico {
+    border-left: 5px solid #c084fc;
+}
+
+.rareza-legendario {
+    border-left: 5px solid #f59e0b;
+}
+
+/* =========================================================
+   ICONO
+   ========================================================= */
+
+.icono-recurso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    background: #121824;
+    border: 3px solid #080a10;
+    box-shadow: inset 3px 3px 0 #0a0d14, inset -3px -3px 0 #27344d;
+    font-size: 22px;
+}
+
+/* =========================================================
+   INFORMACION
+   ========================================================= */
+
+.detalle-recurso {
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.detalle-recurso h2 {
+    margin: 0 0 3px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.detalle-recurso p {
+    margin: 0 0 4px;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    line-height: 1.3;
+    color: #cfbda8;
+}
+
+.detalle-recurso .estadisticas {
+    display: inline-block;
+    margin-bottom: 4px;
+    padding: 2px 6px;
+    background: #120b06;
+    border: 1px solid #382012;
+    border-radius: 2px;
+    font-family: 'Silkscreen', monospace;
+    font-size: 7.5px;
+    line-height: 1.4;
+    color: #f6c876;
+}
+
+.detalle-recurso strong {
+    display: block;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8.5px;
+    color: #ffe66d;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.acciones-tienda {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.acciones-tienda label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    color: #d1b99f;
+}
+
+.acciones-tienda input[type="number"] {
+    width: 44px;
+    padding: 4px 2px;
+    background: #0f0906;
+    border: 2px solid #4a2c1b;
+    border-radius: 0;
+    color: #ffffff;
+    outline: none;
+    box-shadow: inset 1px 1px 0 #000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.acciones-tienda input[type="number"]:focus {
+    border-color: #ffd84d;
+}
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.boton-primario,
+.boton-secundario {
+    border: 2px solid #0d381b;
+    border-radius: 0;
+    padding: 7px 10px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 #000;
+    cursor: pointer;
+    transition: none;
+}
+
+.boton-primario {
+    background: #258a46;
+    border-color: #0d381b;
+    box-shadow: inset 2px 2px 0 #5fe088, inset -2px -2px 0 #135227, 1px 1px 0 #000;
+    color: #ffffff;
+}
+
+.boton-primario:hover {
+    background: #2da353;
+}
+
+.boton-primario:active {
+    box-shadow: inset 2px 2px 0 #135227, inset -2px -2px 0 #5fe088;
+    transform: translateY(1px);
+}
+
+.boton-primario:disabled,
+.boton-secundario:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: inset 2px 2px 0 #3f4663, inset -2px -2px 0 #1b1e2c;
+}
+
+.boton-secundario {
+    background: #33384f;
+    border-color: #1b1e2c;
+    box-shadow: inset 2px 2px 0 #4a5270, inset -2px -2px 0 #1b1e2c, 1px 1px 0 #000;
+    color: #e2e8f0;
+}
+
+.boton-secundario:hover {
+    background: #3f4663;
+}
+
+/* =========================================================
+   MONEDAS (HUD lateral de la maqueta de tienda)
+   ========================================================= */
+
+.pixel-coin-pp {
+    background: radial-gradient(circle, #ffe600 30%, #d49800 90%);
+    border: 2px solid #5a3e00;
+    box-shadow: inset 1px 1px 0px #fff;
+}
+
+.pixel-coin-p {
+    background: radial-gradient(circle, #e2e8f0 30%, #8a99ad 90%);
+    border: 2px solid #334155;
+    box-shadow: inset 1px 1px 0px #fff;
+}
 
 /* =========================================================
    RESPONSIVE
    ========================================================= */
 
 @media (max-width: 700px) {
-
-    .tarjeta-recurso {
-        grid-template-columns: auto 1fr;
-    }
-
-    .acciones-tienda {
-        grid-column: 1 / -1;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .modal-fondo {
         padding: 0;
     }
 
     .modal-juego {
         max-height: 100vh;
-        border-radius: 0;
+    }
+
+    .tarjeta-recurso {
+        align-items: flex-start;
+    }
+
+    .acciones-tienda {
+        width: 100%;
+        justify-content: flex-end;
     }
 }

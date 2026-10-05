@@ -1,7 +1,8 @@
 /* ============================================================================
-   Login.razor — pixel Terraria
-   El chassis que ocupa todo el viewport (.pf-auth / .pf-frame / .pf-panel) y
-   todo el cromado viven en wwwroot/css/pixel.css.
+   Register.razor — pixel Terraria
+   Mismo criterio de estilo que Login: el fondo es el pasto animado
+   (.terrain-bg) y el chassis queda centrado en pantalla.
+   Todo el cromado vive en wwwroot/css/pixel.css
    ============================================================================ */
 
 :host {
@@ -10,15 +11,17 @@
     min-height: 100vh;
     min-height: 100dvh;
 }
-.formulario {
+
+/* La pagina es un simple contenedor a pantalla completa. */
+.pf-register {
     display: flex;
-    flex-direction: column;
-    margin: 0;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
-/* --- Boton de inicio de sesion: el pixel verde del .boton-primario lleva
-       el icono y el texto en fila, como el diseno --- */
-.boton-primario.iniciar {
+/* --- Boton de enviar: pixel verde del .boton-primario --- */
+.boton-primario {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -32,13 +35,8 @@
     border-radius: 0;
 }
 
-.boton-primario.iniciar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* --- Boton de crear cuenta: reusa el pizarra de la barra lateral --- */
-.custom-btn.crear {
+/* --- Boton de volver: reusa el pizarra de la barra lateral --- */
+.custom-btn.volver {
     gap: 8px;
     font-size: 8px;
 }

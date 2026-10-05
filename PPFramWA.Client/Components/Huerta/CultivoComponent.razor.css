@@ -1,103 +1,44 @@
-﻿.cultivo {
+﻿/* ============================================================================
+   CultivoComponent.razor — pixel Terraria
+   La celda, el marco de valla y el grid viven en HuertaCeldasComponent.razor.css.
+   La life-bar y el popup de cosecha son GLOBALES (wwwroot/css/pixel.css) porque
+   el diseno los coloca dentro de la celda y deben coincidir con los del juego.
+   ============================================================================ */
+
+.cultivo {
     position: relative;
+    display: block;
     width: 100%;
     height: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: inherit;
 }
 
 .cultivo-image {
     width: 100%;
     height: 100%;
+    object-fit: contain;
+    transform-origin: bottom center;
     -webkit-user-select: none;
     user-select: none;
 }
 
-.life-bar-container {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 10px;
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 1px solid #000;
-    border-radius: 6px;
-    padding: 2px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-    pointer-events: none;
-    z-index: 10;
-    transition: opacity 0.3s ease;
-}
-
-.life-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.25s ease-out, background-color 0.3s ease;
-}
-
-.hp-alta {
-    background-color: #2ecc71;
-    box-shadow: 0 0 6px #2ecc71;
-}
-
-.hp-media {
-    background-color: #f1c40f;
-    box-shadow: 0 0 6px #f1c40f;
-}
-
-.hp-baja {
-    background-color: #e74c3c;
-    box-shadow: 0 0 6px #e74c3c;
-}
-
-.cosecha-popup {
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 30;
-    white-space: nowrap;
-    animation: cosechaPopup 1.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.xp-txt,
-.points-txt {
-    font-size: 20px;
-    font-weight: 900;
-    margin: 0;
-    line-height: 1.1;
-    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.8));
-}
-
-.xp-txt {
-    color: #00ffff;
-    -webkit-text-stroke: 1.5px #000000;
-}
-
-.points-txt {
-    color: #ffcc00;
-    -webkit-text-stroke: 1.5px #000000;
-}
+/* =========================================================
+   ANIMACIONES DE ESTADO (ligadas a CultivoState en el .razor)
+   ========================================================= */
 
 .hit {
     animation: cultivoGolpeado 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) 1 normal;
-    transform-origin: bottom center;
 }
 
 .listo {
     animation: cultivoCrecer 0.8s ease-out forwards;
-    transform-origin: bottom center;
 }
 
 .cosechado {
     animation: cultivoDesaparecer 1s ease-in-out forwards;
-    transform-origin: bottom center;
 }
 
 @keyframes cultivoGolpeado {
@@ -128,27 +69,6 @@
     100% {
         transform: scale(1) translateX(0) rotate(0deg);
         filter: brightness(1);
-    }
-}
-
-@keyframes cosechaPopup {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, 15px) scale(0.6);
-    }
-
-    20% {
-        opacity: 1;
-        transform: translate(-50%, -10px) scale(1.2);
-    }
-
-    40% {
-        transform: translate(-50%, -20px) scale(1);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -60px) scale(0.9);
     }
 }
 

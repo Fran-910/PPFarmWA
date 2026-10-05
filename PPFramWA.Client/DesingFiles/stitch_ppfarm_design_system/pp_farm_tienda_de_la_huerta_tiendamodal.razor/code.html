@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TiendaModal.razor - Tienda de la Huerta</title>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Pixel / Retro Style -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* Estilos Pixel Art Terraria */
+    * {
+      image-rendering: pixelated;
+    }
+    .font-pixel {
+      font-family: 'Press Start 2P', monospace;
+    }
+    .font-retro {
+      font-family: 'Silkscreen', monospace;
+    }
+
+    /* Fondo de huerta ajedrezada idéntica a la captura */
+    .bg-checker-grass {
+      background-color: #8cd634;
+      background-image: 
+        linear-gradient(45deg, #78be28 25%, transparent 25%), 
+        linear-gradient(-45deg, #78be28 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #78be28 75%), 
+        linear-gradient(-45deg, transparent 75%, #78be28 75%);
+      background-size: 32px 32px;
+      background-position: 0 0, 0 16px, 16px -16px, -16px 0px;
+    }
+
+    /* Modal Terraria: Marco de madera oscura remachada y biselada */
+    .modal-fondo {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(1.5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      padding: 12px;
+    }
+
+    .modal-juego {
+      width: 100%;
+      max-width: 680px;
+      max-height: 94%;
+      background: #382419;
+      border: 4px solid #140b07;
+      box-shadow: 
+        inset 4px 4px 0px #5c3c28,
+        inset -4px -4px 0px #22140c,
+        0 8px 0px rgba(0,0,0,0.8),
+        0 0 0 2px #000000;
+      display: flex;
+      flex-direction: column;
+      color: #f7eed7;
+      position: relative;
+    }
+
+    /* Cabecera estilo Terraria */
+    .modal-cabecera {
+      background: #23160e;
+      border-bottom: 4px solid #140b07;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: inset 0 -2px 0 #3a2214;
+    }
+
+    .modal-cabecera h1 {
+      font-size: 13px;
+      color: #ffd84d;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+    }
+
+    .modal-cabecera p {
+      font-size: 8px;
+      color: #bfa588;
+      margin-top: 3px;
+      letter-spacing: 0.2px;
+    }
+
+    /* Botón cerrar Terraria */
+    .boton-cerrar {
+      background: #b92b27;
+      color: #ffffff;
+      border: 2px solid #520e0c;
+      box-shadow: inset 2px 2px 0 #e65c58, inset -2px -2px 0 #6e1513, 1px 1px 0 #000;
+      width: 28px;
+      height: 28px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .boton-cerrar:hover {
+      background: #d43531;
+    }
+    .boton-cerrar:active {
+      box-shadow: inset 2px 2px 0 #6e1513, inset -2px -2px 0 #e65c58;
+      transform: translateY(1px);
+    }
+
+    /* Saldo y Mensaje Exitoso */
+    .saldo {
+      background: #180e09;
+      border-bottom: 2px solid #2b180d;
+      padding: 6px 14px;
+      font-size: 9px;
+      color: #fce570;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .saldo strong {
+      color: #55ff99;
+      letter-spacing: 0.5px;
+    }
+
+    .mensaje-exito {
+      background: #1b3d22;
+      border-bottom: 2px solid #0d2212;
+      color: #7aff9b;
+      font-size: 8px;
+      padding: 6px 14px;
+      letter-spacing: 0.3px;
+      box-shadow: inset 2px 2px 0 #2a5f35;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    /* Contenedor del scroll de catálogo */
+    .modal-contenido {
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #2c1b12;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+    }
+
+    /* Tarjeta de ítem */
+    .tarjeta-recurso {
+      background: #1e130c;
+      border: 3px solid #100905;
+      box-shadow: 
+        inset 2px 2px 0 #3a2517,
+        inset -2px -2px 0 #0c0603,
+        1px 1px 0 rgba(0,0,0,0.7);
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* Bordes por rareza Terraria */
+    .rareza-comun {
+      border-left: 5px solid #a3a3a3;
+    }
+    .rareza-raro {
+      border-left: 5px solid #38bdf8;
+    }
+    .rareza-epico {
+      border-left: 5px solid #c084fc;
+    }
+
+    /* Slot pixel Terraria para íconos */
+    .icono-recurso {
+      width: 44px;
+      height: 44px;
+      background: #121824;
+      border: 3px solid #080a10;
+      box-shadow: inset 3px 3px 0 #0a0d14, inset -3px -3px 0 #27344d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .detalle-recurso {
+      flex: 1 1 200px;
+      min-width: 0;
+    }
+    .detalle-recurso h2 {
+      font-size: 10px;
+      color: #ffffff;
+      margin-bottom: 3px;
+      text-shadow: 1px 1px 0 #000;
+    }
+    .detalle-recurso p {
+      font-size: 8px;
+      color: #cfbda8;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      font-family: 'Silkscreen', monospace;
+    }
+    .detalle-recurso .estadisticas {
+      font-size: 7.5px;
+      color: #f6c876;
+      background: #120b06;
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid #382012;
+      border-radius: 2px;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .detalle-recurso strong {
+      display: block;
+      font-size: 8.5px;
+      color: #ffe66d;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    /* Acciones de compra */
+    .acciones-tienda {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .acciones-tienda label {
+      font-size: 8px;
+      color: #d1b99f;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .acciones-tienda input[type="number"] {
+      width: 44px;
+      background: #0f0906;
+      border: 2px solid #4a2c1b;
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      padding: 4px 2px;
+      text-align: center;
+      outline: none;
+      box-shadow: inset 1px 1px 0 #000;
+    }
+    .acciones-tienda input[type="number"]:focus {
+      border-color: #ffd84d;
+    }
+
+    /* Botón verde retro Terraria */
+    .boton-primario {
+      background: #258a46;
+      border: 2px solid #0d381b;
+      box-shadow: inset 2px 2px 0 #5fe088, inset -2px -2px 0 #135227, 1px 1px 0 #000;
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8.5px;
+      padding: 7px 10px;
+      cursor: pointer;
+      text-shadow: 1px 1px 0 #000;
+      transition: none;
+    }
+    .boton-primario:hover {
+      background: #2da353;
+    }
+    .boton-primario:active {
+      box-shadow: inset 2px 2px 0 #135227, inset -2px -2px 0 #5fe088;
+      transform: translateY(1px);
+    }
+
+    /* Scrollbar pixelada */
+    .modal-contenido::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-contenido::-webkit-scrollbar-track {
+      background: #170d08;
+    }
+    .modal-contenido::-webkit-scrollbar-thumb {
+      background: #5c3c28;
+      border: 2px solid #170d08;
+    }
+    .modal-contenido::-webkit-scrollbar-thumb:hover {
+      background: #7a5036;
+    }
+
+    /* HUD lateral del juego */
+    .pixel-coin-pp {
+      background: radial-gradient(circle, #ffe600 30%, #d49800 90%);
+      border: 2px solid #5a3e00;
+      box-shadow: inset 1px 1px 0px #fff;
+    }
+    .pixel-coin-p {
+      background: radial-gradient(circle, #e2e8f0 30%, #8a99ad 90%);
+      border: 2px solid #334155;
+      box-shadow: inset 1px 1px 0px #fff;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 m-0 p-0 font-pixel select-none overflow-hidden flex items-center justify-center min-h-screen text-white">
+<!-- BEGIN: GameContainer -->
+<main class="relative w-full max-w-[1024px] h-[640px] overflow-hidden shadow-2xl border-4 border-black" data-purpose="game-screen">
+<!-- BEGIN: BackgroundGameWorld (Huerta con cultivos de la captura original) -->
+<div class="absolute inset-0 bg-checker-grass" data-purpose="game-field">
+<!-- Parcela central de cultivo pixelada -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="relative w-[340px] h-[340px] bg-[#4a2618] border-4 border-[#2b140c] shadow-[0_0_0_4px_#346817] p-2 grid grid-cols-5 grid-rows-5 gap-2">
+<!-- Valla / Bordillo con flores decorativas -->
+<span class="absolute -top-3 left-4 text-xs">🌼</span>
+<span class="absolute -top-3 right-4 text-xs">🌺</span>
+<span class="absolute -bottom-3 left-1/2 -translate-x-1/2 text-xs">🌼</span>
+<span class="absolute top-1/2 -left-3 -translate-y-1/2 text-xs">🌸</span>
+<span class="absolute top-1/2 -right-3 -translate-y-1/2 text-xs">💠</span>
+<!-- 25 parcelas de tierra con flores/zanahorias sembradas -->
+<!-- Fila 1 -->
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<!-- Fila 2 -->
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌱</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<!-- Fila 3 -->
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<!-- Fila 4 -->
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<!-- Fila 5 -->
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+<div class="bg-[#381c11] border border-[#231109] flex items-center justify-center text-xs">🌻</div>
+</div>
+</div>
+</div>
+<!-- END: BackgroundGameWorld -->
+<!-- BEGIN: LeftHUD (Pepe, Nivel, Monedas, Acceso rápido de la captura) -->
+<aside class="absolute left-3 top-3 bottom-3 flex flex-col justify-between pointer-events-none z-10 text-[10px]" data-purpose="player-stats-sidebar">
+<div class="space-y-1.5 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+<h2 class="text-xs text-white font-bold tracking-wide">Pepe</h2>
+<p class="text-yellow-100 text-[9px]">Nivel: 20</p>
+<p class="text-cyan-300 text-[9px]">Xp: 0/100</p>
+<!-- Moneda PP -->
+<div class="flex items-center gap-1.5 pt-1">
+<div class="w-5 h-5 rounded-full pixel-coin-pp flex items-center justify-center text-[7px] font-black text-amber-950">PP</div>
+<span class="text-yellow-300 font-bold text-[10px]">100</span>
+</div>
+<!-- Moneda P -->
+<div class="flex items-center gap-1.5">
+<div class="w-5 h-5 rounded-full pixel-coin-p flex items-center justify-center text-[8px] font-black text-slate-800">P</div>
+<span class="text-slate-200 font-bold text-[10px]">1230</span>
+</div>
+</div>
+<!-- Barra lateral de iconos de la huerta -->
+<nav class="flex flex-col gap-2 pb-2">
+<!-- Botón Tienda (Activo) -->
+<div class="w-10 h-10 bg-yellow-500/20 border-2 border-yellow-400 rounded flex items-center justify-center text-base shadow-[0_0_8px_rgba(250,204,21,0.6)]">
+        🏪
+      </div>
+<!-- Botón Mochila -->
+<div class="w-10 h-10 bg-amber-950/80 border-2 border-amber-800 rounded flex items-center justify-center text-base opacity-75">
+        🎒
+      </div>
+<!-- Botón Ajustes -->
+<div class="w-10 h-10 bg-slate-900/80 border-2 border-slate-700 rounded flex items-center justify-center text-base opacity-75">
+        ⚙️
+      </div>
+</nav>
+</aside>
+<!-- END: LeftHUD -->
+<!-- BEGIN: TiendaModal.razor -->
+<div class="modal-fondo">
+<section aria-label="Tienda" aria-modal="true" class="modal-juego" role="dialog">
+<!-- HEADER (modal-cabecera) -->
+<header class="modal-cabecera">
+<div>
+<h1>🌱 Tienda de la Huerta</h1>
+<p>Conseguí recursos para tu huerta.</p>
+</div>
+<button aria-label="Cerrar tienda" class="boton-cerrar">×</button>
+</header>
+<!-- SALDO DEL JUGADOR -->
+<div class="saldo">
+        💰 PP Coins: <strong>150.00</strong>
+</div>
+<!-- MENSAJE DE COMPRA -->
+<p class="mensaje-exito">¡Compra exitosa! Se equipó en tu mochila.</p>
+<!-- CONTENIDO (modal-contenido) -->
+<div class="modal-contenido">
+<!-- Tarjeta 1: Pala de Hierro -->
+<article class="tarjeta-recurso rareza-comun">
+<div class="icono-recurso">🪏</div>
+<div class="detalle-recurso">
+<h2>Pala de Hierro</h2>
+<p>Cava parcelas y cosecha con mayor eficiencia.</p>
+<div class="estadisticas">⚡ 15 · 🛡️ 100 · 🔨 Herramienta · 💎 Comun</div>
+<strong>💰 25.00 PP Coins c/u</strong>
+</div>
+<div class="acciones-tienda">
+<label>
+              Cantidad
+              <input max="99" min="1" type="number" value="1"/>
+</label>
+<button class="boton-primario">Comprar</button>
+</div>
+</article>
+<!-- Tarjeta 2: Regadera Automática -->
+<article class="tarjeta-recurso rareza-raro">
+<div class="icono-recurso">💧</div>
+<div class="detalle-recurso">
+<h2>Regadera Automática</h2>
+<p>Riega múltiples parcelas en área de 3x3 de forma continua.</p>
+<div class="estadisticas">⚡ 25 · 🛡️ 80 · 🔨 Herramienta · 💎 Raro</div>
+<strong>💰 45.00 PP Coins c/u</strong>
+</div>
+<div class="acciones-tienda">
+<label>
+              Cantidad
+              <input max="99" min="1" type="number" value="1"/>
+</label>
+<button class="boton-primario">Comprar</button>
+</div>
+</article>
+<!-- Tarjeta 3: Semilla de Zanahoria -->
+<article class="tarjeta-recurso rareza-comun">
+<div class="icono-recurso">🥕</div>
+<div class="detalle-recurso">
+<h2>Semilla de Zanahoria</h2>
+<p>Semillas de rápida germinación para cosechar ricas zanahorias.</p>
+<div class="estadisticas">⚡ 10 · 🛡️ 1 · 🌾 Semilla · 💎 Comun</div>
+<strong>💰 5.00 PP Coins c/u</strong>
+</div>
+<div class="acciones-tienda">
+<label>
+              Cantidad
+              <input max="99" min="1" type="number" value="1"/>
+</label>
+<button class="boton-primario">Comprar</button>
+</div>
+</article>
+<!-- Tarjeta 4: Fertilizante Cripto -->
+<article class="tarjeta-recurso rareza-epico">
+<div class="icono-recurso">⚡</div>
+<div class="detalle-recurso">
+<h2>Fertilizante Cripto</h2>
+<p>Acelera drásticamente el crecimiento y garantiza cosecha de oro.</p>
+<div class="estadisticas">⚡ 40 · 🛡️ 1 · 🧪 Insumo · 💎 Epico</div>
+<strong>💰 70.00 PP Coins c/u</strong>
+</div>
+<div class="acciones-tienda">
+<label>
+              Cantidad
+              <input max="99" min="1" type="number" value="1"/>
+</label>
+<button class="boton-primario">Comprar</button>
+</div>
+</article>
+</div>
+</section>
+</div>
+<!-- END: TiendaModal.razor -->
+</main>
+<!-- END: GameContainer -->
+</body></html>

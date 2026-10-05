@@ -1,12 +1,5 @@
-﻿body {
-    .custom-btn
-
-{
-    font-size: 1rem;
-    transition: filter .12s ease, opacity .12s ease;
-}
-
-.custom-btn:hover {
-    filter: brightness(0.92);
-}
-}
+﻿/* Los estilos de .custom-btn y .btn-guardar viven en wwwroot/css/pixel.css
+   porque son globales: .custom-btn se usa desde Home.razor (padre) y el
+   <button> se renderiza aqui dentro, por lo que un .razor.css con scope
+   no aplicaria. Antes este archivo contenia un bloque con nesting CSS
+   invalido que se reemplazo. */

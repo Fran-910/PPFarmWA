@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PPFarm - Home</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Pixel Style -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            pixel: ['"Press Start 2P"', 'monospace'],
+            silkscreen: ['"Silkscreen"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    * {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      user-select: none;
+      box-sizing: border-box;
+    }
+
+    /* Fondo de pasto pixel art tipo tablero ajedrezado verde */
+    .bg-checker-grass {
+      background-color: #8bc34a;
+      background-image: 
+        linear-gradient(45deg, #7cb342 25%, transparent 25%), 
+        linear-gradient(-45deg, #7cb342 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #7cb342 75%), 
+        linear-gradient(-45deg, transparent 75%, #7cb342 75%);
+      background-size: 48px 48px;
+      background-position: 0 0, 0 24px, 24px -24px, -24px 0px;
+    }
+
+    /* Pixel art shadows and text strokes */
+    .pixel-text-shadow {
+      text-shadow: 2px 2px 0px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 2px 0 0 #000, 0 2px 0 #000;
+    }
+    .xp-txt {
+      color: #38bdf8;
+      font-weight: 900;
+      text-shadow: 2px 2px 0px #03346e, -1px -1px 0 #03346e, 1px -1px 0 #03346e, -1px 1px 0 #03346e, 2px 0 0 #03346e, 0 2px 0 #03346e;
+    }
+    .points-txt {
+      color: #facc15;
+      font-weight: 900;
+      text-shadow: 2px 2px 0px #78350f, -1px -1px 0 #78350f, 1px -1px 0 #78350f, -1px 1px 0 #78350f, 2px 0 0 #78350f, 0 2px 0 #78350f;
+    }
+
+    /* Barra lateral estilo Blazor PPFarm */
+    .barra-lateral {
+      width: 240px;
+      min-width: 240px;
+      background-color: #1e1e1e;
+      border-right: 4px solid #333333;
+      box-shadow: inset -2px 0 0 #111;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+      z-index: 30;
+      font-family: '"Press Start 2P"', monospace;
+    }
+
+    .barra-lateral ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .barra-lateral li {
+      font-size: 11px;
+      color: #f3f4f6;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Botones de acción Blazor custom-btn */
+    .custom-btn {
+      width: 100%;
+      background-color: #2b3945;
+      color: #f8fafc;
+      border: 3px solid #111827;
+      box-shadow: inset 2px 2px 0 #475569, inset -2px -2px 0 #0f172a, 0 3px 0 #000;
+      padding: 10px 8px;
+      font-size: 10px;
+      font-family: '"Press Start 2P"', monospace;
+      text-align: center;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.05s steps(2);
+    }
+    .custom-btn:hover {
+      background-color: #3b4b59;
+      transform: translateY(-1px);
+      box-shadow: inset 2px 2px 0 #64748b, inset -2px -2px 0 #1e293b, 0 4px 0 #000;
+    }
+    .custom-btn:active {
+      transform: translateY(2px);
+      box-shadow: inset 2px 2px 0 #0f172a, inset -2px -2px 0 #475569, 0 1px 0 #000;
+    }
+    .btn-guardar {
+      background-color: #2e7d32 !important;
+      box-shadow: inset 2px 2px 0 #4caf50, inset -2px -2px 0 #1b5e20, 0 3px 0 #000 !important;
+    }
+    .btn-guardar:hover {
+      background-color: #388e3c !important;
+    }
+
+    .mensaje-guardado.ok {
+      font-size: 8px;
+      color: #4ade80;
+      margin-top: 14px;
+      padding: 6px;
+      background: #142817;
+      border: 2px solid #22543d;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* Huerta Celdas y Cerca de Madera */
+    .pixel-wood-fence {
+      background: #3e2213;
+      border: 8px solid #241208;
+      box-shadow: inset 0 0 0 4px #5e341c, 0 8px 0 rgba(0,0,0,0.45);
+      outline: 3px solid #140904;
+      position: relative;
+    }
+
+    /* Celda individual de cultivo */
+    .huerta-celda {
+      width: 58px;
+      height: 58px;
+      background: #4a240f;
+      border: 2px solid #271206;
+      box-shadow: inset 2px 2px 0 #6d3819, inset -2px -2px 0 #1e0d04;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .huerta-celda:hover {
+      filter: brightness(1.12);
+    }
+
+    /* Barra de vida en cultivos */
+    .life-bar-container {
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      right: 5px;
+      height: 4px;
+      background-color: #1a1a1a;
+      border: 1px solid #000;
+      z-index: 10;
+    }
+    .life-bar-fill.hp-alta {
+      height: 100%;
+      width: 100%;
+      background-color: #22c55e;
+    }
+
+    /* Floating harvest popup */
+    @keyframes harvestFloat {
+      0% { transform: translate(-50%, 0); opacity: 1; }
+      50% { transform: translate(-50%, -14px); opacity: 1; }
+      100% { transform: translate(-50%, -24px); opacity: 0.95; }
+    }
+    .cosecha-popup {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: harvestFloat 1.8s ease-in-out infinite alternate;
+    }
+
+    /* Equipped Frame & Hotbar */
+    .equipped-frame {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1e130c;
+      border: 3px solid #451a03;
+      box-shadow: inset 0 0 0 2px #78350f, 0 4px 0 #000;
+      padding: 6px 12px;
+    }
+    .hotbar-slot {
+      width: 44px;
+      height: 44px;
+      background: #252830;
+      border: 3px solid #111419;
+      box-shadow: inset 2px 2px 0 #3b4252, inset -2px -2px 0 #0d0f12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .hotbar-slot.active {
+      border-color: #f59e0b;
+      background: #343a46;
+      box-shadow: inset 2px 2px 0 #fde68a, inset -2px -2px 0 #92400e, 0 0 6px rgba(245, 158, 11, 0.6);
+    }
+    .slot-number {
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      font-size: 8px;
+      color: #94a3b8;
+      font-family: '"Press Start 2P"', monospace;
+    }
+    .slot-qty {
+      position: absolute;
+      bottom: 2px;
+      right: 3px;
+      font-size: 8px;
+      color: #ffffff;
+      font-family: '"Press Start 2P"', monospace;
+      text-shadow: 1px 1px 0 #000;
+    }
+  </style>
+</head>
+<body class="bg-[#121212] m-0 p-0 overflow-x-hidden font-pixel text-white min-h-screen flex items-center justify-center p-2 sm:p-4 select-none">
+<!-- BEGIN: Home.razor Layout Container -->
+<div class="home-content relative w-full max-w-[1100px] h-[680px] bg-checker-grass border-4 border-[#1c1c1c] shadow-2xl flex flex-row overflow-hidden" data-purpose="home-content">
+<!-- 1. BARRA LATERAL (ancho 240px, fondo #1e1e1e con borde pixelado #333) -->
+<div class="barra-lateral shrink-0" data-purpose="sidebar-navigation">
+<nav class="flex flex-col justify-between h-full">
+<ul>
+<!-- Player Username (razor fallback Pepe) -->
+<li class="text-[#facc15] font-bold text-xs pb-1 tracking-wider border-b-2 border-[#333]">
+            Pepe
+          </li>
+<!-- NIVEL -->
+<li class="text-white text-[10px]">
+            NIVEL 20
+          </li>
+<!-- XP -->
+<li class="text-[#38bdf8] text-[10px]">
+            XP 0 / 100
+          </li>
+<!-- PP (Moneda dorada pixel) -->
+<li class="pt-1">
+<span class="w-6 h-6 rounded-none bg-[#f59e0b] border-2 border-[#78350f] shadow-[inset_1px_1px_0_#fef08a,inset_-1px_-1px_0_#b45309] inline-flex items-center justify-center text-[8px] font-bold text-[#78350f]">PP</span>
+<span class="text-white text-[11px] font-bold">100</span>
+</li>
+<!-- PC (Moneda plateada pixel) -->
+<li>
+<span class="w-6 h-6 rounded-none bg-[#cbd5e1] border-2 border-[#334155] shadow-[inset_1px_1px_0_#ffffff,inset_-1px_-1px_0_#64748b] inline-flex items-center justify-center text-[9px] font-bold text-[#334155]">PC</span>
+<span class="text-white text-[11px] font-bold">1230</span>
+</li>
+<!-- Nav Buttons -->
+<li class="pt-2">
+<button class="custom-btn" title="Tienda" type="button">Tienda</button>
+</li>
+<li>
+<button class="custom-btn" title="Mochila" type="button">Mochila</button>
+</li>
+<li>
+<button class="custom-btn" title="Computadora" type="button">Computadora</button>
+</li>
+<li>
+<button class="custom-btn" title="Configuración" type="button">Configuración</button>
+</li>
+<li>
+<button class="custom-btn btn-guardar" style="background-color: #2e7d32;" title="Guardar partida" type="button">Guardar partida</button>
+</li>
+</ul>
+<!-- Estado de sincronización -->
+<p class="mensaje-guardado ok">Partida sincronizada con éxito</p>
+</nav>
+</div>
+<!-- END: Barra Lateral -->
+<!-- 2. ÁREA DE JUEGO (HuertaCeldasComponent y CultivoComponent) -->
+<div class="game-container flex-1 relative flex flex-col justify-between items-center p-4" data-purpose="game-container">
+<!-- Top header / route indicator -->
+<div class="w-full flex justify-between items-center text-xs text-neutral-800/80 font-silkscreen font-bold">
+<span>PaginaPrincipal</span>
+<span class="text-[10px] text-neutral-900/60 font-pixel">PPFarmWA v1.0</span>
+</div>
+<!-- Contenedor de la huerta centrado con marco de madera y margaritas -->
+<div class="huerta-container relative flex items-center justify-center my-auto" data-purpose="huerta-container">
+<!-- Enmarcado con una cerca de madera pixelada decorada con flores y margaritas pixeladas -->
+<div class="pixel-wood-fence p-3">
+<!-- Flores Decorativas en los bordes y esquinas (Idénticas a la imagen del juego) -->
+<!-- Esquina superior izquierda (Amarilla) -->
+<div class="absolute -top-3 -left-3 w-5 h-5 bg-[#f59e0b] border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-200"></div>
+</div>
+<!-- Borde superior centro (Margarita blanca) -->
+<div class="absolute -top-3.5 left-1/3 -translate-x-1/2 w-5 h-5 bg-white border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-400"></div>
+</div>
+<!-- Borde superior derecho (Flor roja) -->
+<div class="absolute -top-3.5 right-1/4 w-5 h-5 bg-red-600 border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-300"></div>
+</div>
+<!-- Esquina superior derecha (Blanca) -->
+<div class="absolute -top-3 -right-3 w-5 h-5 bg-white border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-400"></div>
+</div>
+<!-- Borde izquierdo (Margarita blanca) -->
+<div class="absolute top-1/2 -left-3.5 -translate-y-1/2 w-5 h-5 bg-white border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-400"></div>
+</div>
+<!-- Borde derecho superior (Azul) -->
+<div class="absolute top-1/4 -right-3.5 w-5 h-5 bg-blue-600 border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-sky-200"></div>
+</div>
+<!-- Borde derecho centro (Margarita blanca) -->
+<div class="absolute top-1/2 -right-3.5 -translate-y-1/2 w-5 h-5 bg-white border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-400"></div>
+</div>
+<!-- Borde inferior izquierdo (Azul) -->
+<div class="absolute -bottom-3.5 left-1/3 w-5 h-5 bg-blue-600 border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-300"></div>
+</div>
+<!-- Borde inferior derecho (Margarita blanca) -->
+<div class="absolute -bottom-3.5 right-1/3 w-5 h-5 bg-white border-2 border-black flex items-center justify-center z-20">
+<div class="w-2 h-2 bg-yellow-400"></div>
+</div>
+<!-- Esquina inferior derecha (Cuadro blanco) -->
+<div class="absolute -bottom-3 -right-3 w-5 h-5 bg-[#e2e8f0] border-2 border-black z-20"></div>
+<!-- Matriz 5x5 de celdas de cultivo (HuertaCeldasComponent) -->
+<div class="grid grid-cols-5 gap-2 bg-[#2a1307] p-2 border-2 border-[#190a03]" id="huertaGrid">
+<!-- FILA 0 -->
+<div class="huerta-celda"></div>
+<div class="huerta-celda"></div>
+<div class="huerta-celda"></div>
+<!-- Cultivo Girasol (images/cultivo1t.png) -->
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<!-- Pixel Sunflower -->
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24">
+<rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect>
+<rect fill="#22c55e" height="3" width="3" x="8" y="14"></rect>
+<rect fill="#22c55e" height="3" width="3" x="13" y="12"></rect>
+<circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle>
+<circle cx="12" cy="7" fill="#451a03" r="2.5"></circle>
+</svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24">
+<rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect>
+<rect fill="#22c55e" height="3" width="3" x="8" y="14"></rect>
+<rect fill="#22c55e" height="3" width="3" x="13" y="12"></rect>
+<circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle>
+<circle cx="12" cy="7" fill="#451a03" r="2.5"></circle>
+</svg>
+</div>
+<!-- FILA 1 -->
+<div class="huerta-celda"></div>
+<!-- CELDA ACTIVA EN LABRANZA/COSECHA (Con Pala de Hierro y Popup Flotante) -->
+<div class="huerta-celda relative" data-purpose="active-crop-action">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<!-- Brote de cultivo -->
+<svg class="w-8 h-8" fill="none" viewbox="0 0 24 24">
+<rect fill="#4ade80" height="10" width="2" x="11" y="11"></rect>
+<circle cx="12" cy="8" fill="#f59e0b" r="4" stroke="#78350f" stroke-width="1.5"></circle>
+<circle cx="12" cy="8" fill="#451a03" r="2"></circle>
+</svg>
+<!-- Herramienta activa pala labrando -->
+<div class="absolute -bottom-2 -right-3 z-30 pointer-events-none transform -rotate-12">
+<svg class="w-8 h-8 drop-shadow-[0_2px_0_#000]" fill="none" viewbox="0 0 32 32">
+<polygon fill="#e2e8f0" points="12,12 18,6 24,12 18,18" stroke="#0f172a" stroke-width="1.5"></polygon>
+<polygon fill="#94a3b8" points="15,12 18,9 21,12 18,15"></polygon>
+<line stroke="#78350f" stroke-width="2.5" x1="12" x2="6" y1="18" y2="24"></line>
+<rect fill="#451a03" height="4" stroke="#000" stroke-width="1" width="4" x="3" y="24"></rect>
+</svg>
+</div>
+<!-- Popup flotante .cosecha-popup -->
+<div class="cosecha-popup">
+<!-- Moneda plateada de puntos -->
+<div class="w-4 h-4 rounded-none bg-[#cbd5e1] border border-black shadow-[inset_1px_1px_0_#fff,inset_-1px_-1px_0_#64748b] flex items-center justify-center">
+<span class="text-[6px] text-[#334155] font-bold">P</span>
+</div>
+<p class="points-txt text-[10px] m-0">+15 P</p>
+<p class="xp-txt text-[10px] m-0 ml-1">+20 XP!</p>
+</div>
+</div>
+<!-- Resto de Fila 1 con girasoles -->
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24">
+<rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect>
+<rect fill="#22c55e" height="3" width="3" x="8" y="14"></rect>
+<circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle>
+<circle cx="12" cy="7" fill="#451a03" r="2.5"></circle>
+</svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24">
+<rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect>
+<circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle>
+<circle cx="12" cy="7" fill="#451a03" r="2.5"></circle>
+</svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24">
+<rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect>
+<circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle>
+<circle cx="12" cy="7" fill="#451a03" r="2.5"></circle>
+</svg>
+</div>
+<!-- FILA 2 (Todos con cultivo) -->
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<!-- FILA 3 -->
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<!-- FILA 4 -->
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+<div class="huerta-celda">
+<div class="life-bar-container"><div class="life-bar-fill hp-alta"></div></div>
+<svg class="w-9 h-9" fill="none" viewbox="0 0 24 24"><rect fill="#4ade80" height="11" width="2" x="11" y="10"></rect><circle cx="12" cy="7" fill="#f59e0b" r="5" stroke="#78350f" stroke-width="1.5"></circle><circle cx="12" cy="7" fill="#451a03" r="2.5"></circle></svg>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Huerta Container -->
+<!-- 3. HOTBAR / EQUIPPED FRAME -->
+<footer class="w-full flex justify-center items-center pb-2 z-20 gap-3" data-purpose="bottom-bar">
+<!-- Equipped Frame: Herramienta Activa (Pala de Hierro) -->
+<div class="equipped-frame" title="Herramienta equipada">
+<span class="text-[9px] text-[#facc15] font-bold">ACTIVO</span>
+<div class="w-9 h-9 bg-[#2b303c] border-2 border-[#111] flex items-center justify-center">
+<svg class="w-7 h-7" fill="none" viewbox="0 0 32 32">
+<polygon fill="#e2e8f0" points="12,12 18,6 24,12 18,18" stroke="#0f172a" stroke-width="1.5"></polygon>
+<line stroke="#ca8a04" stroke-width="2.5" x1="12" x2="6" y1="18" y2="24"></line>
+</svg>
+</div>
+</div>
+<!-- Hotbar de 5 slots de acceso rápido con números [1] [2] [3] [4] [5] -->
+<div class="flex items-center gap-1.5 bg-[#1a110a] p-1.5 border-2 border-[#381a08] shadow-md">
+<!-- Slot 1 (Selected / Active) -->
+<div class="hotbar-slot active" title="[1] Pala de Hierro">
+<span class="slot-number">1</span>
+<svg class="w-6 h-6" fill="none" viewbox="0 0 32 32">
+<polygon fill="#e2e8f0" points="12,12 18,6 24,12 18,18" stroke="#0f172a" stroke-width="1.5"></polygon>
+<line stroke="#ca8a04" stroke-width="2.5" x1="12" x2="6" y1="18" y2="24"></line>
+</svg>
+</div>
+<!-- Slot 2: Regadera -->
+<div class="hotbar-slot" title="[2] Regadera">
+<span class="slot-number">2</span>
+<svg class="w-6 h-6" fill="none" viewbox="0 0 24 24">
+<rect fill="#0284c7" height="9" stroke="#0f172a" stroke-width="1" width="10" x="6" y="8"></rect>
+<path d="M16 11 L20 7" stroke="#38bdf8" stroke-width="2"></path>
+<path d="M6 10 C4 10 4 15 6 15" fill="none" stroke="#0284c7" stroke-width="2"></path>
+</svg>
+</div>
+<!-- Slot 3: Semillas de Girasol -->
+<div class="hotbar-slot" title="[3] Semillas de Girasol">
+<span class="slot-number">3</span>
+<div class="w-4 h-5 bg-amber-200 border border-amber-900 flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-amber-600"></div>
+</div>
+<span class="slot-qty">x24</span>
+</div>
+<!-- Slot 4: Fertilizante -->
+<div class="hotbar-slot" title="[4] Fertilizante">
+<span class="slot-number">4</span>
+<div class="w-4 h-5 bg-[#15803d] border border-[#052e16] flex items-center justify-center">
+<span class="text-[6px] text-white font-bold">F</span>
+</div>
+<span class="slot-qty">x8</span>
+</div>
+<!-- Slot 5: Vacío -->
+<div class="hotbar-slot opacity-60" title="[5] Vacío">
+<span class="slot-number">5</span>
+</div>
+</div>
+</footer>
+<!-- END: Hotbar -->
+</div>
+<!-- END: Game Container -->
+</div>
+<!-- END: Home.razor Layout Container -->
+</body></html>

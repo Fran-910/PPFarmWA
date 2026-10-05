@@ -23,7 +23,7 @@
 
             <!-- Indicador de saldos reales -->
             <div style="background-color: #f1f8ff; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>Tus saldos:</strong> 🪙 @saldoPoints Points | 💰 @saldoPPCoints.ToString("0.##") PP Coins
+                <strong>Tus saldos:</strong> 🪙 @JugadorState.__jugador.points Points | 💰 @JugadorState.__jugador.ppCoins.ToString("0.##") PP Coins
             </div>
 
             <!-- Mensajes del sistema -->
@@ -41,7 +41,7 @@
 
                     <div class="form-group">
                         <label>Points a convertir:</label>
-                        <input type="number" @bind="PuntosAConvertir" @bind:event="oninput" placeholder="Ej: 1000" min="0" max="@saldoPoints" />
+                        <input type="number" @bind="PuntosAConvertir" @bind:event="oninput" placeholder="Ej: 1000" min="0" max="@JugadorState.__jugador.points" />
                     </div>
                     <div class="form-group">
                         <label>Equivalente en PP Coins:</label>
@@ -49,7 +49,7 @@
                     </div>
 
                     <button class="action-btn"
-                            disabled="@(ocupado || PuntosAConvertir <= 0 || PuntosAConvertir > saldoPoints)"
+                            disabled="@(ocupado || PuntosAConvertir <= 0 || PuntosAConvertir > JugadorState.__jugador.points)"
                             @onclick="ConfirmarConversionAsync">
                         @(ocupado ? "Procesando..." : "Confirmar Conversión")
                     </button>
@@ -92,7 +92,6 @@
 
     private int idJugador = 2;
     private double saldoPPCoints;
-    private double saldoPoints = 5000; // Puesto a mano temporalmente hasta que el backend envíe los points
     private bool ocupado;
     private string? mensaje;
     private string claseMensaje = "mensaje-exito";
@@ -134,8 +133,8 @@
 
             if (respuestaDelServidor.Exito)
             {
-                saldoPoints -= PuntosAConvertir;
-                saldoPPCoints += EquivalentePPCoints;
+                JugadorState.__jugador.points -= PuntosAConvertir;
+                JugadorState.__jugador.ppCoins += EquivalentePPCoints;
 
                 historialConversiones.Insert(0, $"-{PuntosAConvertir} Points / +{EquivalentePPCoints} PP Coins");
                 PuntosAConvertir = 0;
@@ -154,7 +153,7 @@
 
     private async Task ActualizarSaldo()
     {
-        var jugador = await JugadorService.ObtenerPorId(idJugador);
+        var jugador = await JugadorService.ObtenerPorId(JugadorState.__jugador.Id);
 
         if (jugador is null)
         {

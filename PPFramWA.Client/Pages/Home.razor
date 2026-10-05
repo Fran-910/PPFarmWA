@@ -1,4 +1,5 @@
 ﻿@page "/"
+@implements IDisposable
 @inject JugadorState jugadorState
 @inject JugadorServicio jugadorServicio
 @inject CatalogoRecursos catalogoRecursos
@@ -6,19 +7,35 @@
 <PageTitle>Home</PageTitle>
 
 <div style="cursor: @cursorActual;" @onmousedown="CambiarAClick" @onmouseup="RestablecerAMain" @onmouseover="RestablecerAMain" @onmouseleave="RestablecerAMain"
-     class="home-content">
+     class="home-content terrain-bg">
+
+    <!-- ============ BARRA LATERAL ============ -->
     <div class="barra-lateral">
         <nav>
             <ul>
-                <li>@(jugadorState?.__jugador?.userName ?? "Jugador")</li>
-                <li>NIVEL @(jugadorState?.__jugador?.level ?? 0)</li>
-                <li>XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
-                <li>PP @(jugadorState?.__jugador?.points ?? 0)</li>
-                <li><CustomButton OnClick="IrATienda" Label="Tienda"></CustomButton></li>
-                <li><CustomButton OnClick="IrAMochila" Label="Mochila"></CustomButton></li>
-                <li><CustomButton onclick="IrAComputadora" Label="Computadora"></CustomButton></li>
-                <li><CustomButton onclick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
-                <li><CustomButton OnClick="GuardarPartidaAsync" Label="@LabelGuardar" Color="#2e7d32"></CustomButton></li>
+                <li class="jugador-nombre">@(jugadorState?.__jugador?.userName ?? "Jugador")</li>
+
+                <li class="jugador-nivel">NIVEL @(jugadorState?.__jugador?.level ?? 0)</li>
+
+                <li class="jugador-xp">XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
+
+                <!-- PP = puntos cosechados -->
+                <li class="jugador-moneda">
+                    <span class="coin coin-pp">PP</span>
+                    <span class="coin-valor">@(jugadorState?.__jugador?.points ?? 0)</span>
+                </li>
+
+                <!-- PC = PP Coins -->
+                <li class="jugador-moneda">
+                    <span class="coin coin-pc">PC</span>
+                    <span class="coin-valor">@(jugadorState?.__jugador?.ppCoins ?? 0)</span>
+                </li>
+
+                <li class="jugador-accion"><CustomButton OnClick="IrATienda" Label="Tienda"></CustomButton></li>
+                <li class="jugador-accion"><CustomButton OnClick="IrAMochila" Label="Mochila"></CustomButton></li>
+                <li class="jugador-accion"><CustomButton OnClick="IrAComputadora" Label="Computadora"></CustomButton></li>
+                <li class="jugador-accion"><CustomButton OnClick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
+                <li class="jugador-accion"><CustomButton OnClick="GuardarPartidaAsync" Label="@LabelGuardar" Class="btn-guardar"></CustomButton></li>
             </ul>
             @if (!string.IsNullOrEmpty(mensajeGuardado))
             {
@@ -26,26 +43,38 @@
             }
         </nav>
     </div>
+
     @if (recursos is not null)
     {
+        <!-- ============ AREA DE JUEGO ============ -->
         <div class="game-container">
+
+            <div class="game-header">
+                <span>PaginaPrincipal</span>
+                <span class="game-version">PPFarmWA v1.0</span>
+            </div>
+
             <HuertaCeldasComponent></HuertaCeldasComponent>
-            <div style="background-image: url(/images/ui/equipped-frame/EquippedItemFrame.png)" class="equipped-frame">
+
+            <!-- El marco del item equipado ya no usa imagen: el cromado esta
+                 en .equipped-frame (pixel.css) para igualar el resto de la HUD -->
+            <div class="equipped-frame">
                 <img src="/images/tools/@jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")/Main.png" />
             </div>
+
         </div>
     }
 
     @if (mostrarTienda)
     {
-    <TiendaModal OnClose="CerrarModales" />
+        <TiendaModal OnClose="CerrarModales" />
     }
 
     @if (mostrarInventario)
     {
-    <InventarioModal OnClose="CerrarModales" />
+        <InventarioModal OnClose="CerrarModales" />
     }
-    
+
 </div>
 @code {
 
@@ -55,6 +84,7 @@
     private string? mensajeGuardado;
     private bool exitoGuardado;
     private bool guardando;
+    private CancellationTokenSource? ctsMensaje;
 
     private string LabelGuardar => guardando ? "Guardando..." : "Guardar partida";
     private string ClaseMensajeGuardado => exitoGuardado ? "mensaje-guardado ok" : "mensaje-guardado error";
@@ -152,8 +182,7 @@
 
         if (jugador is null)
         {
-            exitoGuardado = false;
-            mensajeGuardado = "No hay jugador en sesión.";
+            await MostrarMensajeTemporal("No hay jugador en sesión.", false);
             return;
         }
 
@@ -162,13 +191,11 @@
         {
             var (exito, mensaje) = await jugadorServicio.GuardarPartida(jugador);
 
-            exitoGuardado = exito;
-            mensajeGuardado = mensaje;
+            await MostrarMensajeTemporal(mensaje, exito);
         }
         catch (Exception ex)
         {
-            exitoGuardado = false;
-            mensajeGuardado = $"Error de conexión: {ex.Message}";
+            await MostrarMensajeTemporal($"Error de conexión: {ex.Message}", false);
         }
         finally
         {
@@ -176,13 +203,40 @@
         }
     }
 
-    public void Dispose()
+    // El aviso de guardado se oculta solo: antes queda pegado en pantalla
+    // indefinidamente. Cada aviso nuevo cancela el temporizador del anterior.
+    private async Task MostrarMensajeTemporal(string mensaje, bool exito, int milisegundos = 3000)
     {
-        jugadorState.OnChange -= Actualizar;
+        ctsMensaje?.Cancel();
+        ctsMensaje?.Dispose();
+        ctsMensaje = new CancellationTokenSource();
+        var token = ctsMensaje.Token;
+
+        exitoGuardado = exito;
+        mensajeGuardado = mensaje;
+
+        try
+        {
+            await Task.Delay(milisegundos, token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        mensajeGuardado = null;
+        await InvokeAsync(StateHasChanged);
     }
 
-    //se solucionaron los errores de q no aparecian las ventanas desplazantes de tienda y inventario
-    //ahora tengo q comprobar por que me sale error cuando habro los modales sera por validaciones o por q el modal tiene algo raro en la parte del render.
-    // por otra parte ya poner a prueba la bd y verificar q no haiga errores y q se carguen las cosas
-    //correctamente.
+    public void Dispose()
+    {
+        ctsMensaje?.Cancel();
+        ctsMensaje?.Dispose();
+        jugadorState.OnChange -= Actualizar;
+    }
 }

@@ -6,6 +6,7 @@ namespace PPFramWA.Client.Domains
     {
         public int Id { get; set; }
         public string userName { get; set; }
+        public string email { get; set; }
         public int level { get; set; }
         public int experiencia { get; set; }
         public double ppCoins { get; set; }
@@ -37,6 +38,7 @@ namespace PPFramWA.Client.Domains
         {
             Id = dto.JugadorId;
             userName = dto.userName;
+            email = dto.email;
             level = dto.level;
             experiencia = dto.experiencia;
             ppCoins = dto.ppCoins;

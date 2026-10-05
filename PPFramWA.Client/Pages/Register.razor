@@ -5,42 +5,118 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
-<div>
-    <h1>Crear Cuenta</h1>
+<div class="pf-register">
+    <div class="pf-auth terrain-bg">
+        <div class="pf-title">PP FARM</div>
 
-    @if (!string.IsNullOrEmpty(mensajeError))
-    {
-        <div>@mensajeError</div>
-    }
+        <div class="pf-frame">
+            <!-- Acentos de esquina (formas del diseno original, paleta Terraria) -->
+            <div class="pf-corner pf-corner-tl"></div>
+            <div class="pf-corner pf-corner-tr"></div>
+            <div class="pf-corner pf-corner-bl"></div>
+            <div class="pf-corner pf-corner-br"></div>
 
-    @if (cargando)
-    {
-        <p>Cargando...</p>
-    }
-    else
-    {
-        <form @onsubmit="ProcesarRegistro">
+            <form class="pf-panel" @onsubmit="ProcesarRegistro" @onsubmit:preventDefault>
 
-            <div>
-                <input @bind="registro.userName" type="text" placeholder="Nombre de usuario" required />
-            </div>
+                <!-- CABECERA -->
+                <header class="pf-cabecera">
+                    <div class="pf-pips">
+                        <span>👤</span>
+                    </div>
 
-            <div>
-                <input @bind="registro.email" type="email" placeholder="Correo electrónico" required />
-            </div>
+                    <h1>Crear Cuenta</h1>
 
-            <div>
-                <input @bind="registro.password" type="password" placeholder="Contraseña" required />
-            </div>
+                    <div class="pf-pips">
+                        <span class="pf-pip"></span>
+                    </div>
+                </header>
 
-            <div>
-                <button type="submit">Crear cuenta</button>
-            </div>
-            <div>
-                 <button type="button" class="volver" @onclick="Volver">Volver Al Login</button>
-            </div>
-        </form>
-    }
+                <!-- MENSAJE DE ERROR -->
+                @if (!string.IsNullOrEmpty(mensajeError))
+                {
+                    <div class="pf-error" id="errorBox">
+                        <span>⚠</span>
+                        <span id="errorMessage">@mensajeError</span>
+                    </div>
+                }
+
+                @if (cargando)
+                {
+                    <p class="pf-loading">⏳ Guardando granjero...</p>
+                }
+                else
+                {
+                    <div class="pf-body">
+                        <div class="pf-field">
+                            <label for="usernameInput">
+                                <span>🏷</span>
+                                <span>Usuario</span>
+                            </label>
+                            <div class="pf-input">
+                                <input id="usernameInput"
+                                       type="text"
+                                       required
+                                       autocomplete="username"
+                                       placeholder="Nombre de usuario"
+                                       @bind="registro.userName" />
+                            </div>
+                        </div>
+
+                        <div class="pf-field">
+                            <label for="emailInput">
+                                <span>📧</span>
+                                <span>Correo</span>
+                            </label>
+                            <div class="pf-input">
+                                <input id="emailInput"
+                                       type="email"
+                                       required
+                                       autocomplete="email"
+                                       placeholder="Correo electrónico"
+                                       @bind="registro.email" />
+                            </div>
+                        </div>
+
+                        <div class="pf-field">
+                            <label for="passwordInput">
+                                <span>🔒</span>
+                                <span>Contrase&ntilde;a</span>
+                            </label>
+                            <div class="pf-input">
+                                <input id="passwordInput"
+                                       type="password"
+                                       required
+                                       minlength="8"
+                                       autocomplete="new-password"
+                                       placeholder="Contraseña"
+                                       @bind="registro.password" />
+                            </div>
+                        </div>
+
+                        <div class="pf-actions">
+                            <button type="submit" class="boton-primario">
+                                <span>📝</span>
+                                <span>Crear cuenta</span>
+                            </button>
+
+                            <button type="button"
+                                    class="custom-btn volver"
+                                    @onclick="Volver">
+                                <span>⬅</span>
+                                <span>Volver Al Login</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PIE -->
+                    <footer class="pf-footer">
+                        <span class="pf-footer-right">PP-FARM-OS</span>
+                    </footer>
+                }
+
+            </form>
+        </div>
+    </div>
 </div>
 
 @code {

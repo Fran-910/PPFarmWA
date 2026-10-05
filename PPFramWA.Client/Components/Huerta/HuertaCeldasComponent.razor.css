@@ -1,13 +1,227 @@
-﻿
+﻿/* ============================================================================
+   HuertaCeldasComponent.razor — pixel Terraria
+   Portado de:
+     DesingFiles/stitch_ppfarm_design_system/pp_farm_huerta_y_barra_lateral_home.razor/code.html
+   ============================================================================ */
+
+/* =========================================================
+   CONTENEDOR
+   ========================================================= */
+
 .huerta-container {
+    position: relative;
     display: flex;
-    flex-direction: row;
-    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    margin: auto 0;
+}
+
+/* =========================================================
+   CERCA DE MADERA
+   ========================================================= */
+
+.pixel-wood-fence {
+    position: relative;
+    padding: clamp(8px, 0.9vw, 14px);
+    max-width: 100%;
+    box-sizing: border-box;
+    background: var(--tf-fence);
+    border: clamp(5px, 0.55vw, 8px) solid #241208;
+    outline: 3px solid var(--tf-fence-outline);
+    box-shadow: inset 0 0 0 4px var(--tf-fence-hi), 0 8px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* =========================================================
+   FLORES DECORATIVAS (20x20 con nucleo de 8x8)
+   ========================================================= */
+
+.flor {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #000;
+    box-sizing: border-box;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.flor-centro {
+    width: 8px;
+    height: 8px;
+}
+
+.flor-amarilla {
+    background: #f59e0b;
+}
+
+.flor-blanca {
+    background: #fff;
+}
+
+.flor-roja {
+    background: #dc2626;
+}
+
+.flor-azul {
+    background: #2563eb;
+}
+
+/* Esquina inferior derecha: cuadro liso, sin nucleo */
+.flor-pizarra {
+    background: #e2e8f0;
+}
+
+.flor-centro-claro {
+    background: #fef08a;
+}
+
+.flor-centro-amarillo {
+    background: #facc15;
+}
+
+.flor-centro-celeste {
+    background: #bae6fd;
+}
+
+/* --- Posiciones --- */
+
+.flor-sup-izq {
+    top: -12px;
+    left: -12px;
+}
+
+.flor-sup-centro {
+    top: -14px;
+    left: 33.33%;
+    transform: translateX(-50%);
+}
+
+.flor-sup-cuarto {
+    top: -14px;
+    right: 25%;
+}
+
+.flor-sup-der {
+    top: -12px;
+    right: -12px;
+}
+
+.flor-izq-medio {
+    top: 50%;
+    left: -14px;
+    transform: translateY(-50%);
+}
+
+.flor-der-cuarto {
+    top: 25%;
+    right: -14px;
+}
+
+.flor-der-medio {
+    top: 50%;
+    right: -14px;
+    transform: translateY(-50%);
+}
+
+.flor-inf-tercio {
+    bottom: -14px;
+    left: 33.33%;
+}
+
+.flor-inf-tercio-der {
+    bottom: -14px;
+    right: 33.33%;
+}
+
+.flor-inf-der {
+    bottom: -12px;
+    right: -12px;
+}
+
+/* =========================================================
+   MATRIZ DE CELDAS: 5 columnas, el numero de filas depende
+   de huerta.cantCeldas (crece con el nivel del jugador)
+   ========================================================= */
+
+/* Las celdas ocupan el espacio disponible. El diseno fija 5 columnas; aca los
+   tracks son 1fr para que la huerta crezca con la pantalla y se mantiene
+   --celdas solo para el ancho (5 columnas en desktop, menos en movil).
+   El alto de cada celda se deriva del ancho con aspect-ratio para que
+   sigan siendo cuadradas. */
+.huerta-container {
+    --celdas: 5;
+    --gap: clamp(5px, 0.6vw, 14px);
+    /* Tope de celda: no supera 11vw ni lo que entra en 3 filas (max 12 celdas
+       segun CeldasHuerta), para que la huerta crezca sin desbordar en alto. */
+    --celda-max: clamp(46px, min(11vw, (100dvh - 240px) / 3), 230px);
+    --grid-max: calc(var(--celdas) * var(--celda-max) + (var(--celdas) - 1) * var(--gap) + 2 * var(--gap) + 4px);
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.huerta-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--celdas), minmax(0, 1fr));
+    gap: var(--gap);
+    padding: var(--gap);
+    width: 100%;
+    max-width: var(--grid-max);
+    margin: 0 auto;
+    background: var(--tf-grid-bg);
+    border: 2px solid var(--tf-grid-border);
 }
 
 .huerta-celda {
-    text-align: center;
-    width: 100px;
-    height: auto;
-    background-color: #808080;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--tf-soil);
+    border: 2px solid #271206;
+    box-shadow: inset 2px 2px 0 var(--tf-soil-hi), inset -2px -2px 0 var(--tf-soil-lo);
+    cursor: pointer;
+}
+
+.huerta-celda:hover {
+    filter: brightness(1.12);
+}
+
+/* =========================================================
+   RESPONSIVE
+   El numero de celdas sigue siendo huerta.cantCeldas (logica intacta):
+   solo cambia cuantas columnas caben por fila.
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .huerta-container {
+        --celdas: 4;
+    }
+}
+
+@media (max-width: 800px) {
+    .huerta-container {
+        --celdas: 3;
+        --celda: clamp(42px, 8vw, 64px);
+    }
+}
+
+@media (max-width: 520px) {
+    .huerta-container {
+        --celdas: 2;
+        --celda: clamp(40px, 15vw, 60px);
+    }
+}
+
+/* En vertical la valla se pega al header en vez de flotar en el centro */
+@media (max-height: 700px) {
+    .huerta-container {
+        margin: 16px 0;
+    }
 }
