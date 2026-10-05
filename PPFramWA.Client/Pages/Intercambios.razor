@@ -1,7 +1,14 @@
 ﻿@page "/intercambios"
+@inject VentaServicio VentaServicio
+@inject ItemServicio ItemServicio
+@inject JugadorState JugadorState
+@inject NavigationManager NavigationManager
 
 <PageTitle>Intercambios</PageTitle>
 
+<button class="btn-volver" @onclick="VolverAlHome">
+    ← Volver
+</button>
 <div class="intercambios">
 
     <h1>Intercambios</h1>
@@ -14,12 +21,15 @@
         <div class="campo">
             <label>Recurso</label>
 
-            <select>
-                <option>Seleccionar recurso</option>
-                <option>Madera</option>
-                <option>Piedra</option>
-                <option>Semillas</option>
-                <option>Hierro</option>
+            <select @bind="itemSeleccionadoId">
+                <option value="">Seleccionar recurso</option>
+
+                @foreach (var item in inventarioJugador)
+                {
+                    <option value="@item.Id">
+                        @IconoRecurso(item.nombre) @item.nombre - Cantidad: @item.cantidad
+                    </option>
+                }
             </select>
         </div>
 
@@ -28,6 +38,7 @@
 
             <input type="number"
                    min="1"
+                   @bind="cantidadVenta"
                    placeholder="Cantidad" />
         </div>
 
@@ -36,16 +47,20 @@
 
             <input type="number"
                    min="0"
+                   @bind="precioVenta"
                    placeholder="PP Coins" />
         </div>
 
-        <button class="btn-publicar">
+        <button class="btn-publicar" @onclick="PublicarIntercambio">
             Publicar intercambio
         </button>
 
+        @if (!string.IsNullOrWhiteSpace(mensajePublicacion))
+        {
+            <p>@mensajePublicacion</p>
+        }
+
     </div>
-
-
     <!-- INTERCAMBIOS DISPONIBLES -->
     <div class="disponibles">
 
@@ -53,194 +68,271 @@
 
         <div class="lista-intercambios">
 
-            <!-- INTERCAMBIO 1 -->
-            <div class="intercambio">
+            @if (cargando)
+            {
+                <p>Cargando intercambios...</p>
+            }
+            else if (error)
+            {
+                <p>Ocurrió un error al cargar los intercambios.</p>
+            }
+            else if (ventasDisponibles.Count == 0)
+            {
+                <p>No hay intercambios disponibles.</p>
+            }
+            else
+            {
+                @foreach (var venta in ventasDisponibles)
+                {
+                    <div class="intercambio">
 
-                <h3>Juan</h3>
+                        <h3>👤 Jugador @venta.idJugadorVendedor</h3>
 
-                <p>
-                    <strong>Recurso:</strong> Madera
-                </p>
+                        <p class="recurso-venta">
+                            @IconoRecurso(venta.nombreRecurso ?? "") @venta.nombreRecurso
+                        </p>
 
-                <p>
-                    <strong>Cantidad:</strong> 10
-                </p>
+                        <p>
+                            <strong>Cantidad:</strong>
+                            @venta.cantidadVenta
+                        </p>
 
-                <p>
-                    <strong>Precio:</strong> 50 PP Coins
-                </p>
+                        <p>
+                            <strong>Precio:</strong>
+                            🪙 @venta.precioVenta PP Coins
+                        </p>
 
-                <button class="btn-comprar">
-                    Comprar
-                </button>
+                        <button class="btn-comprar"
+                                @onclick="() => PrepararCompra(venta)">
+                            🛒 Comprar
+                        </button>
 
-            </div>
-
-
-            <!-- INTERCAMBIO 2 -->
-            <div class="intercambio">
-
-                <h3>Pedro</h3>
-
-                <p>
-                    <strong>Recurso:</strong> Semillas
-                </p>
-
-                <p>
-                    <strong>Cantidad:</strong> 5
-                </p>
-
-                <p>
-                    <strong>Precio:</strong> 30 PP Coins
-                </p>
-
-                <button class="btn-comprar">
-                    Comprar
-                </button>
-
-            </div>
+                    </div>
+                }
+            }
 
         </div>
 
     </div>
 
+    @if (mostrarConfirmacion && ventaSeleccionada != null)
+    {
+        <div class="modal-fondo">
+
+            <div class="modal-compra">
+
+                <h2>Confirmar compra</h2>
+                <p class="recurso-venta">
+                    @IconoRecurso(ventaSeleccionada.nombreRecurso ?? "") @ventaSeleccionada.nombreRecurso
+                </p>
+
+                <p>
+                    <strong>Cantidad:</strong>
+                    @ventaSeleccionada.cantidadVenta
+                </p>
+
+                <p>
+                    <strong>Precio:</strong>
+                    🪙 @ventaSeleccionada.precioVenta PP Coins
+                </p>
+
+                <p>
+                    <strong>Vendedor:</strong>
+                    Jugador @ventaSeleccionada.idJugadorVendedor
+                </p>
+
+                <div class="modal-botones">
+
+                    <button class="btn-cancelar"
+                            @onclick="CancelarCompra">
+                        Cancelar
+                    </button>
+
+                    <button class="btn-confirmar"
+                            @onclick="ConfirmarCompra">
+                        Comprar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
 </div>
 
 
-<style>
-
-    /* CONTENEDOR PRINCIPAL */
-
-    .intercambios {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 20px;
-    }
 
 
-        /* TITULO */
 
-        .intercambios h1 {
-            text-align: center;
-            margin-bottom: 35px;
-            font-size: 40px;
-        }
+@code {
 
-
-    /* PUBLICAR */
-
-    .publicar {
-        max-width: 600px;
-        margin: 0 auto 40px auto;
-        padding: 25px;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-    }
-
-        .publicar h2 {
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-
-    /* CAMPOS */
-
-    .campo {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 18px;
-    }
-
-        .campo label {
-            margin-bottom: 7px;
-            font-weight: bold;
-        }
-
-        .campo input,
-        .campo select {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #aaa;
-            font-size: 15px;
-        }
-
-
-    /* BOTON PUBLICAR */
-
-    .btn-publicar {
-        width: 100%;
-        padding: 12px;
-        margin-top: 5px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-
-    /* DISPONIBLES */
-
-    .disponibles h2 {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-
-    /* LISTA */
-
-    .lista-intercambios {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-
-
-    /* TARJETA */
-
-    .intercambio {
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-    }
-
-        .intercambio h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 22px;
-        }
-
-        .intercambio p {
-            margin: 8px 0;
-        }
-
-
-    /* BOTON COMPRAR */
-
-    .btn-comprar {
-        width: 100%;
-        margin-top: 15px;
-        padding: 10px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-
-    /* CELULAR */
-
-    @@media (max-width: 700px) {
-
+    private string IconoRecurso(string nombre)
     {
+        return nombre switch
+        {
+            "Pala" => "🪏",
+            "Madera" => "🪵",
+            "Hierro" => "⚙️",
+            "Pico de Hierro" => "⛏️",
+            "Semillas" => "🌱",
+            _ => "📦"
+        };
+    }
 
-        .lista-intercambios {
-            grid-template-columns: 1fr;
+    private void VolverAlHome()
+{
+    NavigationManager.NavigateTo("/");
+}
+    private List<VentaDTO> ventasDisponibles = new();
+    private List<InventarioDTO> inventarioJugador = new();
+    private int itemSeleccionadoId;
+    private int cantidadVenta;
+    private double precioVenta;
+    private string mensajePublicacion = "";
+    private bool mostrarConfirmacion = false;
+    private VentaDTO? ventaSeleccionada;
+
+    private bool cargando = true;
+    private bool error = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
+
+            int jugadorId = JugadorState.__jugador?.Id ?? 20;
+
+            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
         }
-
-        .intercambios {
-            padding: 15px;
+        catch
+        {
+            error = true;
+        }
+        finally
+        {
+            cargando = false;
         }
     }
 
-</style>
+    private async Task PublicarIntercambio()
+    {
+        mensajePublicacion = "";
+
+        if (itemSeleccionadoId == 0)
+        {
+            mensajePublicacion = "Seleccioná un recurso.";
+            return;
+        }
+
+        if (cantidadVenta <= 0)
+        {
+            mensajePublicacion = "Ingresá una cantidad válida.";
+            return;
+        }
+
+        if (precioVenta < 0)
+        {
+            mensajePublicacion = "Ingresá un precio válido.";
+            return;
+        }
+
+        int jugadorId = JugadorState.__jugador?.Id ?? 20;
+
+        var venta = new VentaDTO
+        {
+            idJugadorVendedor = jugadorId,
+            idJugadorComprador = null,
+            cantidadVenta = cantidadVenta,
+            precioVenta = precioVenta
+        };
+
+        var creada = await VentaServicio.PublicarIntercambio(
+            itemSeleccionadoId,
+            venta);
+
+        if (creada)
+        {
+            mensajePublicacion = "Intercambio publicado correctamente.";
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
+            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+        }
+        else
+        {
+            mensajePublicacion = "No se pudo publicar el intercambio.";
+        }
+    }
+
+
+
+
+
+    private void PrepararCompra(VentaDTO venta)
+    {
+        ventaSeleccionada = venta;
+        mostrarConfirmacion = true;
+    }
+
+    private void CancelarCompra()
+    {
+        ventaSeleccionada = null;
+        mostrarConfirmacion = false;
+    }
+
+    private async Task ConfirmarCompra()
+    {
+        if (ventaSeleccionada == null)
+            return;
+
+        int jugadorId = 9;
+
+        var comprado = await VentaServicio.ComprarIntercambio(
+            ventaSeleccionada.Id,
+            jugadorId
+        );
+
+        mostrarConfirmacion = false;
+
+        if (comprado)
+        {
+            mensajePublicacion = "Compra realizada correctamente.";
+
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
+            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+        }
+        else
+        {
+            mensajePublicacion = "No se pudo realizar la compra.";
+        }
+
+        ventaSeleccionada = null;
+    }
+
+    private async Task ComprarIntercambio(int idVenta)
+    {
+        int jugadorId = 9;
+        
+        var comprado = await VentaServicio.ComprarIntercambio(
+            idVenta,
+            jugadorId
+        );
+
+        if (comprado)
+        {
+            mensajePublicacion = "Compra realizada correctamente.";
+
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
+
+            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+        }
+        else
+        {
+            mensajePublicacion = "No se pudo realizar la compra.";
+        }
+    }
+
+
+
+}

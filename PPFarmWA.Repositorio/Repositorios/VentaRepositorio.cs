@@ -22,5 +22,12 @@ namespace PPFarmWA.Repositorio.Repositorios
                     v.idJugadorComprador == idJugador)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Venta>> GetVentasDisponiblesAsync()
+        {
+            return await _dbSet
+                .Where(v => v.idJugadorComprador == null)
+                .ToListAsync();
+        }
     }
 }

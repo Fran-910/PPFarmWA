@@ -8,5 +8,6 @@ namespace PPFarmWA.Repositorio.Repositorios
     public interface IVentaRepositorio : IRepositorio<Venta>
     {
         Task<IEnumerable<Venta>> GetVentasJugadorAsync(int idJugador);
+        Task<IEnumerable<Venta>> GetVentasDisponiblesAsync();
     }
 }

@@ -9,12 +9,12 @@
     <div class="main-section">
 
         <div class="sidebar">
-            <button class="nav-btn @(vistaActual == "Convertir" ? "active" : "")"
-                    @onclick='() => CambiarVista("Convertir")'>
+            <button class="nav-btn @(!mostrarIntercambio ? "active" : "")"
+                    @onclick="MostrarPrincipal">
                 Convertir
             </button>
-            <button class="nav-btn @(vistaActual == "Intercambiar" ? "active" : "")"
-                    @onclick='() => CambiarVista("Intercambiar")'>
+            <button class="nav-btn @(mostrarIntercambio ? "active" : "")"
+                    @onclick="MostrarIntercambio">
                 Intercambiar
             </button>
         </div>
@@ -34,7 +34,7 @@
                 </p>
             }
 
-            @if (vistaActual == "Convertir")
+            @if (!mostrarIntercambio)
             {
                 <div class="convertir-view">
                     <h2>Convertir Points a PP Coins</h2>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             }
-            else if (vistaActual == "Intercambiar")
+            else 
             {
                 <div class="intercambiar-view">
                     <h2>Mercado de Intercambio</h2>
@@ -81,6 +81,9 @@
                         <li>🪏 1x Pala de Bronce</li>
                         <li>🌙 1x Hoz Dorada</li>
                     </ul>
+                    <button class="action-btn" @onclick="MostrarPrincipal">
+                        ← Volver
+                    </button>
                 </div>
             }
         </div>
@@ -88,7 +91,7 @@
 </div>
 
 @code {
-    private string vistaActual = "Convertir";
+    private bool mostrarIntercambio = false;
 
     private int idJugador = 2;
     private double saldoPPCoints;
@@ -173,10 +176,19 @@
         JugadorState.NotificarCambios();
     }
 
-    private void CambiarVista(string nuevaVista)
+    private void MostrarIntercambio()
     {
-        vistaActual = nuevaVista;
+        mostrarIntercambio = true;
         PuntosAConvertir = 0;
         mensaje = null;
     }
+
+    private void MostrarPrincipal()
+    {
+        mostrarIntercambio = false;
+        PuntosAConvertir = 0;
+        mensaje = null;
+    }
+
+
 }

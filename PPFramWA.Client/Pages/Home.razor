@@ -1,95 +1,152 @@
 ﻿@page "/"
 @implements IDisposable
+
 @inject JugadorState jugadorState
 @inject JugadorServicio jugadorServicio
 @inject CatalogoRecursos catalogoRecursos
 @inject NavigationManager navigationManager
+
 <PageTitle>Home</PageTitle>
 
-<div style="cursor: @cursorActual;" @onmousedown="CambiarAClick" @onmouseup="RestablecerAMain" @onmouseover="RestablecerAMain" @onmouseleave="RestablecerAMain"
-     class="home-content terrain-bg">
+@if (!mostrarInternet)
+{
+    <div style="cursor: @cursorActual;"
+         @onmousedown="CambiarAClick"
+         @onmouseup="RestablecerAMain"
+         @onmouseover="RestablecerAMain"
+         @onmouseleave="RestablecerAMain"
+         class="home-content terrain-bg">
 
-    <!-- ============ BARRA LATERAL ============ -->
-    <div class="barra-lateral">
-        <nav>
-            <ul>
-                <li class="jugador-nombre">@(jugadorState?.__jugador?.userName ?? "Jugador")</li>
+        <div class="barra-lateral">
+            <nav>
+                <ul>
 
-                <li class="jugador-nivel">NIVEL @(jugadorState?.__jugador?.level ?? 0)</li>
+                    <li class="jugador-nombre">
+                        @(jugadorState?.__jugador?.userName ?? "Jugador")
+                    </li>
 
-                <li class="jugador-xp">XP @(jugadorState?.__jugador?.experiencia ?? 0) / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)</li>
+                    <li class="jugador-nivel">
+                        NIVEL @(jugadorState?.__jugador?.level ?? 0)
+                    </li>
 
-                <!-- PP = puntos cosechados -->
-                <li class="jugador-moneda">
-                    <span class="coin coin-pp">PP</span>
-                    <span class="coin-valor">@(jugadorState?.__jugador?.points ?? 0)</span>
-                </li>
+                    <li class="jugador-xp">
+                        XP @(jugadorState?.__jugador?.experiencia ?? 0)
+                        / @(jugadorState?.__jugador?.experienciaParaSubir ?? 10)
+                    </li>
 
-                <!-- PC = PP Coins -->
-                <li class="jugador-moneda">
-                    <span class="coin coin-pc">PC</span>
-                    <span class="coin-valor">@(jugadorState?.__jugador?.ppCoins ?? 0)</span>
-                </li>
+                    <li class="jugador-moneda">
+                        <span class="coin coin-pp">PP</span>
+                        <span class="coin-valor">
+                            @(jugadorState?.__jugador?.points ?? 0)
+                        </span>
+                    </li>
 
-                <li class="jugador-accion"><CustomButton OnClick="IrATienda" Label="Tienda"></CustomButton></li>
-                <li class="jugador-accion"><CustomButton OnClick="IrAMochila" Label="Mochila"></CustomButton></li>
-                <li class="jugador-accion"><CustomButton OnClick="IrAComputadora" Label="Computadora"></CustomButton></li>
-                <li class="jugador-accion"><CustomButton OnClick="IrAConfiguracion" Label="Configuración"></CustomButton></li>
-                <li class="jugador-accion"><CustomButton OnClick="GuardarPartidaAsync" Label="@LabelGuardar" Class="btn-guardar"></CustomButton></li>
-            </ul>
-            @if (!string.IsNullOrEmpty(mensajeGuardado))
-            {
-                <p class="@ClaseMensajeGuardado">@mensajeGuardado</p>
-            }
-        </nav>
-    </div>
+                    <li class="jugador-moneda">
+                        <span class="coin coin-pc">PC</span>
+                        <span class="coin-valor">
+                            @(jugadorState?.__jugador?.ppCoins ?? 0)
+                        </span>
+                    </li>
 
-    @if (recursos is not null)
-    {
-        <!-- ============ AREA DE JUEGO ============ -->
-        <div class="game-container">
+                    <li class="jugador-accion">
+                        <CustomButton OnClick="IrATienda"
+                                      Label="Tienda" />
+                    </li>
 
-            <div class="game-header">
-                <span>PaginaPrincipal</span>
-                <span class="game-version">PPFarmWA v1.0</span>
-            </div>
+                    <li class="jugador-accion">
+                        <CustomButton OnClick="IrAMochila"
+                                      Label="Mochila" />
+                    </li>
 
-            <HuertaCeldasComponent></HuertaCeldasComponent>
+                    <li class="jugador-accion">
+                        <CustomButton OnClick="IrAComputadora"
+                                      Label="Computadora" />
+                    </li>
 
-            <!-- El marco del item equipado ya no usa imagen: el cromado esta
-                 en .equipped-frame (pixel.css) para igualar el resto de la HUD -->
-            <div class="equipped-frame">
-                <img src="/images/tools/@jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")/Main.png" />
-            </div>
+                    <li class="jugador-accion">
+                        <CustomButton OnClick="IrAIntercambios"
+                                      Label="Intercambios" />
+                    </li>
 
+                    <li class="jugador-accion">
+                        <CustomButton OnClick="IrAConfiguracion"
+                                      Label="Configuración" />
+                    </li>
+
+                    <li class="jugador-accion">
+                        <CustomButton OnClick="GuardarPartidaAsync"
+                                      Label="@LabelGuardar"
+                                      Class="btn-guardar" />
+                    </li>
+
+                </ul>
+
+                @if (!string.IsNullOrEmpty(mensajeGuardado))
+                {
+                    <p class="@ClaseMensajeGuardado">
+                        @mensajeGuardado
+                    </p>
+                }
+            </nav>
         </div>
-    }
 
-    @if (mostrarTienda)
-    {
-        <TiendaModal OnClose="CerrarModales" />
-    }
+        @if (recursos is not null)
+        {
+            <div class="game-container">
 
-    @if (mostrarInventario)
-    {
-        <InventarioModal OnClose="CerrarModales" />
-    }
+                <div class="game-header">
+                    <span>PaginaPrincipal</span>
+                    <span class="game-version">PPFarmWA v1.0</span>
+                </div>
 
-</div>
-@code {
+                <HuertaCeldasComponent />
 
+                <div class="equipped-frame">
+                    <img src="/images/tools/@jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")/Main.png" />
+                </div>
+
+            </div>
+        }
+
+        @if (mostrarTienda)
+        {
+            <TiendaModal OnClose="CerrarModales" />
+        }
+
+        @if (mostrarInventario)
+        {
+            <InventarioModal OnClose="CerrarModales" />
+        }
+
+    </div>
+}
+
+@if (mostrarInternet)
+{
+    <Internet />
+}
+
+@code
+{
     private bool mostrarTienda;
     private bool mostrarInventario;
+    private bool mostrarInternet;
 
     private string? mensajeGuardado;
     private bool exitoGuardado;
     private bool guardando;
     private CancellationTokenSource? ctsMensaje;
 
-    private string LabelGuardar => guardando ? "Guardando..." : "Guardar partida";
-    private string ClaseMensajeGuardado => exitoGuardado ? "mensaje-guardado ok" : "mensaje-guardado error";
+    private string LabelGuardar =>
+        guardando ? "Guardando..." : "Guardar partida";
+
+    private string ClaseMensajeGuardado =>
+        exitoGuardado
+            ? "mensaje-guardado ok"
+            : "mensaje-guardado error";
 
     public List<RecursoDTO>? recursos;
+
     string? cursorActual;
     string? currentToolImg;
 
@@ -100,6 +157,7 @@
             navigationManager.NavigateTo("/login");
             return;
         }
+
         jugadorState.OnChange += Actualizar;
         jugadorState.__jugador.OnCambioUltimaHerramienta += SetUpTool;
 
@@ -108,8 +166,6 @@
         SetUpTool();
     }
 
-    //NAVEGACIÓN
-
     public void Actualizar()
     {
         InvokeAsync(StateHasChanged);
@@ -117,43 +173,49 @@
 
     public void SetUpTool()
     {
-        //obtener idUltimaHerramienta a partir de la lista de ITEMS del jugador.
-
-        RecursoDTO dataHerramienta = recursos.Where(x => x.Id == jugadorState.__jugador.items.Where(i => i.idRecurso == x.Id).Select(i => i.idRecurso).FirstOrDefault()).FirstOrDefault() ??
-        new RecursoDTO()
-        {
-            Id = 0,
-            nombre = "Ninguna",
-            descripcion = "No hay herramienta equipada",
-            eficiencia = 10,
-            durabilidad = -1,
-            valor = 0,
-            deTienda = false,
-            tipo = PPFarmWA.Shared.Enum.TipoItemEnum.Herramienta,
-            idRareza = PPFarmWA.Shared.Enum.RarezaEnum.Comun,
-        };
+        RecursoDTO dataHerramienta =
+            recursos.Where(x =>
+                x.Id ==
+                jugadorState.__jugador.items
+                    .Where(i => i.idRecurso == x.Id)
+                    .Select(i => i.idRecurso)
+                    .FirstOrDefault())
+            .FirstOrDefault()
+            ??
+            new RecursoDTO()
+            {
+                Id = 0,
+                nombre = "Ninguna",
+                descripcion = "No hay herramienta equipada",
+                eficiencia = 10,
+                durabilidad = -1,
+                valor = 0,
+                deTienda = false,
+                tipo = PPFarmWA.Shared.Enum.TipoItemEnum.Herramienta,
+                idRareza = PPFarmWA.Shared.Enum.RarezaEnum.Comun
+            };
 
         jugadorState.__jugador.recurso = dataHerramienta;
     }
 
     public void CambiarAClick()
     {
-        cursorActual = $"url('/images/tools/default/Click.png'), auto";
+        cursorActual =
+            "url('/images/tools/default/Click.png'), auto";
     }
 
     public void RestablecerAMain()
     {
-        cursorActual = $"url('/images/tools/default/Main.png'), auto";
+        cursorActual =
+            "url('/images/tools/default/Main.png'), auto";
     }
-
-
-    //NAVEGACIÓN
 
     public void IrATienda()
     {
         mostrarInventario = false;
         mostrarTienda = true;
     }
+
     public void IrAMochila()
     {
         mostrarTienda = false;
@@ -165,16 +227,21 @@
         mostrarTienda = false;
         mostrarInventario = false;
     }
+
     public void IrAComputadora()
     {
-        navigationManager.NavigateTo("/internet");
+        mostrarInternet = true;
     }
+
+    public void IrAIntercambios()
+    {
+        navigationManager.NavigateTo("/intercambios");
+    }
+
     public void IrAConfiguracion()
     {
         navigationManager.NavigateTo("/");
     }
-
-    //GUARDAR PARTIDA
 
     public async Task GuardarPartidaAsync()
     {
@@ -182,20 +249,26 @@
 
         if (jugador is null)
         {
-            await MostrarMensajeTemporal("No hay jugador en sesión.", false);
+            await MostrarMensajeTemporal(
+                "No hay jugador en sesión.",
+                false);
             return;
         }
 
         guardando = true;
+
         try
         {
-            var (exito, mensaje) = await jugadorServicio.GuardarPartida(jugador);
+            var (exito, mensaje) =
+                await jugadorServicio.GuardarPartida(jugador);
 
             await MostrarMensajeTemporal(mensaje, exito);
         }
         catch (Exception ex)
         {
-            await MostrarMensajeTemporal($"Error de conexión: {ex.Message}", false);
+            await MostrarMensajeTemporal(
+                $"Error de conexión: {ex.Message}",
+                false);
         }
         finally
         {
@@ -203,13 +276,16 @@
         }
     }
 
-    // El aviso de guardado se oculta solo: antes queda pegado en pantalla
-    // indefinidamente. Cada aviso nuevo cancela el temporizador del anterior.
-    private async Task MostrarMensajeTemporal(string mensaje, bool exito, int milisegundos = 3000)
+    private async Task MostrarMensajeTemporal(
+        string mensaje,
+        bool exito,
+        int milisegundos = 3000)
     {
         ctsMensaje?.Cancel();
         ctsMensaje?.Dispose();
+
         ctsMensaje = new CancellationTokenSource();
+
         var token = ctsMensaje.Token;
 
         exitoGuardado = exito;
@@ -230,6 +306,7 @@
         }
 
         mensajeGuardado = null;
+
         await InvokeAsync(StateHasChanged);
     }
 
@@ -237,6 +314,7 @@
     {
         ctsMensaje?.Cancel();
         ctsMensaje?.Dispose();
+
         jugadorState.OnChange -= Actualizar;
     }
 }

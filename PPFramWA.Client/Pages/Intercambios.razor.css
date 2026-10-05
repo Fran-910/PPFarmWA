@@ -1,0 +1,326 @@
+﻿
+/* CONTENEDOR PRINCIPAL */
+.intercambios {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* TITULO */
+
+.intercambios h1 {
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 40px;
+}
+
+/* PUBLICAR */
+
+.publicar {
+    max-width: 600px;
+    margin: 0 auto 40px auto;
+    padding: 25px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+}
+
+    .publicar h2 {
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+/* CAMPOS */
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+    .campo label {
+        margin-bottom: 7px;
+        font-weight: bold;
+    }
+
+    .campo input,
+    .campo select {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #aaa;
+        font-size: 15px;
+    }
+
+/* BOTON PUBLICAR */
+
+.btn-publicar {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* DISPONIBLES */
+
+.disponibles h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* LISTA */
+
+.lista-intercambios {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+/* TARJETA */
+
+.intercambio {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+}
+
+    .intercambio h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 22px;
+    }
+
+    .intercambio p {
+        margin: 8px 0;
+    }
+
+/* BOTON COMPRAR */
+
+.btn-comprar {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* CELULAR */
+
+@media (max-width: 700px) {
+
+    .lista-intercambios {
+        grid-template-columns: 1fr;
+    }
+
+    .intercambios {
+        padding: 15px;
+    }
+}
+
+.btn-volver {
+    font-size: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+
+/* FONDO DE LA VENTANA */
+.modal-fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* VENTANA DE CONFIRMACION */
+.modal-compra {
+    width: 400px;
+    max-width: 90%;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+    /* TITULO */
+    .modal-compra h2 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    /* DATOS */
+    .modal-compra p {
+        margin: 12px 0;
+        font-size: 16px;
+    }
+
+/* BOTONES */
+.modal-botones {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-cancelar,
+.btn-confirmar {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.btn-cancelar {
+    background-color: #ddd;
+}
+
+.btn-confirmar {
+    background-color: #28a745;
+    color: white;
+}
+
+    .btn-cancelar:hover,
+    .btn-confirmar:hover,
+    .btn-comprar:hover,
+    .btn-publicar:hover {
+        opacity: 0.85;
+    }
+
+/* DISTRIBUCIÓN DE LA PÁGINA */
+.intercambios {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 25px;
+}
+
+    /* TÍTULO */
+    .intercambios h1 {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 40px;
+    }
+
+/* PUBLICAR */
+.publicar {
+    max-width: none;
+    margin: 0;
+}
+
+/* DISPONIBLES */
+.disponibles {
+    margin: 0;
+}
+
+/* LISTA DE INTERCAMBIOS */
+.lista-intercambios {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+/* TARJETAS */
+.intercambio {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* BOTONES */
+.btn-publicar,
+.btn-comprar {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+    .btn-publicar:hover,
+    .btn-comprar:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+
+/* CELULAR */
+@media (max-width: 800px) {
+    .intercambios {
+        grid-template-columns: 1fr;
+    }
+
+        .intercambios h1 {
+            grid-column: 1;
+        }
+}
+
+/* ENCABEZADOS DE SECCIONES */
+.publicar h2,
+.disponibles h2 {
+    background: #e6f1ff;
+    padding: 18px;
+    margin: -25px -25px 25px -25px;
+    border-radius: 12px 12px 0 0;
+    text-align: left;
+    font-size: 28px;
+}
+
+.disponibles {
+    padding: 25px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background: white;
+}
+
+/* MEJORAS DE CAMPOS */
+.campo input,
+.campo select {
+    padding: 13px;
+    font-size: 16px;
+}
+
+/* BOTÓN PUBLICAR */
+.btn-publicar {
+    background: #1976d2;
+    color: white;
+    font-size: 17px;
+    padding: 13px;
+}
+
+/* TARJETAS DE INTERCAMBIO */
+.intercambio {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .intercambio:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    }
+
+/* BOTÓN COMPRAR */
+.btn-comprar {
+    background: #28a745;
+    color: white;
+    font-size: 16px;
+    padding: 12px;
+}
+.recurso-venta {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 12px 0;
+}
