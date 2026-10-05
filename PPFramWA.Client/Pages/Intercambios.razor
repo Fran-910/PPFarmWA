@@ -286,8 +286,7 @@
         if (ventaSeleccionada == null)
             return;
 
-        int jugadorId = 9;
-
+       int jugadorId = JugadorState.__jugador?.Id ?? 0;
         var comprado = await VentaServicio.ComprarIntercambio(
             ventaSeleccionada.Id,
             jugadorId
@@ -312,8 +311,7 @@
 
     private async Task ComprarIntercambio(int idVenta)
     {
-        int jugadorId = 9;
-        
+       int jugadorId = JugadorState.__jugador?.Id ?? 0;
         var comprado = await VentaServicio.ComprarIntercambio(
             idVenta,
             jugadorId
