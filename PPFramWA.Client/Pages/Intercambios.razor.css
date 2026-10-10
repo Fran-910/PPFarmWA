@@ -324,3 +324,27 @@
     font-weight: bold;
     margin: 12px 0;
 }
+
+.intercambios .publicar h2,
+.intercambios .disponibles h2 {
+    color: #222 !important;
+    text-shadow: none !important;
+}
+
+.intercambios .disponibles > p {
+    color: #222 !important;
+    text-shadow: none !important;
+}
+
+.intercambios .intercambio h3,
+.intercambios .intercambio p {
+    color: #222 !important;
+    text-shadow: none !important;
+}
+
+.intercambios .lista-intercambios > p {
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}

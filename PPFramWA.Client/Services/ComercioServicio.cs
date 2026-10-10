@@ -1,6 +1,7 @@
 ﻿using PPFarmWA.Shared.DTO;
 using PPFramWA.Client.Services;
 using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace PPFarmWA.Client.Services
 {
@@ -33,6 +34,7 @@ namespace PPFarmWA.Client.Services
             );
         }
 
+
         public async Task<(bool Exito, string Mensaje)> ConvertirPoints(int idJugador, int puntosAConvertir)
         {
             var request = new
@@ -44,6 +46,39 @@ namespace PPFarmWA.Client.Services
             return (respuesta.IsSuccessStatusCode, await LeerMensaje(respuesta));
         }
 
+        public async Task<(bool Exito, string Mensaje)> convertirpoints(
+                      int idJugador,
+                      int puntosconvertidos)
+        {
+            var respuesta = await _api.PutAsync<object>(
+                $"api/Jugador/{idJugador}/convertir-points?puntos={puntosconvertidos}",
+                new { });
+
+            if (!respuesta.IsSuccessStatusCode)
+            {
+                var error = await respuesta.Content.ReadAsStringAsync();
+
+                return (
+                    false,
+                    string.IsNullOrWhiteSpace(error)
+                        ? "No se pudo realizar la conversión."
+                        : error.Trim('"')
+                );
+            }
+
+            var resultado =
+                await respuesta.Content.ReadFromJsonAsync<RespuestaConversion>();
+
+            return (
+                true,
+                resultado?.Mensaje ?? "Conversión realizada correctamente."
+            );
+        }
+        private class RespuestaConversion
+        {
+            public string? Mensaje { get; set; }
+        }
+
     private static async Task<string> LeerMensaje(HttpResponseMessage respuesta)
         {
             var texto = await respuesta.Content.ReadAsStringAsync();
@@ -51,5 +86,14 @@ namespace PPFarmWA.Client.Services
                 ? (respuesta.IsSuccessStatusCode ? "Operación realizada correctamente." : "No se pudo completar la operación.")
                 : texto.Trim('"');
         }
+
     }
 }
+
+
+        
+   
+
+   
+
+

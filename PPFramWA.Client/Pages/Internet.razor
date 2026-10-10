@@ -1,18 +1,19 @@
-﻿@page "/internet"
+﻿```razor
+@page "/internet"
 
-@* Inyectamos los servicios *@
 @inject JugadorServicio JugadorService
 @inject JugadorState JugadorState
-@inject ComercioServicio ComercioService
+@inject ComercioServicio ComercioServicio
+@inject NavigationManager navigationManager
 
 <div class="internet-container">
     <div class="main-section">
-
         <div class="sidebar">
             <button class="nav-btn @(!mostrarIntercambio ? "active" : "")"
                     @onclick="MostrarPrincipal">
                 Convertir
             </button>
+
             <button class="nav-btn @(mostrarIntercambio ? "active" : "")"
                     @onclick="MostrarIntercambio">
                 Intercambiar
@@ -20,18 +21,15 @@
         </div>
 
         <div class="content-area">
-
-            <!-- Indicador de saldos reales con protección contra nulos (?) -->
-            <div style="background-color: #f1f8ff; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>Tus saldos:</strong> 🪙 @(JugadorState.__jugador?.points ?? 0) Points | 💰 @(JugadorState.__jugador?.ppCoins ?? 0) PP Coins
+            <div style="background-color:#f1f8ff;padding:10px;border-radius:5px;margin-bottom:20px;">
+                <strong>Tus saldos:</strong>
+                🪙 @(JugadorState.__jugador?.points ?? 0) Points |
+                💰 @(JugadorState.__jugador?.ppCoins ?? 0) PP Coins
             </div>
 
-            <!-- Mensajes del sistema -->
             @if (!string.IsNullOrWhiteSpace(mensaje))
             {
-                <p class="@claseMensaje" style="padding: 10px; border-radius: 5px; margin-bottom: 15px; font-weight: bold;">
-                    @mensaje
-                </p>
+                <p class="@claseMensaje">@mensaje</p>
             }
 
             @if (!mostrarIntercambio)
@@ -41,8 +39,13 @@
 
                     <div class="form-group">
                         <label>Points a convertir:</label>
-                        <input type="number" @bind="PuntosAConvertir" @bind:event="oninput" placeholder="Ej: 1000" min="0" max="@(JugadorState.__jugador?.points ?? 0)" />
+                        <input type="number"
+                               @bind="PuntosAConvertir"
+                               @bind:event="oninput"
+                               min="0"
+                               max="@(JugadorState.__jugador?.points ?? 0)" />
                     </div>
+
                     <div class="form-group">
                         <label>Equivalente en PP Coins:</label>
                         <input type="text" disabled value="@EquivalentePPCoints" />
@@ -54,11 +57,12 @@
                         @(ocupado ? "Procesando..." : "Confirmar Conversión")
                     </button>
 
-                    <div style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 15px;">
+                    <div style="margin-top:30px;border-top:2px solid #eee;padding-top:15px;">
                         <h3>Últimas conversiones</h3>
+
                         @if (historialConversiones.Count == 0)
                         {
-                            <p style="color: #666;">No hay conversiones recientes.</p>
+                            <p>No hay conversiones recientes.</p>
                         }
                         else
                         {
@@ -76,11 +80,12 @@
             {
                 <div class="intercambiar-view">
                     <h2>Mercado de Intercambio</h2>
-                    <ul class="item-list">
-                        <li>⛏️ 1x Pico de Diamante</li>
-                        <li>🪏 1x Pala de Bronce</li>
-                        <li>🌙 1x Hoz Dorada</li>
-                    </ul>
+                    <p>Accedé al mercado para ver los intercambios disponibles.</p>
+
+                    <button class="action-btn" @onclick="IrAIntercambios">
+                        🛒 Abrir mercado
+                    </button>
+
                     <button class="action-btn" @onclick="MostrarPrincipal">
                         ← Volver
                     </button>
@@ -92,7 +97,7 @@
 
 @code {
     private bool mostrarIntercambio = false;
-    private int idJugador = 2;
+    private int idJugador;
     private bool ocupado;
     private string? mensaje;
     private string claseMensaje = "mensaje-exito";
@@ -100,9 +105,11 @@
     private List<string> historialConversiones = new();
     private const decimal TasaDeCambio = 10m;
 
+
     
     private int saldoPoints;
     private double saldoPPCoins;
+
 
     public int PuntosAConvertir
     {
@@ -110,26 +117,38 @@
         set => _puntosAConvertir = value;
     }
 
-    public int EquivalentePPCoints => (int)(PuntosAConvertir / TasaDeCambio);
+    public int EquivalentePPCoints =>
+        (int)(PuntosAConvertir / TasaDeCambio);
 
     protected override async Task OnInitializedAsync()
     {
-        idJugador = JugadorState.__jugador?.Id > 0
-            ? JugadorState.__jugador.Id
-            : 2;
+        if (JugadorState.__jugador == null)
+        {
+            navigationManager.NavigateTo("/login");
+            return;
+        }
 
+        idJugador = JugadorState.__jugador.Id;
         await ActualizarSaldo();
     }
 
-    
     private void MostrarPrincipal()
     {
         mostrarIntercambio = false;
+        PuntosAConvertir = 0;
+        mensaje = null;
     }
 
     private void MostrarIntercambio()
     {
         mostrarIntercambio = true;
+        PuntosAConvertir = 0;
+        mensaje = null;
+    }
+
+    private void IrAIntercambios()
+    {
+        navigationManager.NavigateTo("/intercambios");
     }
 
     private async Task ConfirmarConversionAsync()
@@ -139,21 +158,27 @@
 
         try
         {
-            var respuestaDelServidor = await ComercioService.ConvertirPoints(idJugador, PuntosAConvertir);
+            var respuesta = await ComercioServicio.convertirpoints(
+                idJugador,
+                PuntosAConvertir);
 
-            mensaje = respuestaDelServidor.Mensaje;
-            claseMensaje = respuestaDelServidor.Exito ? "mensaje-exito" : "mensaje-error";
+            mensaje = respuesta.Mensaje;
+            claseMensaje = respuesta.Exito
+                ? "mensaje-exito"
+                : "mensaje-error";
 
-            if (respuestaDelServidor.Exito && JugadorState.__jugador != null)
+            if (respuesta.Exito && JugadorState.__jugador != null)
             {
-                JugadorState.__jugador.points -= PuntosAConvertir;
-                JugadorState.__jugador.ppCoins += EquivalentePPCoints;
+                await ActualizarSaldo();
 
-                historialConversiones.Insert(0, $"-{PuntosAConvertir} Points / +{EquivalentePPCoints} PP Coins");
+                historialConversiones.Insert(
+                    0,
+                    $"-{PuntosAConvertir} Points / +{EquivalentePPCoints} PP Coins");
+
                 PuntosAConvertir = 0;
             }
         }
-        catch (Exception)
+        catch
         {
             mensaje = "Ocurrió un error de conexión.";
             claseMensaje = "mensaje-error";
@@ -164,18 +189,21 @@
         }
     }
 
-    private async Task ActualizarSaldo()
+    private Task ActualizarSaldo()
     {
         if (JugadorState.__jugador != null)
         {
+
             
             saldoPoints = JugadorState.__jugador.points;
             saldoPPCoins = JugadorState.__jugador.ppCoins;
 
             
+
             JugadorState.NotificarCambios();
         }
 
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }
+```

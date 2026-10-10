@@ -86,7 +86,11 @@
                 {
                     <div class="intercambio">
 
-                        <h3>👤 Jugador @venta.idJugadorVendedor</h3>
+                        <h3>
+                            👤 @(string.IsNullOrWhiteSpace(venta.nombreJugadorVendedor)
+                                    ? $"Jugador {venta.idJugadorVendedor}"
+                                    : venta.nombreJugadorVendedor) publicó un recurso
+                        </h3>
 
                         <p class="recurso-venta">
                             @IconoRecurso(venta.nombreRecurso ?? "") @venta.nombreRecurso
@@ -167,16 +171,14 @@
 
 
 @code {
-
     private string IconoRecurso(string nombre)
     {
         return nombre switch
         {
             "Pala" => "🪏",
-            "Madera" => "🪵",
-            "Hierro" => "⚙️",
-            "Pico de Hierro" => "⛏️",
-            "Semillas" => "🌱",
+            "Pico de Bronce" => "⛏️",
+            "Pico de Diamante" => "⛏️",
+            "Hoz Dorada" => "🌾",
             _ => "📦"
         };
     }
@@ -203,7 +205,13 @@
         {
             ventasDisponibles = await VentaServicio.ObtenerDisponibles();
 
-            int jugadorId = JugadorState.__jugador?.Id ?? 20;
+            if (JugadorState.__jugador == null)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            int jugadorId = JugadorState.__jugador.Id;
 
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
         }
@@ -239,7 +247,15 @@
             return;
         }
 
-        int jugadorId = JugadorState.__jugador?.Id ?? 20;
+        if (JugadorState.__jugador == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        int jugadorId = JugadorState.__jugador.Id;
+
+      
 
         var venta = new VentaDTO
         {
@@ -283,10 +299,15 @@
 
     private async Task ConfirmarCompra()
     {
-        if (ventaSeleccionada == null)
+        if (JugadorState.__jugador == null)
+        {
+            NavigationManager.NavigateTo("/login");
             return;
+        }
 
-       int jugadorId = JugadorState.__jugador?.Id ?? 0;
+        int jugadorId = JugadorState.__jugador.Id;
+
+       
         var comprado = await VentaServicio.ComprarIntercambio(
             ventaSeleccionada.Id,
             jugadorId
@@ -311,7 +332,13 @@
 
     private async Task ComprarIntercambio(int idVenta)
     {
-       int jugadorId = JugadorState.__jugador?.Id ?? 0;
+        if (JugadorState.__jugador == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+        int jugadorId = JugadorState.__jugador.Id;
+
         var comprado = await VentaServicio.ComprarIntercambio(
             idVenta,
             jugadorId

@@ -168,6 +168,8 @@ namespace PPFarmWA.Server.Controllers
 
                 var recurso = await _context.Recursos
                     .FindAsync(item.RecursoId);
+                var vendedor = await _context.Jugadores
+    .FindAsync(v.idJugadorVendedor);
 
                 resultado.Add(new VentaDTO
                 {
@@ -177,7 +179,8 @@ namespace PPFarmWA.Server.Controllers
                     cantidadVenta = v.cantidadVenta,
                     precioVenta = v.precioVenta,
                     idRecurso = item.RecursoId,
-                    nombreRecurso = recurso?.nombre
+                    nombreRecurso = recurso?.nombre,
+                    nombreJugadorVendedor = vendedor?.userName
                 });
             }
 

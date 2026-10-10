@@ -19,5 +19,7 @@ namespace PPFarmWA.Shared.DTO
         public int idRecurso { get; set; }
 
         public string? nombreRecurso { get; set; }
+        public string? nombreJugadorVendedor { get; set; }
+
     }
 }
