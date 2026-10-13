@@ -4,6 +4,7 @@ using PPFarmWA.Repositorio;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Server;
 using PPFarmWA.Server.Services;
+using PPFarmWA.Servicios;
 using PPFramWA.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ConversorServicio>();
+builder.Services.AddScoped<MercadoServicio>();
 
 #endregion
 

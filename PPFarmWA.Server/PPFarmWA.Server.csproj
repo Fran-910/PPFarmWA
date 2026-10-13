@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PPFarmWA.BD\PPFarmWA.BD.csproj" />
     <ProjectReference Include="..\PPFarmWA.Repositorio\PPFarmWA.Repositorio.csproj" />
+    <ProjectReference Include="..\PPFarmWA.Servicios\PPFarmWA.Servicios.csproj" />
     <ProjectReference Include="..\PPFarmWA.Shared\PPFarmWA.Shared.csproj" />
     <ProjectReference Include="..\PPFramWA.Client\PPFramWA.Client.csproj" />
   </ItemGroup>

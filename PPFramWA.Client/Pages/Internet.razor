@@ -100,7 +100,7 @@
     private List<string> historialConversiones = new();
     private const decimal TasaDeCambio = 10m;
 
-    // Declaramos estas variables para que no te tire error CS0103
+    
     private int saldoPoints;
     private double saldoPPCoins;
 
@@ -121,7 +121,7 @@
         await ActualizarSaldo();
     }
 
-    // Faltaban estos dos métodos para los botones laterales
+    
     private void MostrarPrincipal()
     {
         mostrarIntercambio = false;
@@ -168,11 +168,11 @@
     {
         if (JugadorState.__jugador != null)
         {
-            // Actualizamos las dos monedas usando el estado
+            
             saldoPoints = JugadorState.__jugador.points;
             saldoPPCoins = JugadorState.__jugador.ppCoins;
 
-            // Avisamos a la página que los datos cambiaron para que se repinte
+            
             JugadorState.NotificarCambios();
         }
 
