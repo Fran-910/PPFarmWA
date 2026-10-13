@@ -33,37 +33,23 @@ namespace PPFarmWA.Client.Services
             );
         }
 
-        public async Task <(bool Exito, string Mensaje)> convertirpoints(int puntosconvertidos)
+        public async Task<(bool Exito, string Mensaje)> ConvertirPoints(int idJugador, int puntosAConvertir)
         {
-            await Task.Delay(1000);
-            return (true, $"Se han convertido {puntosconvertidos} puntos a PP Coins.");
+            var request = new
+            {
+                IdJugador = idJugador,
+                PuntosAConvertir = puntosAConvertir
+            };
+            var respuesta = await _api.PostAsync("api/Conversor/convertir", request);
+            return (respuesta.IsSuccessStatusCode, await LeerMensaje(respuesta));
         }
-        private static async Task<string> LeerMensaje(HttpResponseMessage respuesta)
+
+    private static async Task<string> LeerMensaje(HttpResponseMessage respuesta)
         {
             var texto = await respuesta.Content.ReadAsStringAsync();
-
             return string.IsNullOrWhiteSpace(texto)
-                ? (respuesta.IsSuccessStatusCode
-                    ? "Operación realizada correctamente."
-                    : "No se pudo completar la operación.")
+                ? (respuesta.IsSuccessStatusCode ? "Operación realizada correctamente." : "No se pudo completar la operación.")
                 : texto.Trim('"');
         }
-
-        public async Task<RespuestaFalsa> ConvertirPoints(int puntosConvertidos)
-        {
-            await Task.Delay(1000);
-
-            return new RespuestaFalsa
-            {
-                Exito = true,
-                Mensaje = $"¡Conversión exitosa! El servidor aprobó tus {puntosConvertidos} Points."
-            };
-        }
-    }
-
-    public class RespuestaFalsa
-    {
-        public bool Exito { get; set; }
-        public string? Mensaje { get; set; }
     }
 }

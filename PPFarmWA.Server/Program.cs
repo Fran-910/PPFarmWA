@@ -3,6 +3,7 @@ using PPFarmWA.BD.Datos;
 using PPFarmWA.Repositorio;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Server;
+using PPFarmWA.Server.Services;
 using PPFramWA.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ConversorServicio>();
 
 #endregion
 

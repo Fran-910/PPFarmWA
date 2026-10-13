@@ -3,7 +3,7 @@
 @* Inyectamos los servicios *@
 @inject JugadorServicio JugadorService
 @inject JugadorState JugadorState
-@inject ComercioServicio ComercioServicio
+@inject ComercioServicio ComercioService
 
 <div class="internet-container">
     <div class="main-section">
@@ -21,9 +21,9 @@
 
         <div class="content-area">
 
-            <!-- Indicador de saldos reales -->
+            <!-- Indicador de saldos reales con protección contra nulos (?) -->
             <div style="background-color: #f1f8ff; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>Tus saldos:</strong> 🪙 @JugadorState.__jugador.points Points | 💰 @JugadorState.__jugador.ppCoins.ToString("0.##") PP Coins
+                <strong>Tus saldos:</strong> 🪙 @(JugadorState.__jugador?.points ?? 0) Points | 💰 @(JugadorState.__jugador?.ppCoins ?? 0) PP Coins
             </div>
 
             <!-- Mensajes del sistema -->
@@ -41,7 +41,7 @@
 
                     <div class="form-group">
                         <label>Points a convertir:</label>
-                        <input type="number" @bind="PuntosAConvertir" @bind:event="oninput" placeholder="Ej: 1000" min="0" max="@JugadorState.__jugador.points" />
+                        <input type="number" @bind="PuntosAConvertir" @bind:event="oninput" placeholder="Ej: 1000" min="0" max="@(JugadorState.__jugador?.points ?? 0)" />
                     </div>
                     <div class="form-group">
                         <label>Equivalente en PP Coins:</label>
@@ -49,7 +49,7 @@
                     </div>
 
                     <button class="action-btn"
-                            disabled="@(ocupado || PuntosAConvertir <= 0 || PuntosAConvertir > JugadorState.__jugador.points)"
+                            disabled="@(ocupado || PuntosAConvertir <= 0 || PuntosAConvertir > (JugadorState.__jugador?.points ?? 0))"
                             @onclick="ConfirmarConversionAsync">
                         @(ocupado ? "Procesando..." : "Confirmar Conversión")
                     </button>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             }
-            else 
+            else
             {
                 <div class="intercambiar-view">
                     <h2>Mercado de Intercambio</h2>
@@ -92,17 +92,17 @@
 
 @code {
     private bool mostrarIntercambio = false;
-
     private int idJugador = 2;
-    private double saldoPPCoints;
     private bool ocupado;
     private string? mensaje;
     private string claseMensaje = "mensaje-exito";
-
     private int _puntosAConvertir;
     private List<string> historialConversiones = new();
-
     private const decimal TasaDeCambio = 10m;
+
+    // Declaramos estas variables para que no te tire error CS0103
+    private int saldoPoints;
+    private double saldoPPCoins;
 
     public int PuntosAConvertir
     {
@@ -121,6 +121,17 @@
         await ActualizarSaldo();
     }
 
+    // Faltaban estos dos métodos para los botones laterales
+    private void MostrarPrincipal()
+    {
+        mostrarIntercambio = false;
+    }
+
+    private void MostrarIntercambio()
+    {
+        mostrarIntercambio = true;
+    }
+
     private async Task ConfirmarConversionAsync()
     {
         ocupado = true;
@@ -128,13 +139,12 @@
 
         try
         {
-            
-            var respuestaDelServidor = await ComercioServicio.convertirpoints(PuntosAConvertir);
+            var respuestaDelServidor = await ComercioService.ConvertirPoints(idJugador, PuntosAConvertir);
 
             mensaje = respuestaDelServidor.Mensaje;
             claseMensaje = respuestaDelServidor.Exito ? "mensaje-exito" : "mensaje-error";
 
-            if (respuestaDelServidor.Exito)
+            if (respuestaDelServidor.Exito && JugadorState.__jugador != null)
             {
                 JugadorState.__jugador.points -= PuntosAConvertir;
                 JugadorState.__jugador.ppCoins += EquivalentePPCoints;
@@ -156,39 +166,16 @@
 
     private async Task ActualizarSaldo()
     {
-        var jugador = await JugadorService.ObtenerPorId(JugadorState.__jugador.Id);
-
-        if (jugador is null)
+        if (JugadorState.__jugador != null)
         {
-            return;
+            // Actualizamos las dos monedas usando el estado
+            saldoPoints = JugadorState.__jugador.points;
+            saldoPPCoins = JugadorState.__jugador.ppCoins;
+
+            // Avisamos a la página que los datos cambiaron para que se repinte
+            JugadorState.NotificarCambios();
         }
 
-        saldoPPCoints = jugador.ppCoins;
-
-        //solucionar esto
-        
-        //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
-        //{
-            //Id = jugador.Id
-        //};
-
-        JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
-        JugadorState.NotificarCambios();
+        await Task.CompletedTask;
     }
-
-    private void MostrarIntercambio()
-    {
-        mostrarIntercambio = true;
-        PuntosAConvertir = 0;
-        mensaje = null;
-    }
-
-    private void MostrarPrincipal()
-    {
-        mostrarIntercambio = false;
-        PuntosAConvertir = 0;
-        mensaje = null;
-    }
-
-
 }
