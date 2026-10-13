@@ -33,14 +33,17 @@ namespace PPFarmWA.Server.Controllers
             try
             {
                 // 1. Buscar la publicación
-                var venta = await _context.Ventas.FindAsync(id);
+                var venta = await _context.Ventas
+      .FromSqlInterpolated(
+          $"SELECT * FROM dbo.Ventas WITH (UPDLOCK, ROWLOCK) WHERE Id = {id}")
+      .FirstOrDefaultAsync();
 
                 if (venta == null)
                     return NotFound("La publicación no existe.");
 
                 // 2. Verificar que todavía esté disponible
                 if (venta.idJugadorComprador != null)
-                    return BadRequest("Esta publicación ya fue comprada.");
+                    return Conflict("Esta publicación ya fue comprada por otro jugador.");
 
                 // 3. Evitar que el vendedor se compre a sí mismo
                 if (venta.idJugadorVendedor == idJugadorComprador)
@@ -152,7 +155,8 @@ namespace PPFarmWA.Server.Controllers
 
 
         [HttpGet("disponibles")]
-        public async Task<ActionResult<IEnumerable<VentaDTO>>> GetDisponibles()
+        public async Task<ActionResult<IEnumerable<VentaDTO>>> GetDisponibles(
+             [FromQuery] int idJugador)
         {
             var ventas = await _repositorio.GetVentasDisponiblesAsync();
 
@@ -160,6 +164,10 @@ namespace PPFarmWA.Server.Controllers
 
             foreach (var v in ventas)
             {
+                // No mostrar las publicaciones del jugador actual.
+                if (v.idJugadorVendedor == idJugador)
+                    continue;
+
                 var item = await _context.Items
                     .FirstOrDefaultAsync(i => i.VentaId == v.Id);
 

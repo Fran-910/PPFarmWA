@@ -18,10 +18,11 @@ namespace PPFramWA.Client.Services
         }
 
 
-        public async Task<List<VentaDTO>> ObtenerDisponibles()
+        public async Task<List<VentaDTO>> ObtenerDisponibles(int idJugador)
         {
             return await _api.GetAsync<List<VentaDTO>>(
-                "api/Venta/disponibles") ?? new List<VentaDTO>();
+                $"api/Venta/disponibles?idJugador={idJugador}")
+                ?? new List<VentaDTO>();
         }
 
 

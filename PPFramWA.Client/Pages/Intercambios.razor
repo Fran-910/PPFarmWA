@@ -141,8 +141,12 @@
                 </p>
 
                 <p>
-                    <strong>Vendedor:</strong>
-                    Jugador @ventaSeleccionada.idJugadorVendedor
+                    <p>
+                        <strong>Vendedor:</strong>
+                        @(string.IsNullOrWhiteSpace(ventaSeleccionada.nombreJugadorVendedor)
+                            ? $"Jugador {ventaSeleccionada.idJugadorVendedor}"
+                            : ventaSeleccionada.nombreJugadorVendedor)
+                    </p>
                 </p>
 
                 <div class="modal-botones">
@@ -201,18 +205,17 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (JugadorState.__jugador == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        int jugadorId = JugadorState.__jugador.Id;
+
         try
         {
-            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
-
-            if (JugadorState.__jugador == null)
-            {
-                NavigationManager.NavigateTo("/login");
-                return;
-            }
-
-            int jugadorId = JugadorState.__jugador.Id;
-
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
         }
         catch
@@ -272,8 +275,8 @@
         if (creada)
         {
             mensajePublicacion = "Intercambio publicado correctamente.";
-            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
-            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
+            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId); ;
         }
         else
         {
@@ -319,7 +322,7 @@
         {
             mensajePublicacion = "Compra realizada correctamente.";
 
-            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
         }
         else
@@ -348,7 +351,7 @@
         {
             mensajePublicacion = "Compra realizada correctamente.";
 
-            ventasDisponibles = await VentaServicio.ObtenerDisponibles();
+            ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
 
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
         }
