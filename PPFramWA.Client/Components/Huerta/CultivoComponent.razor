@@ -71,12 +71,16 @@
     
     public void CambiarAClick()
     {
-        cursorActual = $"url('/images/tools/{jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")}/Click.png'), auto";
+        var name = jugadorState.__jugador.recurso?.nombre?.ToLower().Replace(" ", "-") ?? "default";
+        if (jugadorState.__jugador.recurso?.Id == 0) name = "default";
+        cursorActual = $"url('/images/tools/{name}/Click.png'), auto";
     }
 
     public void RestablecerAMain()
     {
-        cursorActual = $"url('/images/tools/{jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")}/Main.png'), auto";
+        var name = jugadorState.__jugador.recurso?.nombre?.ToLower().Replace(" ", "-") ?? "default";
+        if (jugadorState.__jugador.recurso?.Id == 0) name = "default";
+        cursorActual = $"url('/images/tools/{name}/Main.png'), auto";
     }
 
 

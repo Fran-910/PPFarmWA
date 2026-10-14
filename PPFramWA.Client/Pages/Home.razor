@@ -102,7 +102,7 @@
                 <HuertaCeldasComponent />
 
                 <div class="equipped-frame">
-                    <img src="/images/tools/@jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-")/Main.png" />
+                    <img src="/images/tools/@((jugadorState.__jugador.recurso?.Id == 0) ? "default" : jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-"))/Main.png" />
                 </div>
 
             </div>
@@ -173,19 +173,20 @@
 
     public void SetUpTool()
     {
+        int idUltimoRecurso = jugadorState.__jugador.idUltimoRecurso;
+        if (idUltimoRecurso == 0 && jugadorState.__jugador.idUltimaHerramienta != 0)
+        {
+            var it = jugadorState.__jugador.items?.FirstOrDefault(i => i.Id == jugadorState.__jugador.idUltimaHerramienta);
+            idUltimoRecurso = it?.idRecurso ?? 0;
+            jugadorState.__jugador.idUltimoRecurso = idUltimoRecurso;
+        }
         RecursoDTO dataHerramienta =
-            recursos.Where(x =>
-                x.Id ==
-                jugadorState.__jugador.items
-                    .Where(i => i.idRecurso == x.Id)
-                    .Select(i => i.idRecurso)
-                    .FirstOrDefault())
-            .FirstOrDefault()
+            recursos?.FirstOrDefault(r => r.Id == idUltimoRecurso)
             ??
             new RecursoDTO()
             {
                 Id = 0,
-                nombre = "Ninguna",
+                nombre = "default",
                 descripcion = "No hay herramienta equipada",
                 eficiencia = 10,
                 durabilidad = -1,

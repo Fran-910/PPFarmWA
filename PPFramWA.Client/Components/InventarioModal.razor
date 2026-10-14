@@ -163,6 +163,11 @@
                                 💰 Vender
                             </button>
 
+                            <button class="boton-equipar"
+                                    @onclick="() => Equipar(item)">
+                                ?? Equipar
+                            </button>
+
                         </div>
 
                     </article>
@@ -245,7 +250,7 @@
     }
 
     // =========================================================
-    // VENDER ITEM
+    // BOTONES
     // =========================================================
 
     private async Task Vender(
@@ -283,6 +288,12 @@
         }
     }
 
+    public async Task Equipar(InventarioDTO item)
+    {
+        JugadorState.__jugador.CambioUltimaHerramienta(item.Id, item.idRecurso);
+
+        JugadorState.NotificarCambios();
+    }
 
     // =========================================================
     // CAMBIAR CANTIDAD

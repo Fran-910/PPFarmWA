@@ -3,7 +3,8 @@
 @inject RecursoServicio RecursoService
 @inject JugadorServicio JugadorService
 @inject ComercioServicio ComercioService
-@inject JugadorState JugadorState
+@inject JugadorState jugadorState
+@inject ItemServicio itemServicio
 
 <div class="modal-fondo" @onclick="Cerrar">
 
@@ -201,8 +202,8 @@
     {
         // Obtiene el Id del jugador desde el estado de la aplicación.
         // Si no existe un jugador válido, utiliza 2 como valor predeterminado.
-        idJugador = JugadorState.__jugador?.Id > 0
-            ? JugadorState.__jugador.Id
+        idJugador = jugadorState.__jugador?.Id > 0
+            ? jugadorState.__jugador.Id
             : 2;
 
         // Obtiene los recursos disponibles en la tienda.
@@ -243,6 +244,7 @@
         // Si la compra fue exitosa, actualiza el saldo.
         if (r.Exito)
         {
+            await ActualizarInventarioEnMemoria();
             await ActualizarSaldo();
         }
     }
@@ -271,10 +273,37 @@
         // };
 
         // Actualiza las PP Coins del jugador en el estado global.
-        JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
+        jugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
 
         // Notifica al resto de componentes que hubo un cambio.
-        JugadorState.NotificarCambios();
+        jugadorState.NotificarCambios();
+    }
+
+    private async Task ActualizarInventarioEnMemoria()
+    {
+        var jugador = await JugadorService.ObtenerPorId(idJugador);
+
+        var items = await itemServicio.ObtenerInventario(idJugador);
+
+        if(items != null && items.Any())
+        {
+            var itemsDTO = new List<ItemDTO>();
+            foreach(var i in items)
+            {
+                var dto = new ItemDTO()
+                {
+                    Id = i.Id,
+                    cantidad = i.cantidad,
+                    idJugador = i.idJugador,
+                    idRecurso = i.idRecurso,
+                };
+
+                itemsDTO.Add(dto);
+
+            }
+
+            jugadorState.__jugador.items = itemsDTO;
+        }
     }
 
 

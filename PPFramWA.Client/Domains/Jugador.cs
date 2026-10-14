@@ -48,11 +48,10 @@ namespace PPFramWA.Client.Domains
             calcularExpNecesaria();
         }
 
-        public void CambioUltimaHerramienta(int idHerramienta)
+        public void CambioUltimaHerramienta(int idItem, int idRecurso)
         {
-            idUltimaHerramienta = idHerramienta;
-            // Select de los items del inventario del jugador en memoria para obtener la herramienta con el id correspondiente
-            // idUltimoRecurso = herramienta.idRecurso; con esa prop se puede obtener el recurso en los componentes
+            idUltimaHerramienta = idItem;
+            idUltimoRecurso = idRecurso;
             OnCambioUltimaHerramienta?.Invoke();
         }
         public void calcularExpNecesaria()

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\PPFramWA.Client\PPFramWA.Client.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Plantilla\" />
+  </ItemGroup>
+
 </Project>
