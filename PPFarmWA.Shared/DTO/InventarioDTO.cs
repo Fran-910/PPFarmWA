@@ -23,6 +23,8 @@ namespace PPFarmWA.Shared.DTO
 
         public int durabilidad { get; set; }
 
+        public int durabilidadItem { get; set; }
+
         public double valor { get; set; }
 
         public TipoItemEnum tipo { get; set; }

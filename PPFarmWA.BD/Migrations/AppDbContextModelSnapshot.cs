@@ -41,6 +41,9 @@ namespace PPFarmWA.BD.Migrations
                     b.Property<int>("cantidad")
                         .HasColumnType("int");
 
+                    b.Property<int>("durabilidad")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("JugadorId");

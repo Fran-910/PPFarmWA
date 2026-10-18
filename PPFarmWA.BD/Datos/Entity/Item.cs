@@ -15,5 +15,6 @@ namespace PPFarmWA.BD.Datos.Entity
         public Recurso Recurso {  get; set; }
         public int? VentaId { get; set; }
         public Venta? Venta { get; set; }
+        public int durabilidad { get; set; }
     }
 }
