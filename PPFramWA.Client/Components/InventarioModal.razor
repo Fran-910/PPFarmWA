@@ -192,7 +192,7 @@
 
     private readonly Dictionary<int, double> Precios = new();
 
-    private int idJugador = 2;
+    private int idJugador = 0;
 
     private double saldo;
 
@@ -211,7 +211,7 @@
     {
         idJugador = JugadorState.__jugador?.Id > 0
             ? JugadorState.__jugador.Id
-            : 2;
+            : 0;
 
         await Recargar();
     }
@@ -281,7 +281,7 @@
         {
             await Recargar();
         }
-    }
+    }//q esta parte de venta sea mas por intercambio q por una venta normal diria.// puesta en comun con el cliente en duda, YA SE ARREGLARON LOS MOKEOS. 
 
 
     // =========================================================
