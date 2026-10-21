@@ -78,6 +78,9 @@
                                       Label="@LabelGuardar"
                                       Class="btn-guardar" />
                     </li>
+                    <li><CustomButton onclick="CerrarSesion" 
+                        Label="Cerrar Sesión">
+                        </CustomButton></li>
 
                 </ul>
 
@@ -243,6 +246,12 @@
     {
         navigationManager.NavigateTo("/");
     }
+
+    public void CerrarSesion()
+    {
+        navigationManager.NavigateTo("/login");
+    }
+
 
     public async Task GuardarPartidaAsync()
     {
