@@ -98,7 +98,6 @@
             <div class="game-container">
 
                 <div class="game-header">
-                    <span>PaginaPrincipal</span>
                     <span class="game-version">PPFarmWA v1.0</span>
                 </div>
 
@@ -163,6 +162,10 @@
 
         jugadorState.OnChange += Actualizar;
         jugadorState.__jugador.OnCambioUltimaHerramienta += SetUpTool;
+        jugadorState.__jugador.OnSubioNivel += async () =>
+        {
+            await GuardarPartidaAsync();
+        };
 
         recursos = await catalogoRecursos.ObtenerRecursosAsync();
 
@@ -255,7 +258,10 @@
 
     public async Task GuardarPartidaAsync()
     {
+        if (guardando) return;
+
         var jugador = jugadorState.__jugador;
+
 
         if (jugador is null)
         {

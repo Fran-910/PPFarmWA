@@ -16,6 +16,10 @@
     <ProjectReference Include="..\PPFarmWA.Shared\PPFarmWA.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\cultivos\" />
+  </ItemGroup>
+
 	
 
 </Project>

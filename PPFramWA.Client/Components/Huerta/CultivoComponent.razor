@@ -1,7 +1,8 @@
-﻿@inject JugadorState jugadorState
+﻿@using PPFarmWA.Shared.Catalogos
+@inject JugadorState jugadorState
 <button style="cursor: @cursorActual" @onmousedown="CambiarAClick" @onmouseup="RestablecerAMain" @onmouseover="RestablecerAMain" class="cultivo" @onclick="OnClick">
 
-    @if (estado != CultivoState.cosechado && cultivo.vida < cultivo.vidaMaxima)
+    @if (estado != CultivoState.cosechado && cultivo!.vida < cultivo.vidaMaxima)
     {
         <div class="life-bar-container">
             <div class="life-bar-fill @ObtenerClaseColorBarra()"
@@ -10,7 +11,7 @@
         </div>
     }
 
-    <img class="cultivo-image @estado" src="images/cultivo1t.png" alt="Cultivo" draggable="false" />
+    <img class="cultivo-image @estado" src="/images/cultivos/@cultivo!.skinRoute" alt="Cultivo" draggable="false" />
     
     @if (mostrarPopup)
     {
@@ -27,11 +28,13 @@
     public CultivoState estado = CultivoState.listo;
     public bool mostrarPopup { get; set; } = false;
     private double PorcentajeVida;
-    string cursorActual;
+    string cursorActual = string.Empty;
 
     protected override void OnInitialized()
     {
         cultivo = new(jugadorState);
+        cultivo.CalcularSkin();
+        jugadorState.__jugador!.OnSubioNivel += cultivo.CalcularSkin;
     }
 
     public async Task OnClick()
@@ -39,7 +42,7 @@
 
         if (estado == CultivoState.listo || estado == CultivoState.standby)
         {
-            cultivo.Golpeado(jugadorState.__jugador.recurso.eficiencia);
+            cultivo!.Golpeado(jugadorState.__jugador!.recurso.eficiencia);
             ActualizarPorcentajeVida();
 
             await hitAnim();
@@ -54,7 +57,7 @@
     {
         estado = CultivoState.hit;
         
-        if (cultivo.vida <= 0)
+        if (cultivo!.vida <= 0)
         {
             estado = CultivoState.cosechado;
             mostrarPopup = true;
@@ -71,14 +74,14 @@
     
     public void CambiarAClick()
     {
-        var name = jugadorState.__jugador.recurso?.nombre?.ToLower().Replace(" ", "-") ?? "default";
+        var name = jugadorState.__jugador!.recurso?.nombre?.ToLower().Replace(" ", "-") ?? "default";
         if (jugadorState.__jugador.recurso?.Id == 0) name = "default";
         cursorActual = $"url('/images/tools/{name}/Click.png'), auto";
     }
 
     public void RestablecerAMain()
     {
-        var name = jugadorState.__jugador.recurso?.nombre?.ToLower().Replace(" ", "-") ?? "default";
+        var name = jugadorState.__jugador!.recurso?.nombre?.ToLower().Replace(" ", "-") ?? "default";
         if (jugadorState.__jugador.recurso?.Id == 0) name = "default";
         cursorActual = $"url('/images/tools/{name}/Main.png'), auto";
     }

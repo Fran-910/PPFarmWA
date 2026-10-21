@@ -32,127 +32,18 @@
 }
 
 /* =========================================================
-   FLORES DECORATIVAS (20x20 con nucleo de 8x8)
+   MATRIZ DE CELDAS: el numero de columnas lo fija el componente
+   (--celdas inline, derivado de CeldasHuerta.ColumnasPara) para
+   que todas las filas queden completas, sin tracks vacios.
    ========================================================= */
 
-.flor {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #000;
-    box-sizing: border-box;
-    z-index: 20;
-    pointer-events: none;
-}
-
-.flor-centro {
-    width: 8px;
-    height: 8px;
-}
-
-.flor-amarilla {
-    background: #f59e0b;
-}
-
-.flor-blanca {
-    background: #fff;
-}
-
-.flor-roja {
-    background: #dc2626;
-}
-
-.flor-azul {
-    background: #2563eb;
-}
-
-/* Esquina inferior derecha: cuadro liso, sin nucleo */
-.flor-pizarra {
-    background: #e2e8f0;
-}
-
-.flor-centro-claro {
-    background: #fef08a;
-}
-
-.flor-centro-amarillo {
-    background: #facc15;
-}
-
-.flor-centro-celeste {
-    background: #bae6fd;
-}
-
-/* --- Posiciones --- */
-
-.flor-sup-izq {
-    top: -12px;
-    left: -12px;
-}
-
-.flor-sup-centro {
-    top: -14px;
-    left: 33.33%;
-    transform: translateX(-50%);
-}
-
-.flor-sup-cuarto {
-    top: -14px;
-    right: 25%;
-}
-
-.flor-sup-der {
-    top: -12px;
-    right: -12px;
-}
-
-.flor-izq-medio {
-    top: 50%;
-    left: -14px;
-    transform: translateY(-50%);
-}
-
-.flor-der-cuarto {
-    top: 25%;
-    right: -14px;
-}
-
-.flor-der-medio {
-    top: 50%;
-    right: -14px;
-    transform: translateY(-50%);
-}
-
-.flor-inf-tercio {
-    bottom: -14px;
-    left: 33.33%;
-}
-
-.flor-inf-tercio-der {
-    bottom: -14px;
-    right: 33.33%;
-}
-
-.flor-inf-der {
-    bottom: -12px;
-    right: -12px;
-}
-
-/* =========================================================
-   MATRIZ DE CELDAS: 5 columnas, el numero de filas depende
-   de huerta.cantCeldas (crece con el nivel del jugador)
-   ========================================================= */
-
-/* Las celdas ocupan el espacio disponible. El diseno fija 5 columnas; aca los
-   tracks son 1fr para que la huerta crezca con la pantalla y se mantiene
-   --celdas solo para el ancho (5 columnas en desktop, menos en movil).
+/* Las celdas ocupan el espacio disponible. Los tracks son 1fr para que la
+   huerta crezca con la pantalla; el numero de columnas es siempre un divisor
+   de huerta.cantCeldas, asi que la ultima fila nunca queda a medias.
    El alto de cada celda se deriva del ancho con aspect-ratio para que
    sigan siendo cuadradas. */
 .huerta-container {
-    --celdas: 5;
+    --celdas: 5; /* fallback: el componente lo sobreescribe inline */
     --gap: clamp(5px, 0.6vw, 14px);
     /* Tope de celda: no supera 11vw ni lo que entra en 3 filas (max 12 celdas
        segun CeldasHuerta), para que la huerta crezca sin desbordar en alto. */
@@ -195,29 +86,10 @@
 
 /* =========================================================
    RESPONSIVE
-   El numero de celdas sigue siendo huerta.cantCeldas (logica intacta):
-   solo cambia cuantas columnas caben por fila.
+   Las columnas ya no cambian por ancho de pantalla: deben seguir
+   dividiendo huerta.cantCeldas para no dejar huecos. La huerta se
+   adapta sola porque los tracks son 1fr y --celda-max usa 11vw.
    ========================================================= */
-
-@media (max-width: 1100px) {
-    .huerta-container {
-        --celdas: 4;
-    }
-}
-
-@media (max-width: 800px) {
-    .huerta-container {
-        --celdas: 3;
-        --celda: clamp(42px, 8vw, 64px);
-    }
-}
-
-@media (max-width: 520px) {
-    .huerta-container {
-        --celdas: 2;
-        --celda: clamp(40px, 15vw, 60px);
-    }
-}
 
 /* En vertical la valla se pega al header en vez de flotar en el centro */
 @media (max-height: 700px) {
