@@ -89,11 +89,3 @@ namespace PPFarmWA.Client.Services
 
     }
 }
-
-
-        
-   
-
-   
-
-

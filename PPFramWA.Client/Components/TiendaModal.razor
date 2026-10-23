@@ -202,9 +202,9 @@
     {
         // Obtiene el Id del jugador desde el estado de la aplicación.
         // Si no existe un jugador válido, utiliza 0 como valor predeterminado.
-        idJugador = JugadorState.__jugador?.Id > 0
-            ? JugadorState.__jugador.Id
-            : 0;
+        // idJugador = JugadorState.__jugador?.Id > 0
+        //     ? JugadorState.__jugador.Id
+        //     : 0;
 
         // Obtiene los recursos disponibles en la tienda.
         recursos = await RecursoService.ObtenerRecursosTienda();

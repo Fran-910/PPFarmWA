@@ -14,13 +14,10 @@
              aria-label="Inventario"
              @onclick:stopPropagation="true">
 
-        <!-- CABECERA -->
-
         <header class="modal-cabecera">
-
             <div>
                 <h1>🎒 Mi Inventario</h1>
-                <p>Equipá o vendé tus recursos.</p>
+                <p>Seleccioná un objeto para ver sus detalles.</p>
             </div>
 
             <button class="boton-cerrar"
@@ -28,189 +25,273 @@
                     aria-label="Cerrar inventario">
                 ×
             </button>
-
         </header>
-
-
-        <!-- SALDO -->
 
         <div class="saldo">
             💰 PP Coins:
             <strong>@saldo.ToString("0.##")</strong>
         </div>
 
-
-        <!-- MENSAJE -->
-
         @if (!string.IsNullOrWhiteSpace(mensaje))
         {
-            <p class="@claseMensaje">
-                @mensaje
-            </p>
+            <p class="@claseMensaje">@mensaje</p>
         }
 
-
-        <!-- CONTENIDO -->
-
-        <div class="modal-contenido">
+        <div class="inventario-grid">
 
             @if (items is null)
             {
-                <p class="estado-modal">
-                    🌱 Cargando inventario...
-                </p>
+                <p class="estado-modal">🌱 Cargando inventario...</p>
             }
             else if (items.Count == 0)
             {
-                <p class="estado-modal">
-                    📦 Tu inventario está vacío.
-                </p>
+                <p class="estado-modal">📦 Tu inventario está vacío.</p>
             }
             else
             {
                 @foreach (var item in items)
                 {
-                    var cantidad = cantidades.TryGetValue(
-                        item.Id,
-                        out var seleccionada)
-                        ? seleccionada
-                        : 1;
+                    <button type="button"
+                            @key="item.Id"
+                            class="item-tarjeta @ClaseRareza(item.idRareza)"
+                            @onclick="() => Seleccionar(item)">
 
-                    <article class="tarjeta-recurso @ClaseRareza(item.idRareza)">
-
-                        <!-- ICONO -->
-
-                        <div class="icono-recurso">
+                        <span class="item-icono">
                             @Icono(item.nombre)
-                        </div>
+                        </span>
 
+                        <span class="item-nombre">
+                            @item.nombre
+                        </span>
 
-                        <!-- INFORMACIÓN -->
+                        <span class="item-tipo">
+                            @Tipo(item.tipo)
+                        </span>
 
-                        <div class="detalle-recurso">
+                        @if (item.cantidad > 1)
+                        {
+                            <span class="item-cantidad">
+                                x @item.cantidad
+                            </span>
+                        }
 
-                            <h2>
-                                @item.nombre
-                            </h2>
-
-                            <p>
-                                @item.descripcion
-                            </p>
-
-                            <div class="estadisticas">
-
-                                ⚡ @item.eficiencia
-
-                                ·
-
-                                🛡️ @item.durabilidadItem / @item.durabilidad
-
-                                ·
-
-                                🔨 @Tipo(item.tipo)
-
-                                ·
-
-                                💎 @Rareza(item.idRareza)
-
-                            </div>
-
-                            <strong>
-                                📦 Cantidad: @item.cantidad
-                            </strong>
-
-                        </div>
-
-
-                        <!-- ACCIONES -->
-
-                        <div class="acciones-tienda">
-
-                                <label>
-                                Vender cantidad
-
-                                <input type="number"
-                                       min="1"
-                                       max="@item.cantidad"
-                                       value="@cantidad"
-                                       @onchange="e =>
-                                           CambiarCantidad(
-                                               item.Id,
-                                               item.cantidad,
-                                               e.Value?.ToString())" />
-                            </label>
-
-
-                            <label>
-                                Precio total
-
-                                <input type="number"
-                                       min="0"
-                                       step="0.01"
-                                       value="@(Precios.TryGetValue(item.Id, out var precio)
-                                           ? precio
-                                           : item.valor * cantidad)"
-                                       @onchange="e =>
-                                           CambiarPrecio(
-                                               item.Id,
-                                               e.Value?.ToString())" />
-                            </label>
-
-
-                            <button class="boton-primario"
-                                    disabled="@ocupado"
-                                    @onclick="() => Vender(item, cantidad)">
-                                💰 Vender
-                            </button>
-
-                            <button class="boton-equipar"
-                                    @onclick="() => Equipar(item)">
-                                ?? Equipar
-                            </button>
-
-                        </div>
-
-                    </article>
+                        <span class="item-valor">
+                            💰 @item.valor PP
+                        </span>
+                    </button>
                 }
             }
-
         </div>
-
     </section>
-
 </div>
 
+@if (seleccionado is not null)
+{
+    <div class="modal-fondo modal-superior"
+         @onclick="CerrarDetalles">
+
+        <section class="modal-juego modal-detalles"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-label="Detalles del objeto"
+                 @onclick:stopPropagation="true">
+
+            <header class="modal-cabecera">
+                <div>
+                    <h1>📜 Detalles</h1>
+                    <p>Información completa del objeto.</p>
+                </div>
+
+                <button class="boton-cerrar"
+                        @onclick="CerrarDetalles">
+                    ×
+                </button>
+            </header>
+
+            <div class="detalle-contenido">
+                <div class="detalle-icono @ClaseRareza(seleccionado.idRareza)">
+                    @Icono(seleccionado.nombre)
+                </div>
+
+                <h2 class="detalle-nombre">@seleccionado.nombre</h2>
+
+                <span class="detalle-rareza">
+                    💎 @Rareza(seleccionado.idRareza)
+                </span>
+
+                <p class="detalle-descripcion">
+                    @(string.IsNullOrWhiteSpace(seleccionado.descripcion)
+                        ? "No hay una descripción disponible."
+                        : seleccionado.descripcion)
+                </p>
+
+                <div class="detalle-estadisticas">
+                    <div>
+                        <span>⚡ Eficiencia</span>
+                        <strong>@seleccionado.eficiencia</strong>
+                    </div>
+
+                    <div>
+                        <span>🛡️ Durabilidad</span>
+                        <strong>
+                            @seleccionado.durabilidadItem /
+                            @seleccionado.durabilidad
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>🔨 Tipo</span>
+                        <strong>@Tipo(seleccionado.tipo)</strong>
+                    </div>
+
+                    <div>
+                        <span>💰 Valor de referencia</span>
+                        <strong>@seleccionado.valor.ToString("0.##") PP</strong>
+                    </div>
+
+                    <div>
+                        <span>📦 Unidades disponibles</span>
+                        <strong>@seleccionado.cantidad</strong>
+                    </div>
+                </div>
+
+                <div class="detalle-acciones">
+                    <button class="boton-equipar"
+                            disabled="@ocupado"
+                            @onclick="EquiparSeleccionado">
+                        🧰 Equipar
+                    </button>
+
+                    <button class="boton-primario"
+                            disabled="@ocupado"
+                            @onclick="AbrirConfirmacion">
+                        💰 Vender
+                    </button>
+
+                    <button class="boton-secundario"
+                            disabled="@ocupado"
+                            @onclick="CerrarDetalles">
+                        Volver
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+
+@if (mostrarConfirmacion && seleccionado is not null)
+{
+    <div class="modal-fondo modal-confirmacion"
+         @onclick="CancelarConfirmacion">
+
+        <section class="modal-juego modal-confirmar-venta"
+                 role="alertdialog"
+                 aria-modal="true"
+                 aria-label="Confirmar venta"
+                 @onclick:stopPropagation="true">
+
+            <header class="modal-cabecera">
+                <div>
+                    <h1>💰 Confirmar venta</h1>
+                    <p>Revisá los detalles antes de continuar.</p>
+                </div>
+
+                <button class="boton-cerrar"
+                        @onclick="CancelarConfirmacion">
+                    ×
+                </button>
+            </header>
+
+            <div class="confirmacion-contenido">
+                <p>
+                    Vas a vender:
+                    <strong>@seleccionado.nombre</strong>
+                </p>
+
+                <label class="campo-cantidad">
+                    Cantidad a vender
+                    <input type="number"
+                           min="1"
+                           max="@seleccionado.cantidad"
+                           value="@cantidadVenta"
+                           @onchange="CambiarCantidadVenta" />
+                </label>
+
+                <div class="resumen-venta">
+                    <div>
+                        <span>Valor de referencia</span>
+                        <strong>
+                            @((seleccionado.valor * cantidadVenta).ToString("0.##")) PP
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Ganancia estimada</span>
+                        <strong class="ganancia">
+                            @GananciaEstimada.ToString("0.##") PP
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Saldo después de vender</span>
+                        <strong>
+                            @((saldo + GananciaEstimada).ToString("0.##")) PP
+                        </strong>
+                    </div>
+                </div>
+
+                <p class="aviso-venta">
+                    La ganancia es estimada y utiliza el 50 % del valor
+                    del recurso por unidad, según la lógica actual del servidor.
+                </p>
+
+                <div class="detalle-acciones">
+                    <button class="boton-primario"
+                            disabled="@(!CantidadValida || ocupado)"
+                            @onclick="ConfirmarVenta">
+                        @(ocupado ? "Procesando..." : "Sí, vender")
+                    </button>
+
+                    <button class="boton-secundario"
+                            disabled="@ocupado"
+                            @onclick="CancelarConfirmacion">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+}
 
 @code {
-
     [Parameter]
     public EventCallback OnClose { get; set; }
 
-
-    // =========================================================
-    // VARIABLES
-    // =========================================================
-
     private List<InventarioDTO>? items;
+    private InventarioDTO? seleccionado;
 
-    private readonly Dictionary<int, int> cantidades = new();
-
-    private readonly Dictionary<int, double> Precios = new();
-
-    private int idJugador = 0;
-
+    private int idJugador;
+    private int cantidadVenta = 1;
     private double saldo;
 
     private bool ocupado;
+    private bool mostrarConfirmacion;
 
     private string? mensaje;
-
     private string claseMensaje = "mensaje-exito";
 
+    private double GananciaEstimada =>
+        seleccionado is null || !CantidadValida
+            ? 0
+            : Math.Round(
+                seleccionado.valor * cantidadVenta * 0.50,
+                2,
+                MidpointRounding.AwayFromZero);
 
-    // =========================================================
-    // INICIALIZACIÓN
-    // =========================================================
+    private bool CantidadValida =>
+        seleccionado is not null &&
+        cantidadVenta >= 1 &&
+        cantidadVenta <= seleccionado.cantidad;
 
     protected override async Task OnInitializedAsync()
     {
@@ -218,13 +299,16 @@
             ? JugadorState.__jugador.Id
             : 0;
 
+        if (idJugador <= 0)
+        {
+            items = new List<InventarioDTO>();
+            mensaje = "No se pudo identificar al jugador.";
+            claseMensaje = "mensaje-error";
+            return;
+        }
+
         await Recargar();
     }
-
-
-    // =========================================================
-    // RECARGAR INVENTARIO
-    // =========================================================
 
     private async Task Recargar()
     {
@@ -236,152 +320,146 @@
         {
             saldo = jugador.ppCoins;
 
-            // JugadorState.__jugador ??=
-            //     new PPFramWA.Client.Domains.Jugador
-            //     {
-            //         Id = jugador.Id
-            //     };
-
-            JugadorState.__jugador.ppCoins =
-                (int)jugador.ppCoins;
-
-            JugadorState.NotificarCambios();
+            if (JugadorState.__jugador is not null)
+            {
+                JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
+                JugadorState.NotificarCambios();
+            }
         }
     }
 
-    // =========================================================
-    // BOTONES
-    // =========================================================
-
-    private async Task Vender(
-        InventarioDTO item,
-        int cantidad)
+    private void Seleccionar(InventarioDTO item)
     {
+        seleccionado = item;
+        cantidadVenta = 1;
+        mostrarConfirmacion = false;
+        mensaje = null;
+    }
+
+    private void CerrarDetalles()
+    {
+        if (ocupado)
+            return;
+
+        mostrarConfirmacion = false;
+        seleccionado = null;
+    }
+
+    private void AbrirConfirmacion()
+    {
+        if (seleccionado is null)
+            return;
+
+        cantidadVenta = 1;
+        mostrarConfirmacion = true;
+    }
+
+    private void CancelarConfirmacion()
+    {
+        if (ocupado)
+            return;
+
+        mostrarConfirmacion = false;
+    }
+
+    private void CambiarCantidadVenta(ChangeEventArgs e)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var cantidad))
+            cantidad = 1;
+
+        cantidadVenta = seleccionado is null
+            ? 1
+            : Math.Clamp(cantidad, 1, seleccionado.cantidad);
+    }
+
+    private async Task ConfirmarVenta()
+    {
+        if (seleccionado is null || !CantidadValida || ocupado)
+            return;
+
+        var itemVendido = seleccionado;
+        var cantidad = cantidadVenta;
+
         ocupado = true;
+        mensaje = null;
 
-        var precio = Precios.TryGetValue(
-            item.Id,
-            out var p)
-            ? p
-            : item.valor * cantidad;
-
-        var resultado = await ComercioService.Vender(
-            new VenderItemDTO
-            {
-                idJugador = idJugador,
-                idItem = item.Id,
-                cantidad = cantidad,
-                precioVenta = precio
-            });
-
-        ocupado = false;
-
-        mensaje = resultado.Mensaje;
-
-        claseMensaje = resultado.Exito
-            ? "mensaje-exito"
-            : "mensaje-error";
-
-        if (resultado.Exito)
+        try
         {
-            await Recargar();
-        }
-    }//q esta parte de venta sea mas por intercambio q por una venta normal diria.// puesta en comun con el cliente en duda, YA SE ARREGLARON LOS MOKEOS. 
+            var resultado = await ComercioService.Vender(
+                new VenderItemDTO
+                {
+                    idJugador = idJugador,
+                    idItem = itemVendido.Id,
+                    cantidad = cantidad
+                });
 
-    public async Task Equipar(InventarioDTO item)
+            mensaje = resultado.Mensaje;
+            claseMensaje = resultado.Exito
+                ? "mensaje-exito"
+                : "mensaje-error";
+
+            if (resultado.Exito)
+            {
+                mostrarConfirmacion = false;
+                seleccionado = null;
+                await Recargar();
+            }
+        }
+        catch (Exception)
+        {
+            mensaje = "Ocurrió un error al vender el objeto.";
+            claseMensaje = "mensaje-error";
+        }
+        finally
+        {
+            ocupado = false;
+        }
+    }
+
+    private Task EquiparSeleccionado()
     {
-        JugadorState.__jugador.CambioUltimaHerramienta(item.Id, item.idRecurso);
+        if (seleccionado is null || JugadorState.__jugador is null)
+            return Task.CompletedTask;
+
+        JugadorState.__jugador.CambioUltimaHerramienta(
+            seleccionado.Id,
+            seleccionado.idRecurso);
 
         JugadorState.NotificarCambios();
+
+        mensaje = $"Equipaste: {seleccionado.nombre}";
+        claseMensaje = "mensaje-exito";
+
+        seleccionado = null;
+
+        return Task.CompletedTask;
     }
-
-    // =========================================================
-    // CAMBIAR CANTIDAD
-    // =========================================================
-
-    private void CambiarCantidad(
-        int id,
-        int maximo,
-        string? valor)
-    {
-        cantidades[id] =
-            int.TryParse(valor, out var cantidad)
-                ? Math.Clamp(cantidad, 1, maximo)
-                : 1;
-    }
-
-
-    // =========================================================
-    // CAMBIAR PRECIO
-    // =========================================================
-
-    private void CambiarPrecio(
-        int id,
-        string? valor)
-    {
-        Precios[id] =
-            double.TryParse(
-                valor,
-                System.Globalization.NumberStyles.Number,
-                System.Globalization.CultureInfo.InvariantCulture,
-                out var precio)
-                    ? Math.Max(0, precio)
-                    : 0;
-    }
-
-
-    // =========================================================
-    // CERRAR MODAL
-    // =========================================================
 
     private Task Cerrar()
     {
+        if (ocupado)
+            return Task.CompletedTask;
+
         return OnClose.InvokeAsync();
     }
 
+    private static string Tipo(TipoItemEnum tipo) => tipo.ToString();
 
-    // =========================================================
-    // INFORMACIÓN DE ITEMS
-    // =========================================================
+    private static string Rareza(RarezaEnum rareza) => rareza.ToString();
 
-    private static string Tipo(TipoItemEnum tipo)
-    {
-        return tipo.ToString();
-    }
-
-
-    private static string Rareza(RarezaEnum rareza)
-    {
-        return rareza.ToString();
-    }
-
-
-    private static string ClaseRareza(RarezaEnum rareza)
-    {
-        return $"rareza-{rareza.ToString().ToLowerInvariant()}";
-    }
-
-
-    // =========================================================
-    // ICONOS
-    // =========================================================
+    private static string ClaseRareza(RarezaEnum rareza) =>
+        $"rareza-{rareza.ToString().ToLowerInvariant()}";
 
     private static string Icono(string nombre)
     {
         return nombre.ToLowerInvariant() switch
         {
             var x when x.Contains("pala") => "🪏",
-
             var x when x.Contains("regadera") => "💧",
-
             var x when x.Contains("tomate") => "🍅",
-
             var x when x.Contains("zanahoria") => "🥕",
-
             var x when x.Contains("maiz") => "🌽",
-
             var x when x.Contains("semilla") => "🌱",
-
             _ => "📦"
         };
     }
