@@ -24,12 +24,6 @@ namespace PPFramWA.Client.Services
                 "api/Jugador") ?? new List<JugadorDTO>();
         }
 
-        public async Task<HttpResponseMessage> GuardarPartida(JugadorDTO jugador)
-        {
-            return await _api.PutAsync<JugadorDTO>(
-                $"api/Jugador/{jugador.Id}", jugador);
-        }
-
         public async Task<(bool Exito, string Mensaje)> GuardarPartida(Jugador jugador)
         {
             var dto = new JugadorPutDTO

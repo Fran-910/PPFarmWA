@@ -1,23 +1,9 @@
 ﻿@inject JugadorState jugadorState
 
-<div class="huerta-container">
+<div class="huerta-container" style="--celdas: @huerta!.columnas">
     <div class="pixel-wood-fence">
 
-        <!-- Flores decorativas en los bordes y esquinas -->
-        <div class="flor flor-amarilla flor-sup-izq"><span class="flor-centro flor-centro-claro"></span></div>
-        <div class="flor flor-blanca flor-sup-centro"><span class="flor-centro flor-centro-amarillo"></span></div>
-        <div class="flor flor-roja flor-sup-cuarto"><span class="flor-centro flor-centro-amarillo"></span></div>
-        <div class="flor flor-blanca flor-sup-der"><span class="flor-centro flor-centro-amarillo"></span></div>
-
-        <div class="flor flor-blanca flor-izq-medio"><span class="flor-centro flor-centro-amarillo"></span></div>
-        <div class="flor flor-azul flor-der-cuarto"><span class="flor-centro flor-centro-celeste"></span></div>
-        <div class="flor flor-blanca flor-der-medio"><span class="flor-centro flor-centro-amarillo"></span></div>
-
-        <div class="flor flor-azul flor-inf-tercio"><span class="flor-centro flor-centro-amarillo"></span></div>
-        <div class="flor flor-blanca flor-inf-tercio-der"><span class="flor-centro flor-centro-amarillo"></span></div>
-        <div class="flor flor-pizarra flor-inf-der"></div>
-
-        <!-- Matriz de 5 columnas; el numero de celdas crece con el nivel -->
+        <!-- Cuadricula completa: --celdas es divisor de cantCeldas (ver CeldasHuerta) -->
         <div class="huerta-grid" id="huertaGrid">
             @for (int i = 1; i <= huerta!.cantCeldas; i++)
             {

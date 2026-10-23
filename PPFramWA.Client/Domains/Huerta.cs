@@ -6,6 +6,7 @@ namespace PPFramWA.Client.Domains
     public class Huerta
     {
         public int cantCeldas { get; set; }
+        public int columnas { get; set; }
         public JugadorState jugadorStateHuerta;
 
         public Huerta(JugadorState jugadorState)
@@ -20,6 +21,7 @@ namespace PPFramWA.Client.Domains
             var umbralDeNivelActual = CeldasHuerta.values.Where(x => x.Key > jugadorStateHuerta.__jugador!.level).MinBy(x => x.Value).Key;
 
             cantCeldas = CeldasHuerta.values[umbralDeNivelActual];
+            columnas = CeldasHuerta.ColumnasPara(cantCeldas);
         }
     }
 }
