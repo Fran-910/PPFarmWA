@@ -47,9 +47,12 @@ namespace PPFarmWA.Repositorio.Repositorios
 
             await _context.SaveChangesAsync();
 
+            var recursoInicial = await _context.Recursos.FindAsync(1);
+
             Item itemInicial = new Item
             {
                 cantidad = 1,
+                durabilidad = recursoInicial?.durabilidad ?? 0,
                 JugadorId = jugador.Id,
                 RecursoId = 1
             };  
@@ -80,7 +83,8 @@ namespace PPFarmWA.Repositorio.Repositorios
                     cantidad = i.cantidad,
                     idJugador = i.JugadorId,
                     idRecurso = i.RecursoId,
-                    idVenta = i.VentaId
+                    idVenta = i.VentaId,
+                    durabilidad = i.durabilidad
                 }).ToList()
             };
         }
@@ -98,7 +102,8 @@ namespace PPFarmWA.Repositorio.Repositorios
                     cantidad = i.cantidad,
                     idJugador = i.JugadorId,
                     idRecurso = i.RecursoId,
-                    idVenta = i.VentaId
+                    idVenta = i.VentaId,
+                    durabilidad = i.durabilidad
                 });
             }
 
@@ -143,7 +148,8 @@ namespace PPFarmWA.Repositorio.Repositorios
                     cantidad = i.cantidad,
                     idJugador = i.JugadorId,
                     idRecurso = i.RecursoId,
-                    idVenta = i.VentaId
+                    idVenta = i.VentaId,
+                    durabilidad = i.durabilidad
                 });
             }
 
@@ -186,7 +192,8 @@ namespace PPFarmWA.Repositorio.Repositorios
                     cantidad = i.cantidad,
                     idJugador = i.JugadorId,
                     idRecurso = i.RecursoId,
-                    idVenta = i.VentaId
+                    idVenta = i.VentaId,
+                    durabilidad = i.durabilidad
                 });
             }
 

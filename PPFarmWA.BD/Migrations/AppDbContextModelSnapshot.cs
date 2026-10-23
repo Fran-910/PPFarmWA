@@ -16,7 +16,7 @@ namespace PPFarmWA.BD.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,6 +39,9 @@ namespace PPFarmWA.BD.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("durabilidad")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

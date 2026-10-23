@@ -10,6 +10,8 @@ namespace PPFarmWA.Shared.DTO
 
         public int cantidad { get; set; }
 
+        public int durabilidad { get; set; }
+
         public int idJugador { get; set; }
 
         public int idRecurso { get; set; }

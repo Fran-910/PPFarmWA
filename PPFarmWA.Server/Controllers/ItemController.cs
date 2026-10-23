@@ -30,6 +30,7 @@ namespace PPFarmWA.Server.Controllers
             {
                 Id = i.Id,
                 cantidad = i.cantidad,
+                durabilidad = i.durabilidad,
                 idJugador = i.JugadorId,
                 idRecurso = i.RecursoId,
                 idVenta = i.VentaId
@@ -60,6 +61,7 @@ namespace PPFarmWA.Server.Controllers
 
                         eficiencia = recurso.eficiencia,
                         durabilidad = recurso.durabilidad,
+                        durabilidadItem = item.durabilidad,
                         valor = recurso.valor,
 
                         tipo = recurso.tipo,
@@ -82,6 +84,7 @@ namespace PPFarmWA.Server.Controllers
             {
                 Id = item.Id,
                 cantidad = item.cantidad,
+                durabilidad = item.durabilidad,
                 idJugador = item.JugadorId,
                 idRecurso = item.RecursoId,
                 idVenta = item.VentaId
@@ -96,10 +99,21 @@ namespace PPFarmWA.Server.Controllers
             var item = new Item
             {
                 cantidad = dto.cantidad,
+                durabilidad = dto.durabilidad,
                 JugadorId = dto.idJugador,
                 RecursoId = dto.idRecurso,
                 VentaId = (dto.idVenta.HasValue && dto.idVenta.Value > 0) ? dto.idVenta : null
             };
+
+            // Si no se especifica durabilidad, tomar la del recurso base
+            if (item.durabilidad == 0)
+            {
+                var recursoBase = await _context.Recursos.FindAsync(item.RecursoId);
+                if (recursoBase != null)
+                {
+                    item.durabilidad = recursoBase.durabilidad;
+                }
+            }
 
             var creado = await _repositorio.AddAsync(item);
 

@@ -393,6 +393,52 @@
 }
 
 /* =========================================================
+   BOTON EQUIPAR (Inventario)
+   ========================================================= */
+
+.boton-equipar {
+    border: 2px solid #6b4c1a;
+    border-radius: 0;
+    padding: 7px 10px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 #000;
+    cursor: pointer;
+    transition: none;
+    background: #a37a2e;
+    border-color: #6b4c1a;
+    box-shadow: inset 2px 2px 0 #d6a94f, inset -2px -2px 0 #7a5a1e, 1px 1px 0 #000;
+    color: #ffffff;
+}
+
+.boton-equipar:hover {
+    background: #b5883a;
+}
+
+.boton-equipar:active {
+    box-shadow: inset 2px 2px 0 #7a5a1e, inset -2px -2px 0 #d6a94f;
+    transform: translateY(1px);
+}
+
+.boton-equipar:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #5a4216;
+    box-shadow: inset 2px 2px 0 #7a5a1e, inset -2px -2px 0 #3a2910;
+}
+
+/* Variante "equipado" */
+.boton-equipar.equipado,
+.item-equipado .boton-equipar {
+    background: #258a46;
+    border-color: #0d381b;
+    box-shadow: inset 2px 2px 0 #5fe088, inset -2px -2px 0 #135227, 1px 1px 0 #000;
+    cursor: default;
+}
+
+/* =========================================================
    MONEDAS (HUD lateral de la maqueta de tienda)
    ========================================================= */
 

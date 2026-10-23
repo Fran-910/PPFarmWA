@@ -103,7 +103,7 @@
 
                                 ·
 
-                                🛡️ @item.durabilidad
+                                🛡️ @item.durabilidadItem / @item.durabilidad
 
                                 ·
 
@@ -161,6 +161,11 @@
                                     disabled="@ocupado"
                                     @onclick="() => Vender(item, cantidad)">
                                 💰 Vender
+                            </button>
+
+                            <button class="boton-equipar"
+                                    @onclick="() => Equipar(item)">
+                                ?? Equipar
                             </button>
 
                         </div>
@@ -245,7 +250,7 @@
     }
 
     // =========================================================
-    // VENDER ITEM
+    // BOTONES
     // =========================================================
 
     private async Task Vender(
@@ -283,6 +288,12 @@
         }
     }//q esta parte de venta sea mas por intercambio q por una venta normal diria.// puesta en comun con el cliente en duda, YA SE ARREGLARON LOS MOKEOS. 
 
+    public async Task Equipar(InventarioDTO item)
+    {
+        JugadorState.__jugador.CambioUltimaHerramienta(item.Id, item.idRecurso);
+
+        JugadorState.NotificarCambios();
+    }
 
     // =========================================================
     // CAMBIAR CANTIDAD

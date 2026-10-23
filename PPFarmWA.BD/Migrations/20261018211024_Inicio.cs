@@ -61,7 +61,7 @@ namespace PPFarmWA.BD.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     idJugadorVendedor = table.Column<int>(type: "int", nullable: false),
-                    idJugadorComprador = table.Column<int>(type: "int", nullable: false),
+                    idJugadorComprador = table.Column<int>(type: "int", nullable: true),
                     cantidadVenta = table.Column<int>(type: "int", nullable: false),
                     precioVenta = table.Column<double>(type: "float", nullable: false)
                 },
@@ -79,7 +79,8 @@ namespace PPFarmWA.BD.Migrations
                     cantidad = table.Column<int>(type: "int", nullable: false),
                     JugadorId = table.Column<int>(type: "int", nullable: false),
                     RecursoId = table.Column<int>(type: "int", nullable: false),
-                    VentaId = table.Column<int>(type: "int", nullable: true)
+                    VentaId = table.Column<int>(type: "int", nullable: true),
+                    durabilidad = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

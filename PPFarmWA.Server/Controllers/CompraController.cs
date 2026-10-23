@@ -62,6 +62,7 @@ namespace PPFarmWA.Server.Controllers
                     _context.Items.Add(new Item
                     {
                         cantidad = dto.cantidad,
+                        durabilidad = recurso.durabilidad,
                         JugadorId = dto.idJugador,
                         RecursoId = dto.idRecurso
                     });

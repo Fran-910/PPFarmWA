@@ -11,15 +11,15 @@ using PPFarmWA.BD.Datos;
 namespace PPFarmWA.BD.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261003141905_migracion1")]
-    partial class migracion1
+    [Migration("20261018211024_Inicio")]
+    partial class Inicio
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -42,6 +42,9 @@ namespace PPFarmWA.BD.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("durabilidad")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -161,7 +164,7 @@ namespace PPFarmWA.BD.Migrations
                     b.Property<int>("cantidadVenta")
                         .HasColumnType("int");
 
-                    b.Property<int>("idJugadorComprador")
+                    b.Property<int?>("idJugadorComprador")
                         .HasColumnType("int");
 
                     b.Property<int>("idJugadorVendedor")
