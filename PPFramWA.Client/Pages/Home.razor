@@ -8,6 +8,8 @@
 
 <PageTitle>Home</PageTitle>
 
+
+
 @if (!mostrarInternet)
 {
     <div style="cursor: @cursorActual;"
@@ -16,9 +18,16 @@
          @onmouseover="RestablecerAMain"
          @onmouseleave="RestablecerAMain"
          class="home-content terrain-bg">
+        
+        <button class="bton-menu" @onclick="BotonSandwich">☰</button>
 
-        <div class="barra-lateral">
+        @if (mostrarMenuLateral)
+        {
+
+            <div class="barra-lateral">
+
             <nav>
+                    
                 <ul>
 
                     <li class="jugador-nombre">
@@ -89,9 +98,11 @@
                 }
             </nav>
         </div>
+        }
 
         @if (recursos is not null)
         {
+
             <div class="game-container">
 
                 <div class="game-header">
@@ -128,6 +139,7 @@
 
 @code
 {
+    private bool mostrarMenuLateral = true;
     private bool mostrarTienda;
     private bool mostrarInventario;
     private bool mostrarInternet;
@@ -317,5 +329,10 @@
         ctsMensaje?.Dispose();
 
         jugadorState.OnChange -= Actualizar;
+    }
+
+   private void BotonSandwich()
+    {
+        mostrarMenuLateral = !mostrarMenuLateral; 
     }
 }
