@@ -1,4 +1,6 @@
-﻿using PPFramWA.Client.Services;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using PPFarmWA.Shared.Catalogos;
+using PPFramWA.Client.Services;
 using System.Runtime.CompilerServices;
 
 namespace PPFramWA.Client.Domains
@@ -9,6 +11,7 @@ namespace PPFramWA.Client.Domains
         public int vidaMaxima { get; set; }
         public int xp { get; set; }
         public int points { get; set; }
+        public string skinRoute { get; set; }
 
         public JugadorState jugadorStateCultivo;
 
@@ -28,6 +31,18 @@ namespace PPFramWA.Client.Domains
             vidaMaxima = vidaCalculada;
             xp = 0;
             points = 0;
+        }
+
+        public void CalcularSkin()
+        {
+            var umbralSeguro = CultivosSkin.values
+            .Where(x => x.Key >= jugadorStateCultivo.__jugador!.level)
+            .Select(x => (int?)x.Key)
+            .Min();
+
+            int umbralDeNivelActual = umbralSeguro ?? CultivosSkin.values.Keys.Max();
+
+            skinRoute = $"/Cultivo{CultivosSkin.values[umbralDeNivelActual]}.png";
         }
 
         //Logica de hit para reducir la vida de los cultivos y ejecutar cosechado

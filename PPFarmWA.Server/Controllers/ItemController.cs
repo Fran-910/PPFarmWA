@@ -129,48 +129,110 @@ namespace PPFarmWA.Server.Controllers
         [HttpPost("vender")]
         public async Task<IActionResult> Vender(VenderItemDTO dto)
         {
-            if (dto.cantidad < 1 || dto.precioVenta < 0)
-                return BadRequest("La cantidad y el precio de venta no son válidos.");
+            if (dto.idJugador <= 0 || dto.idItem <= 0 || dto.cantidad < 1)
+            {
+                return BadRequest("Los datos de la venta no son válidos.");
+            }
 
-            var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == dto.idItem && i.JugadorId == dto.idJugador);
-            if (item is null)
-                return NotFound("El item no pertenece al jugador.");
-            if (item.cantidad < dto.cantidad)
-                return BadRequest("No tenés esa cantidad disponible.");
+            // La transacción comienza antes de consultar el inventario
+            // para proteger la operación ante ventas simultáneas.
+            await using var transaccion =
+                await _context.Database.BeginTransactionAsync(
+                    System.Data.IsolationLevel.Serializable);
 
-            var jugador = await _context.Jugadores.FindAsync(dto.idJugador);
-            if (jugador is null)
-                return NotFound("El jugador no existe.");
-
-            await using var transaccion = await _context.Database.BeginTransactionAsync();
             try
             {
+                var item = await _context.Items
+                    .Include(i => i.Recurso)
+                    .FirstOrDefaultAsync(i =>
+                        i.Id == dto.idItem &&
+                        i.JugadorId == dto.idJugador);
+
+                if (item is null)
+                {
+                    await transaccion.RollbackAsync();
+                    return NotFound("El objeto no pertenece al jugador.");
+                }
+
+                if (item.Recurso is null)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest("No se encontró el recurso del objeto.");
+                }
+
+                if (item.cantidad < dto.cantidad)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest("No tenés esa cantidad disponible.");
+                }
+
+                var jugador = await _context.Jugadores
+                    .FirstOrDefaultAsync(j => j.Id == dto.idJugador);
+
+                if (jugador is null)
+                {
+                    await transaccion.RollbackAsync();
+                    return NotFound("El jugador no existe.");
+                }
+
+                // El servidor obtiene el valor real del recurso.
+                // Se paga el 50 % del valor por cada unidad vendida.
+                var valorUnitario = item.Recurso.valor;
+
+                if (valorUnitario < 0)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest("El valor del recurso no es válido.");
+                }
+
+                var precioVenta = Math.Round(
+                    valorUnitario * dto.cantidad * 0.50,
+                    2,
+                    MidpointRounding.AwayFromZero);
+
+                // Descontar las unidades vendidas.
                 item.cantidad -= dto.cantidad;
-                jugador.ppCoins += dto.precioVenta;
+
+                // Acreditar las PP Coins calculadas en el servidor.
+                jugador.ppCoins += precioVenta;
+
+                // Registrar la venta al sistema del juego.
                 _context.Ventas.Add(new Venta
                 {
                     idJugadorVendedor = dto.idJugador,
                     idJugadorComprador = 0,
                     cantidadVenta = dto.cantidad,
-                    precioVenta = dto.precioVenta
+                    precioVenta = precioVenta
                 });
 
+                // Si no quedan unidades, eliminar el objeto del inventario.
                 if (item.cantidad == 0)
                 {
-                    if (jugador.idUltimaHerramienta == item.Id) jugador.idUltimaHerramienta = 0;
-                    if (jugador.idUltimoDispositivo == item.Id) jugador.idUltimoDispositivo = 0;
-                    if (jugador.idUltimoPotenciador == item.Id) jugador.idUltimoPotenciador = 0;
+                    if (jugador.idUltimaHerramienta == item.Id)
+                        jugador.idUltimaHerramienta = 0;
+
+                    if (jugador.idUltimoDispositivo == item.Id)
+                        jugador.idUltimoDispositivo = 0;
+
+                    if (jugador.idUltimoPotenciador == item.Id)
+                        jugador.idUltimoPotenciador = 0;
+
                     _context.Items.Remove(item);
                 }
 
                 await _context.SaveChangesAsync();
                 await transaccion.CommitAsync();
-                return Ok("Venta realizada correctamente.");
+
+                return Ok(
+                    $"Venta realizada correctamente. Recibiste {precioVenta} PP Coins.");
             }
-            catch
+            catch (Exception)
             {
                 await transaccion.RollbackAsync();
-                return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo completar la venta.");
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    "No se pudo completar la venta.");
             }
         }
     }

@@ -137,7 +137,7 @@
 
                                 <input type="number"
                                        min="1"
-                                       max="99"
+                                       max="3"
                                        value="@cantidad"
                                        @onchange="e => CambiarCantidad(
                                                        recurso.Id,
@@ -182,7 +182,7 @@
     private readonly Dictionary<int, int> cantidades = new();
 
     // Id del jugador actual
-    private int idJugador = 2;
+    private int idJugador = 0;
 
     // Saldo actual de PP Coins
     private double saldo;
@@ -201,10 +201,10 @@
     protected override async Task OnInitializedAsync()
     {
         // Obtiene el Id del jugador desde el estado de la aplicación.
-        // Si no existe un jugador válido, utiliza 2 como valor predeterminado.
-        idJugador = jugadorState.__jugador?.Id > 0
-            ? jugadorState.__jugador.Id
-            : 2;
+        // Si no existe un jugador válido, utiliza 0 como valor predeterminado.
+        // idJugador = JugadorState.__jugador?.Id > 0
+        //     ? JugadorState.__jugador.Id
+        //     : 0;
 
         // Obtiene los recursos disponibles en la tienda.
         recursos = await RecursoService.ObtenerRecursosTienda();
@@ -267,11 +267,12 @@
 
         // Si todavía no existe un jugador en el estado global,
         // crea uno utilizando el Id obtenido.
-        // JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
-        // {
-        //     Id = jugador.Id
-        // };
-
+         //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
+         //{
+           //  Id = jugador.Id
+         //};
+         //ARREGLAR MOKEOS Y COSAS Q NO ANDABAN COMO LO DE ARRIBA, ESTO ES PARA QUE NO SE PIERDA EL ID DEL JUGADOR EN EL ESTADO GLOBAL
+         // EN INVENTARIO Y COSAS ASI, YA QUE SI SE PIERDE EL ID, NO SE PUEDE GUARDAR LA PARTIDA NI NADA, Y NO SE PUEDE COMPRAR NADA, PORQUE NO HAY UN JUGADOR EN EL ESTADO GLOBAL
         // Actualiza las PP Coins del jugador en el estado global.
         jugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
 
@@ -313,9 +314,9 @@
     {
         // Intenta convertir el valor recibido a número.
         // Si no puede convertirlo, utiliza 1.
-        // Además, limita la cantidad entre 1 y 99.
+        // Además, limita la cantidad entre 1 y 3.
         cantidades[id] = int.TryParse(valor, out var cantidad)
-            ? Math.Clamp(cantidad, 1, 99)
+            ? Math.Clamp(cantidad, 1, 3)
             : 1;
     }
 

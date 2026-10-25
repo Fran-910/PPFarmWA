@@ -57,20 +57,35 @@ namespace PPFarmWA.Server.Controllers
                     i.JugadorId == dto.idJugador && i.RecursoId == dto.idRecurso);
 
                 jugador.ppCoins -= precioTotal;
-                if (itemExistente is null)
+                //if (itemExistente is null)
+                //{
+                //    _context.Items.Add(new Item
+                //    {
+                //        cantidad = dto.cantidad,
+                //        durabilidad = recurso.durabilidad,
+                //        JugadorId = dto.idJugador,
+                //        RecursoId = dto.idRecurso
+                //    });
+                //}
+                //else
+                //{
+                //    itemExistente.cantidad += dto.cantidad;
+                //}
+
+
+                for (int i = 0; i < dto.cantidad; i++)
                 {
-                    _context.Items.Add(new Item
+                    var nuevoItem = new Item
                     {
-                        cantidad = dto.cantidad,
+                        cantidad = 1,
                         durabilidad = recurso.durabilidad,
                         JugadorId = dto.idJugador,
                         RecursoId = dto.idRecurso
-                    });
+                    };
+
+                    _context.Items.Add(nuevoItem);
                 }
-                else
-                {
-                    itemExistente.cantidad += dto.cantidad;
-                }
+
 
                 await _context.SaveChangesAsync();
                 await transaccion.CommitAsync();

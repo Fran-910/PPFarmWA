@@ -9,6 +9,5 @@ namespace PPFarmWA.Shared.DTO
         public int idJugador { get; set; }
         public int idItem { get; set; }
         public int cantidad { get; set; }
-        public double precioVenta { get; set; }
     }
 }

@@ -476,3 +476,305 @@
         justify-content: flex-end;
     }
 }
+
+
+/* =========================================
+   INVENTARIO EN CUADRICULA
+   ========================================= */
+
+.inventario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    gap: 10px;
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 62vh;
+    background: #2c1b12;
+}
+
+.item-tarjeta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-width: 0;
+    min-height: 145px;
+    padding: 12px 8px;
+    color: #f7eed7;
+    background: #1e130c;
+    border: 3px solid #100905;
+    border-left-width: 5px;
+    box-shadow: inset 2px 2px 0 #3a2517, inset -2px -2px 0 #0c0603, 2px 2px 0 #000;
+    cursor: pointer;
+    font-family: 'Silkscreen', monospace;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+
+    .item-tarjeta:hover {
+        background: #382419;
+        transform: translateY(-3px);
+    }
+
+    .item-tarjeta:focus-visible {
+        outline: 2px solid #ffd84d;
+        outline-offset: 3px;
+    }
+
+.item-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    background: #121824;
+    border: 3px solid #080a10;
+    box-shadow: inset 3px 3px 0 #0a0d14, inset -3px -3px 0 #27344d;
+    font-size: 30px;
+}
+
+.item-nombre {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    line-height: 1.6;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.item-tipo {
+    color: #cfbda8;
+    font-size: 9px;
+    text-align: center;
+}
+
+.item-cantidad {
+    padding: 3px 7px;
+    background: #403016;
+    border: 1px solid #99752e;
+    color: #ffe66d;
+    font-size: 10px;
+}
+
+.item-valor {
+    color: #7aff9b;
+    font-size: 9px;
+}
+
+/* =========================================
+   CAPAS DE LOS MODALES
+   ========================================= */
+
+.modal-superior {
+    z-index: 2010;
+    background: rgba(0, 0, 0, 0.78);
+}
+
+.modal-confirmacion {
+    z-index: 2020;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.modal-detalles,
+.modal-confirmar-venta {
+    width: 100%;
+    max-width: 480px;
+}
+
+.detalle-contenido,
+.confirmacion-contenido {
+    padding: 18px;
+    overflow-y: auto;
+    background: #2c1b12;
+    color: #f7eed7;
+}
+
+.detalle-contenido {
+    text-align: center;
+}
+
+.detalle-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 14px;
+    background: #121824;
+    border: 4px solid #100905;
+    box-shadow: inset 3px 3px 0 #27344d;
+    font-size: 42px;
+}
+
+.detalle-nombre {
+    margin: 8px 0;
+    color: #ffd84d;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.detalle-rareza {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 5px 9px;
+    background: #180e09;
+    border: 1px solid #5c3c28;
+    color: #f6c876;
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+}
+
+.detalle-descripcion {
+    margin: 8px 0 18px;
+    color: #cfbda8;
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================
+   ESTADISTICAS DEL OBJETO
+   ========================================= */
+
+.detalle-estadisticas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    text-align: left;
+}
+
+    .detalle-estadisticas > div {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 0;
+        padding: 10px;
+        background: #180e09;
+        border: 2px solid #4a2c1b;
+    }
+
+    .detalle-estadisticas span {
+        color: #bfa588;
+        font-family: 'Silkscreen', monospace;
+        font-size: 9px;
+    }
+
+    .detalle-estadisticas strong {
+        color: #ffe66d;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 8px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+/* =========================================
+   BOTONES DEL MODAL DE DETALLES
+   ========================================= */
+
+.detalle-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 20px;
+}
+
+    .detalle-acciones button {
+        min-height: 36px;
+    }
+
+/* =========================================
+   CONFIRMACION DE VENTA
+   ========================================= */
+
+.confirmacion-contenido > p {
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+    .confirmacion-contenido > p strong {
+        color: #ffd84d;
+    }
+
+.campo-cantidad {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 16px 0;
+    color: #cfbda8;
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+}
+
+    .campo-cantidad input {
+        width: 100%;
+        padding: 10px;
+        color: #fff;
+        background: #0f0906;
+        border: 2px solid #6b4c1a;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 11px;
+    }
+
+.resumen-venta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: #180e09;
+    border: 2px solid #5c3c28;
+}
+
+    .resumen-venta > div {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px;
+        font-family: 'Silkscreen', monospace;
+        font-size: 10px;
+    }
+
+    .resumen-venta span {
+        color: #cfbda8;
+    }
+
+    .resumen-venta strong {
+        color: #ffe66d;
+    }
+
+    .resumen-venta .ganancia {
+        color: #7aff9b;
+    }
+
+.aviso-venta {
+    color: #bfa588;
+    font-size: 9px !important;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 480px) {
+    .inventario-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-height: 68vh;
+    }
+
+    .detalle-contenido,
+    .confirmacion-contenido {
+        padding: 12px;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+    }
+
+        .detalle-acciones button {
+            width: 100%;
+        }
+}
