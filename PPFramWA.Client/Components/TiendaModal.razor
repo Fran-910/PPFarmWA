@@ -202,9 +202,9 @@
     {
         // Obtiene el Id del jugador desde el estado de la aplicación.
         // Si no existe un jugador válido, utiliza 0 como valor predeterminado.
-        // idJugador = JugadorState.__jugador?.Id > 0
-        //     ? JugadorState.__jugador.Id
-        //     : 0;
+        idJugador = jugadorState.__jugador?.Id > 0
+            ? jugadorState.__jugador.Id
+            : 0;
 
         // Obtiene los recursos disponibles en la tienda.
         recursos = await RecursoService.ObtenerRecursosTienda();
@@ -253,6 +253,11 @@
     // Obtiene el saldo actualizado del jugador
     private async Task ActualizarSaldo()
     {
+        if (idJugador <= 0)
+        {
+            return;
+        }
+
         // Busca al jugador en el servidor.
         var jugador = await JugadorService.ObtenerPorId(idJugador);
 
@@ -265,31 +270,30 @@
         // Actualiza el saldo local.
         saldo = jugador.ppCoins;
 
-        // Si todavía no existe un jugador en el estado global,
-        // crea uno utilizando el Id obtenido.
-         //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
-         //{
-           //  Id = jugador.Id
-         //};
-         //ARREGLAR MOKEOS Y COSAS Q NO ANDABAN COMO LO DE ARRIBA, ESTO ES PARA QUE NO SE PIERDA EL ID DEL JUGADOR EN EL ESTADO GLOBAL
-         // EN INVENTARIO Y COSAS ASI, YA QUE SI SE PIERDE EL ID, NO SE PUEDE GUARDAR LA PARTIDA NI NADA, Y NO SE PUEDE COMPRAR NADA, PORQUE NO HAY UN JUGADOR EN EL ESTADO GLOBAL
-        // Actualiza las PP Coins del jugador en el estado global.
-        jugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
-
-        // Notifica al resto de componentes que hubo un cambio.
-        jugadorState.NotificarCambios();
+        // Actualiza las PP Coins del jugador en el estado global si existe.
+        if (jugadorState.__jugador is not null)
+        {
+            jugadorState.__jugador.ppCoins = jugador.ppCoins;
+            // Notifica al resto de componentes que hubo un cambio.
+            jugadorState.NotificarCambios();
+        }
     }
 
     private async Task ActualizarInventarioEnMemoria()
     {
+        if (idJugador <= 0 || jugadorState.__jugador is null)
+        {
+            return;
+        }
+
         var jugador = await JugadorService.ObtenerPorId(idJugador);
 
         var items = await itemServicio.ObtenerInventario(idJugador);
 
-        if(items != null && items.Any())
+        if (items != null && items.Any())
         {
             var itemsDTO = new List<ItemDTO>();
-            foreach(var i in items)
+            foreach (var i in items)
             {
                 var dto = new ItemDTO()
                 {
@@ -301,7 +305,6 @@
                 };
 
                 itemsDTO.Add(dto);
-
             }
 
             jugadorState.__jugador.items = itemsDTO;
