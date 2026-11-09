@@ -1,5 +1,4 @@
-﻿```razor
-@page "/internet"
+﻿@page "/internet"
 
 @inject JugadorServicio JugadorService
 @inject JugadorState JugadorState
@@ -18,10 +17,15 @@
                     @onclick="MostrarIntercambio">
                 Intercambiar
             </button>
+
+            <!-- Aquí agregamos el nuevo botón de configuración -->
+            <button class="nav-btn" @onclick="AbrirConfiguracion">
+                ⚙️ Configuración
+            </button>
         </div>
 
         <div class="content-area">
-            <div style="background-color:#f1f8ff;padding:10px;border-radius:5px;margin-bottom:20px;">
+            <div style="background-color:#f1f8ff; color: #000; padding:10px; border-radius:5px; margin-bottom:20px; border: 2px solid #404040;">
                 <strong>Tus saldos:</strong>
                 🪙 @(JugadorState.__jugador?.points ?? 0) Points |
                 💰 @(JugadorState.__jugador?.ppCoins ?? 0) PP Coins
@@ -95,6 +99,9 @@
     </div>
 </div>
 
+<!-- Y aquí abajo de todo llamamos al modal que acabamos de crear -->
+<ConfiguracionModal @bind-Mostrar="mostrarModalConfig" />
+
 @code {
     private bool mostrarIntercambio = false;
     private int idJugador;
@@ -105,11 +112,11 @@
     private List<string> historialConversiones = new();
     private const decimal TasaDeCambio = 10m;
 
-
-    
     private int saldoPoints;
     private double saldoPPCoins;
 
+    // Agregamos la variable que controla si el modal se ve o no
+    private bool mostrarModalConfig = false;
 
     public int PuntosAConvertir
     {
@@ -149,6 +156,12 @@
     private void IrAIntercambios()
     {
         navigationManager.NavigateTo("/intercambios");
+    }
+
+    // Y el método para que el botón lo abra
+    private void AbrirConfiguracion()
+    {
+        mostrarModalConfig = true;
     }
 
     private async Task ConfirmarConversionAsync()
@@ -193,17 +206,11 @@
     {
         if (JugadorState.__jugador != null)
         {
-
-            
             saldoPoints = JugadorState.__jugador.points;
             saldoPPCoins = JugadorState.__jugador.ppCoins;
-
-            
-
             JugadorState.NotificarCambios();
         }
 
         return Task.CompletedTask;
     }
 }
-```
