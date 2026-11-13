@@ -200,11 +200,9 @@
     // Se ejecuta cuando se inicia el componente
     protected override async Task OnInitializedAsync()
     {
-        // Obtiene el Id del jugador desde el estado de la aplicación.
-        // Si no existe un jugador válido, utiliza 0 como valor predeterminado.
-        // idJugador = JugadorState.__jugador?.Id > 0
-        //     ? JugadorState.__jugador.Id
-        //     : 0;
+        idJugador = jugadorState.__jugador?.Id > 0
+            ? jugadorState.__jugador.Id
+            : 0;
 
         // Obtiene los recursos disponibles en la tienda.
         recursos = await RecursoService.ObtenerRecursosTienda();
@@ -267,12 +265,12 @@
 
         // Si todavía no existe un jugador en el estado global,
         // crea uno utilizando el Id obtenido.
-         //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
-         //{
-           //  Id = jugador.Id
-         //};
-         //ARREGLAR MOKEOS Y COSAS Q NO ANDABAN COMO LO DE ARRIBA, ESTO ES PARA QUE NO SE PIERDA EL ID DEL JUGADOR EN EL ESTADO GLOBAL
-         // EN INVENTARIO Y COSAS ASI, YA QUE SI SE PIERDE EL ID, NO SE PUEDE GUARDAR LA PARTIDA NI NADA, Y NO SE PUEDE COMPRAR NADA, PORQUE NO HAY UN JUGADOR EN EL ESTADO GLOBAL
+        //JugadorState.__jugador ??= new PPFramWA.Client.Domains.Jugador
+        //{
+        //  Id = jugador.Id
+        //};
+        //ARREGLAR MOKEOS Y COSAS Q NO ANDABAN COMO LO DE ARRIBA, ESTO ES PARA QUE NO SE PIERDA EL ID DEL JUGADOR EN EL ESTADO GLOBAL
+        // EN INVENTARIO Y COSAS ASI, YA QUE SI SE PIERDE EL ID, NO SE PUEDE GUARDAR LA PARTIDA NI NADA, Y NO SE PUEDE COMPRAR NADA, PORQUE NO HAY UN JUGADOR EN EL ESTADO GLOBAL
         // Actualiza las PP Coins del jugador en el estado global.
         jugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
 
@@ -304,7 +302,7 @@
 
             }
 
-            jugadorState.__jugador.items = itemsDTO;
+            jugadorState.__jugador.RefrescarItems(itemsDTO);
         }
     }
 

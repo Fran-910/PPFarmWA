@@ -71,7 +71,9 @@ namespace PPFarmWA.Server.Controllers
             JugadorPutDTO dto)
         {
             var jugador = await _repositorio.GetByIdAsync(id);
-
+            var jugadorInv = await _repositorio.GetPlayerInv(id);
+            var update = await _repositorio.UpdatePlayerInvAsync(dto.items, jugadorInv);
+           
             if (jugador == null)
                 return NotFound();
 
@@ -80,6 +82,7 @@ namespace PPFarmWA.Server.Controllers
             jugador.ppCoins = dto.ppCoins;
             jugador.points = dto.points;
             jugador.idUltimaHerramienta = dto.idUltimaHerramienta;
+
 
             await _repositorio.UpdateAsync(jugador);
 

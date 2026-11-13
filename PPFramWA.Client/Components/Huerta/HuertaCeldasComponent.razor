@@ -1,4 +1,5 @@
 ﻿@inject JugadorState jugadorState
+@implements IDisposable
 
 <div class="huerta-container" style="--celdas: @huerta!.columnas">
     <div class="pixel-wood-fence">
@@ -18,15 +19,25 @@
 
 @code {
     public Huerta? huerta { get; set; }
+    private Jugador? jugadorSuscrito;
 
     protected override void OnInitialized()
     {
         huerta = new Huerta(jugadorState);
-        jugadorState.__jugador!.OnSubioNivel += ActualizarCeldas;
+        jugadorSuscrito = jugadorState.__jugador;
+        jugadorSuscrito!.OnSubioNivel += ActualizarCeldas;
     }
 
     public void ActualizarCeldas()
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (jugadorSuscrito is not null)
+            jugadorSuscrito.OnSubioNivel -= ActualizarCeldas;
+
+        huerta?.Dispose();
     }
 }

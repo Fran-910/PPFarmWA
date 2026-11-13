@@ -1,5 +1,6 @@
 ﻿@using PPFarmWA.Shared.Catalogos
 @inject JugadorState jugadorState
+@implements IDisposable
 <button style="cursor: @cursorActual" @onmousedown="CambiarAClick" @onmouseup="RestablecerAMain" @onmouseover="RestablecerAMain" class="cultivo" @onclick="OnClick">
 
     @if (estado != CultivoState.cosechado && cultivo!.vida < cultivo.vidaMaxima)
@@ -29,12 +30,14 @@
     public bool mostrarPopup { get; set; } = false;
     private double PorcentajeVida;
     string cursorActual = string.Empty;
+    private Jugador? jugadorSuscrito;
 
     protected override void OnInitialized()
     {
         cultivo = new(jugadorState);
         cultivo.CalcularSkin();
-        jugadorState.__jugador!.OnSubioNivel += cultivo.CalcularSkin;
+        jugadorSuscrito = jugadorState.__jugador;
+        jugadorSuscrito!.OnSubioNivel += cultivo.CalcularSkin;
     }
 
     public async Task OnClick()
@@ -114,5 +117,11 @@
             CultivoState.cosechado => "cultivado",
             _ => ""
         };
+    }
+
+    public void Dispose()
+    {
+        if (cultivo is not null && jugadorSuscrito is not null)
+            jugadorSuscrito.OnSubioNivel -= cultivo.CalcularSkin;
     }
 }
