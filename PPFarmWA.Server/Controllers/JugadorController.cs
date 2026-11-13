@@ -103,38 +103,18 @@ namespace PPFarmWA.Server.Controllers
         }
 
         [HttpPut("{id}/convertir-points")]
-        public async Task<IActionResult> ConvertirPoints(
-    int id,
-    [FromQuery] int puntos)
+        
+        public async Task<IActionResult> ConvertirPoints(int id, int puntos, [FromServices] PPFarmWA.Server.Services.ConversorServicio conversorServicio)
         {
-            if (puntos <= 0)
-                return BadRequest("La cantidad de Points debe ser mayor a 0.");
+            
+            var resultado = await conversorServicio.ConvertirPointsAsync(id, puntos);
 
-            var jugador = await _repositorio.GetByIdAsync(id);
-
-            if (jugador == null)
-                return NotFound("El jugador no existe.");
-
-            if (jugador.points < puntos)
-                return BadRequest("No tenés suficientes Points.");
-
-            int ppCoins = puntos / 10;
-
-            if (ppCoins <= 0)
-                return BadRequest("Necesitás al menos 10 Points para convertir.");
-
-            jugador.points -= puntos;
-            jugador.ppCoins += ppCoins;
-
-            await _repositorio.UpdateAsync(jugador);
-
-            return Ok(new
+            if (!resultado.Exito)
             {
-                Exito = true,
-                Mensaje = $"Se han convertido {puntos} Points a {ppCoins} PP Coins.",
-                Points = jugador.points,
-                PPCoins = jugador.ppCoins
-            });
+                return BadRequest(resultado.Mensaje);
+            }
+
+            return Ok(resultado.Mensaje);
         }
 
         [HttpPost("registrar")]

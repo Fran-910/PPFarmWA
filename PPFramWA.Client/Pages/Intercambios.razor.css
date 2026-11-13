@@ -1,350 +1,1443 @@
-﻿
-/* CONTENEDOR PRINCIPAL */
-.intercambios {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
+﻿/* ============================================
+   PPFarmWA - MERCADO DE INTERCAMBIOS
+   Diseño pixel-art basado en la segunda imagen
+   ============================================ */
+
+* {
+    box-sizing: border-box;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    -webkit-font-smoothing: none;
 }
 
-/* TITULO */
-
-.intercambios h1 {
-    text-align: center;
-    margin-bottom: 35px;
-    font-size: 40px;
-}
-
-/* PUBLICAR */
-
-.publicar {
-    max-width: 600px;
-    margin: 0 auto 40px auto;
-    padding: 25px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-}
-
-    .publicar h2 {
-        margin-bottom: 25px;
-        text-align: center;
-    }
-
-/* CAMPOS */
-
-.campo {
+.intercambios-game {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 12px 2.5%;
     display: flex;
     flex-direction: column;
-    margin-bottom: 18px;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #1a4d27;
+    background-image: url('/fondos/fondo-intercambios.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    color: #f5f3ff;
+    font-family: 'Nunito', system-ui, sans-serif;
 }
 
-    .campo label {
-        margin-bottom: 7px;
-        font-weight: bold;
-    }
+/* BARRA SUPERIOR */
 
-    .campo input,
-    .campo select {
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #aaa;
-        font-size: 15px;
-    }
-
-/* BOTON PUBLICAR */
-
-.btn-publicar {
+.top-bar {
     width: 100%;
-    padding: 12px;
-    margin-top: 5px;
-    border: none;
-    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 40px;
+    margin: 0 auto 8px;
+    flex-shrink: 0;
+}
+
+.btn-pixel-wood {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: linear-gradient(to bottom, #a35617, #773809);
+    border: 3px solid #361702;
+    border-radius: 4px;
+    box-shadow: inset 2px 2px 0 #cf7729, inset -2px -2px 0 #4d2104, 0 4px 0 rgba(0, 0, 0, .5);
+    color: #f5d16e;
+    font-family: 'Silkscreen', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
 }
 
-/* DISPONIBLES */
-
-.disponibles h2 {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-/* LISTA */
-
-.lista-intercambios {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-/* TARJETA */
-
-.intercambio {
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-}
-
-    .intercambio h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        font-size: 22px;
+    .btn-pixel-wood:hover {
+        filter: brightness(1.12);
     }
 
-    .intercambio p {
-        margin: 8px 0;
+    .btn-pixel-wood:active {
+        transform: translateY(3px);
+        box-shadow: inset 2px 2px 0 #4d2104, inset -2px -2px 0 #cf7729, 0 1px 0 rgba(0, 0, 0, .5);
     }
-
-/* BOTON COMPRAR */
-
-.btn-comprar {
-    width: 100%;
-    margin-top: 15px;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* CELULAR */
-
-@media (max-width: 700px) {
-
-    .lista-intercambios {
-        grid-template-columns: 1fr;
-    }
-
-    .intercambios {
-        padding: 15px;
-    }
-}
 
 .btn-volver {
-    font-size: 18px;
-    padding: 10px 20px;
-    cursor: pointer;
+    flex-shrink: 0;
 }
 
+.icon-arrow {
+    width: 16px;
+    height: 16px;
+    fill: #f5d16e;
+}
 
-/* FONDO DE LA VENTANA */
-.modal-fondo {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.55);
+/* OFERTAS ACTIVAS */
+
+.active-offers-panel {
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
+    padding: 6px 12px;
+    background: #8b4513;
+    border: 4px solid #3d1c02;
+    border-radius: 4px;
+    box-shadow: inset 4px 4px 0 #b86720, inset -4px -4px 0 #5c2703, 0 5px 0 rgba(0, 0, 0, .4);
+    flex-shrink: 0;
 }
 
-/* VENTANA DE CONFIRMACION */
-.modal-compra {
-    width: 400px;
-    max-width: 90%;
-    padding: 25px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-    /* TITULO */
-    .modal-compra h2 {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    /* DATOS */
-    .modal-compra p {
-        margin: 12px 0;
-        font-size: 16px;
-    }
-
-/* BOTONES */
-.modal-botones {
+.active-offers-item {
     display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-top: 25px;
+    align-items: center;
+    gap: 8px;
 }
 
-.btn-cancelar,
-.btn-confirmar {
-    flex: 1;
-    padding: 11px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+.stat-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #472204;
+    border: 1px solid #ffaf38;
     font-size: 15px;
 }
 
-.btn-cancelar {
-    background-color: #ddd;
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.btn-confirmar {
-    background-color: #28a745;
-    color: white;
+.stat-label {
+    color: #f5d16e;
+    font-family: 'Silkscreen', monospace;
+    font-size: 7px;
+    text-transform: uppercase;
 }
 
-    .btn-cancelar:hover,
-    .btn-confirmar:hover,
-    .btn-comprar:hover,
-    .btn-publicar:hover {
-        opacity: 0.85;
+.stat-value {
+    color: #fbbf24;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+}
+
+/* TÍTULO */
+
+.market-title-sign {
+    position: relative;
+    left: auto;
+    transform: none;
+    z-index: 1;
+    width: calc(100% - 8px);
+    min-height: 64px;
+    height: 64px;
+    margin: 0 auto 10px;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-shrink: 0;
+    background: #8b4513;
+    border: 4px solid #3d1c02;
+    border-radius: 5px;
+    box-shadow: inset 4px 4px 0 #b86720, inset -4px -4px 0 #5c2703, 0 6px 0 rgba(0, 0, 0, .45);
+}
+
+.corner-leaf {
+    position: absolute;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    background: #4ade80;
+    border: 2px solid #166534;
+    pointer-events: none;
+}
+
+    .corner-leaf.tl {
+        top: -6px;
+        left: -6px;
+        box-shadow: 4px 4px 0 #15803d;
     }
 
-/* DISTRIBUCIÓN DE LA PÁGINA */
-.intercambios {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 20px;
+    .corner-leaf.br {
+        right: -6px;
+        bottom: -6px;
+        box-shadow: -4px -4px 0 #15803d;
+    }
+
+.stall-icon {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    background: #542907;
+    border: 2px solid #ffb03b;
+}
+
+.stall-awning {
+    position: absolute;
+    top: -4px;
+    width: 30px;
+    height: 9px;
+    display: flex;
+    overflow: hidden;
+    border: 1px solid #3b1702;
+    border-radius: 2px 2px 0 0;
+}
+
+    .stall-awning span {
+        flex: 1;
+        background: repeating-linear-gradient( 90deg, #dc2626 0 4px, #fef3c7 4px 8px );
+    }
+
+.stall-crate {
+    margin-bottom: 1px;
+    font-size: 16px;
+}
+
+.market-title-text {
+    min-width: 0;
+    text-align: center;
+}
+
+    .market-title-text h1 {
+        margin: 0;
+        color: #ffe600;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 0 #7d4400, -1px -1px 0 #fffaad, 0 3px 0 #502c00;
+    }
+
+    .market-title-text p {
+        margin: 2px 0 0;
+        color: #f5d16e;
+        font-family: 'Silkscreen', monospace;
+        font-size: 7px;
+        line-height: 1.5;
+        text-transform: uppercase;
+    }
+
+/* DISTRIBUCIÓN DE LOS PANELES */
+
+.market-layout {
+    width: 100%;
+    min-height: 335px;
+    height: 335px;
+    max-height: 335px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 25px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 10px;
+    flex: 0 0 335px;
 }
 
-    /* TÍTULO */
-    .intercambios h1 {
-        grid-column: 1 / -1;
-        text-align: center;
-        margin-bottom: 10px;
-        font-size: 40px;
+.publish-panel,
+.offers-panel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #8b4513;
+    border: 4px solid #3d1c02;
+    box-shadow: inset 4px 4px 0 #b86720, inset -4px -4px 0 #5c2703, 0 6px 0 rgba(0, 0, 0, .45);
+}
+
+.publish-panel {
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.offers-panel {
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+/* ENCABEZADOS */
+
+.panel-header,
+.offers-header {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #572704;
+    flex-shrink: 0;
+}
+
+.panel-header {
+    align-items: flex-start;
+}
+
+.panel-header-icon,
+.offers-title-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #381a02;
+    border: 2px solid #f59e0b;
+    font-size: 17px;
+}
+
+.panel-header h2,
+.offers-title h2 {
+    margin: 0;
+    color: #f5d16e;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.panel-header p,
+.offers-title p {
+    margin: 3px 0 0;
+    color: #fde68a;
+    font-family: 'Silkscreen', monospace;
+    font-size: 7px;
+    line-height: 1.6;
+}
+
+.offers-title {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* FORMULARIO */
+
+.inner-parchment {
+    min-width: 0;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 7px;
+    flex: 0 0 auto;
+    background: #faebd7;
+    border: 3px solid #855325;
+    box-shadow: inset 3px 3px 0 #fff4e0, inset -3px -3px 0 #d4b88f;
+}
+
+.form-row {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+}
+
+    .form-row.two {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 8px;
     }
 
-/* PUBLICAR */
-.publicar {
-    max-width: none;
-    margin: 0;
+        .form-row.two .form-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+.form-group {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-/* DISPONIBLES */
-.disponibles {
-    margin: 0;
+    .form-group.full {
+        width: 100%;
+    }
+
+.label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
 }
 
-/* LISTA DE INTERCAMBIOS */
-.lista-intercambios {
+.intercambios-game label {
+    color: #4a2c0a;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    text-transform: uppercase;
+}
+
+.inventory-badge {
+    padding: 3px 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(to bottom, #11b1e6, #0084b5);
+    border: 2px solid #004561;
+    box-shadow: inset 2px 2px 0 #43cbf9, inset -2px -2px 0 #005f82;
+    color: #fff;
+    font-family: 'Silkscreen', monospace;
+    font-size: 7px;
+    white-space: nowrap;
+}
+
+.inventory-count {
+    color: #facc15;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+}
+
+/* INVENTARIO */
+
+.inventory-integrated {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 0 0 auto;
+}
+
+.inventory-integrated-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.inventory-integrated-title {
+    color: #78350f;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    line-height: 1.7;
+    letter-spacing: 1px;
+}
+
+.inventory-list {
+    min-width: 0;
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 6px;
+    padding-right: 3px;
 }
 
-/* TARJETAS */
-.intercambio {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.inventory-list-integrated {
+    max-height: 100px;
+    overflow-y: auto;
 }
 
-/* BOTONES */
-.btn-publicar,
-.btn-comprar {
-    transition: transform 0.2s ease, opacity 0.2s ease;
+.inventory-item {
+    min-width: 0;
+    padding: 5px 7px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #f5e7d0;
+    border: 1px solid #b98a56;
+    color: #1f2937;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
 }
 
-    .btn-publicar:hover,
-    .btn-comprar:hover {
-        transform: translateY(-2px);
-        opacity: 0.9;
+    .inventory-item:hover {
+        background: #fff7e4;
+        border-color: #e8a22b;
     }
 
-/* CELULAR */
-@media (max-width: 800px) {
-    .intercambios {
-        grid-template-columns: 1fr;
+    .inventory-item.selected {
+        background: #f0fff4;
+        border-color: #22a83f;
+        box-shadow: inset 0 0 0 1px #22a83f;
     }
 
-        .intercambios h1 {
-            grid-column: 1;
+.inventory-item-integrated {
+    min-height: 36px;
+}
+
+.inventory-item-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fef3c7;
+    border: 1px solid #92400e;
+    font-size: 20px;
+}
+
+.inventory-item-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-item-name {
+    overflow: hidden;
+    color: #1f2937;
+    font-size: 12px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inventory-item-qty {
+    color: #4b5563;
+    font-family: 'Silkscreen', monospace;
+    font-size: 7px;
+}
+
+.inventory-empty {
+    grid-column: 1 / -1;
+    padding: 8px;
+    color: #92400e;
+    text-align: center;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+}
+
+.inventory-list::-webkit-scrollbar,
+.inventory-list-integrated::-webkit-scrollbar {
+    width: 8px;
+}
+
+.inventory-list::-webkit-scrollbar-track,
+.inventory-list-integrated::-webkit-scrollbar-track {
+    background: #e7d7b8;
+    border: 1px solid #b98a56;
+}
+
+.inventory-list::-webkit-scrollbar-thumb,
+.inventory-list-integrated::-webkit-scrollbar-thumb {
+    background: #b45309;
+    border: 1px solid #7c2d12;
+}
+
+/* SELECTOR DE RECURSOS */
+
+.select-wrapper {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+.select-icon {
+    position: absolute;
+    left: 8px;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.pixel-select {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 28px 8px 30px;
+    appearance: none;
+    background: #fdf5e6;
+    border: 2px solid #8a511e;
+    border-radius: 2px;
+    color: #3b2f2f;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.select-chevron {
+    position: absolute;
+    right: 10px;
+    color: #7c2d12;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    pointer-events: none;
+}
+
+.pixel-select:focus,
+.pixel-input:focus {
+    outline: 2px solid #14b8a6;
+    outline-offset: 1px;
+}
+
+/* CAMPOS */
+
+.pixel-input {
+    width: 100%;
+    min-width: 0;
+    padding: 8px;
+    background: #fdf5e6;
+    border: 2px solid #8a511e;
+    border-radius: 2px;
+    color: #1f2937;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+}
+
+.input-with-icon {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 8px;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.pixel-input.has-icon {
+    padding-left: 26px;
+}
+
+/* VISTA PREVIA */
+
+.preview-card {
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5e7d0;
+    border: 2px solid #b98a56;
+}
+
+.preview-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fef3c7;
+    border: 2px solid #92400e;
+    font-size: 18px;
+}
+
+.preview-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.preview-name {
+    color: #78350f;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+}
+
+.preview-meta {
+    color: #92400e;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+}
+
+/* BOTONES VERDES */
+
+.btn-pixel-green {
+    padding: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(to bottom, #39d959, #22a83f);
+    border: 3px solid #0f4f1d;
+    box-shadow: inset 3px 3px 0 #67f282, inset -3px -3px 0 #156d29, 0 4px 0 #0b3814;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 1.6;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 1px 2px 0 #07551b;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+    .btn-pixel-green:hover {
+        filter: brightness(1.12);
+    }
+
+    .btn-pixel-green:active {
+        transform: translateY(3px);
+        box-shadow: inset 3px 3px 0 #156d29, inset -3px -3px 0 #67f282, 0 1px 0 #0b3814;
+    }
+
+    .btn-pixel-green.btn-publish,
+    .btn-publish {
+        width: 100%;
+        min-height: 38px;
+        margin-top: 2px;
+        padding: 9px 12px;
+        background: linear-gradient(180deg, #4dff79 0%, #20d957 48%, #0eaa3b 100%);
+        border: 3px solid #075c25;
+        border-radius: 2px;
+        box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35), inset 0 -4px 0 rgba(0, 70, 25, .35), 0 4px 0 #60310e;
+        font-weight: 900;
+    }
+
+.form-message {
+    color: #92400e;
+    text-align: center;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* OFERTAS DISPONIBLES */
+
+.offers-grid {
+    min-width: 0;
+    min-height: 0;
+    padding: 3px 5px 5px 3px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    align-items: start;
+    gap: 8px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+.offers-empty {
+    grid-column: 1 / -1;
+    min-height: 100px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffe16a;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 2;
+    text-shadow: 2px 2px 0 #572704;
+    overflow-wrap: anywhere;
+}
+
+.empty-inner {
+    max-width: 260px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(180deg, #8c4f17 0%, #6b3710 100%);
+    border: 2px solid #3d1c02;
+    box-shadow: inset 2px 2px 0 rgba(255, 199, 120, .25), inset -2px -2px 0 rgba(0, 0, 0, .35);
+}
+
+.empty-icon {
+    font-size: 22px;
+}
+
+.empty-title {
+    color: #f5d16e;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+}
+
+.empty-text {
+    color: #fde68a;
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+}
+
+/* TARJETAS DE OFERTAS */
+
+.offer-card {
+    min-width: 0;
+    min-height: 150px;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    background: #fbf5e8;
+    border: 2px solid #b3804d;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .4), 0 3px 0 #633616, 0 0 10px rgba(255, 190, 60, .15);
+}
+
+    .offer-card:hover {
+        filter: brightness(1.04);
+    }
+
+    .offer-card.card-wood {
+        background: #fbf5e8;
+        border-color: #b3804d;
+    }
+
+    .offer-card.card-stone {
+        background: #f2f7fc;
+        border-color: #94b8e3;
+    }
+
+    .offer-card.card-crop {
+        background: #fffdf0;
+        border-color: #dec659;
+    }
+
+    /* La pala y las herramientas son color crema y dorado */
+
+    .offer-card.card-tool {
+        background: #fbf5e8;
+        background-color: #fbf5e8;
+        border-color: #b3804d;
+    }
+
+.offer-card-top {
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.offer-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fef3c7;
+    border: 2px solid #99601e;
+    font-size: 24px;
+}
+
+.offer-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.offer-name {
+    color: #60330f;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+
+.offer-seller,
+.offer-qty {
+    color: #684b30;
+    font-family: 'Silkscreen', monospace;
+    font-size: 7px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+    .offer-seller b,
+    .offer-qty b {
+        color: #263d25;
+    }
+
+.offer-card-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.offer-price {
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: linear-gradient(180deg, #fff5c9 0%, #ffe49a 100%);
+    border: 2px solid #e5ad24;
+    color: #8a4b08;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.btn-buy {
+    width: 100%;
+    min-height: 32px;
+    padding: 7px;
+    background: linear-gradient(180deg, #4dff79 0%, #20d957 48%, #0eaa3b 100%);
+    border: 2px solid #075c25;
+    border-radius: 2px;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35), inset 0 -3px 0 rgba(0, 70, 25, .3), 0 3px 0 #633616;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    cursor: pointer;
+}
+
+    .btn-buy:hover {
+        filter: brightness(1.12);
+    }
+
+    .btn-buy:active {
+        transform: translateY(2px);
+    }
+
+    .btn-buy:disabled {
+        filter: grayscale(.6);
+        opacity: .65;
+        cursor: not-allowed;
+    }
+
+/* MODAL DE CONFIRMACIÓN */
+
+.modal-backdrop {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .7);
+}
+
+.modal-panel {
+    position: relative;
+    width: 360px;
+    max-width: 100%;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #8b4513;
+    border: 4px solid #3d1c02;
+    box-shadow: inset 4px 4px 0 #b86720, inset -4px -4px 0 #5c2703, 0 10px 0 rgba(0, 0, 0, .5);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #572704;
+}
+
+.modal-header-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #3a1b02;
+    border: 2px solid #4ade80;
+    font-size: 18px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #f5d16e;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.modal-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #faebd7;
+    border: 3px solid #855325;
+    box-shadow: inset 3px 3px 0 #fff4e0, inset -3px -3px 0 #d4b88f;
+}
+
+.modal-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.modal-label {
+    color: #4a2c0a;
+    font-family: 'Silkscreen', monospace;
+    font-size: 9px;
+}
+
+.modal-value {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    color: #1f2937;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-modal {
+    min-width: 0;
+    flex: 1;
+    padding: 10px;
+    font-size: 9px;
+}
+
+/* BARRAS DE DESPLAZAMIENTO */
+
+.offers-grid::-webkit-scrollbar,
+.inventory-list-integrated::-webkit-scrollbar {
+    width: 8px;
+}
+
+.offers-grid::-webkit-scrollbar-track,
+.inventory-list-integrated::-webkit-scrollbar-track {
+    background: #7a3f11;
+    border: 2px solid #4a2408;
+}
+
+.offers-grid::-webkit-scrollbar-thumb,
+.inventory-list-integrated::-webkit-scrollbar-thumb {
+    background: #b45309;
+    border: 2px solid #5c2703;
+}
+
+/* TABLET */
+
+@media (max-width: 1179px) {
+    .intercambios-game {
+        height: auto;
+        min-height: 100vh;
+        padding: 16px 12px;
+        justify-content: center;
+        overflow: visible;
+    }
+
+    .top-bar,
+    .market-title-sign,
+    .market-layout {
+        width: 94%;
+        max-width: 900px;
+    }
+
+    .market-layout {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        flex: 0 0 auto;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .publish-panel,
+    .offers-panel {
+        height: auto;
+        min-height: 220px;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .offers-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+
+    .inventory-list-integrated {
+        max-height: 140px;
+        overflow-y: auto;
+    }
+}
+
+/* CELULARES */
+
+@media (max-width: 700px) {
+    .intercambios-game {
+        padding: 12px 8px;
+    }
+
+    .top-bar {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .market-title-sign {
+        width: 100%;
+        height: auto;
+        min-height: 58px;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .market-title-text h1 {
+        font-size: 10px;
+        line-height: 1.7;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .market-title-text p {
+        font-size: 7px;
+    }
+
+    .market-layout {
+        width: 100%;
+    }
+
+    .panel-header h2,
+    .offers-title h2 {
+        font-size: 9px;
+        overflow-wrap: anywhere;
+    }
+
+    .panel-header p,
+    .offers-title p {
+        font-size: 7px;
+    }
+
+    .form-row.two {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .offers-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .inventory-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+}
+
+/* ESCRITORIO: DISTRIBUCIÓN DE LA SEGUNDA IMAGEN */
+
+@media (min-width: 1180px) {
+    .intercambios-game {
+        height: 100dvh;
+        min-height: 100dvh;
+        width: 100%;
+        padding: 12px 2.5%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background-size: cover;
+        background-position: center center;
+    }
+
+        .intercambios-game .top-bar {
+            width: 100%;
+            min-height: 40px;
+            margin: 0 auto 8px;
+            flex: 0 0 40px;
+        }
+
+        .intercambios-game .market-title-sign {
+            width: calc(100% - 8px);
+            max-width: none;
+            height: 64px;
+            min-height: 64px;
+            margin: 0 auto 10px;
+            padding: 8px 20px;
+            flex: 0 0 64px;
+        }
+
+        .intercambios-game .market-title-text h1 {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .intercambios-game .market-layout {
+            width: 100%;
+            max-width: none;
+            height: 335px;
+            min-height: 335px;
+            max-height: 335px;
+            margin: 0 auto;
+            flex: 0 0 335px;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 10px;
+        }
+
+        .intercambios-game .publish-panel,
+        .intercambios-game .offers-panel {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            max-height: 100%;
+        }
+
+        .intercambios-game .publish-panel {
+            overflow: hidden;
+        }
+
+        .intercambios-game .offers-panel {
+            overflow: hidden;
+        }
+
+        .intercambios-game .inner-parchment {
+            flex: 0 0 auto;
+            height: auto;
+        }
+
+        .intercambios-game .inventory-list-integrated {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .intercambios-game .offers-grid {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            align-content: start;
+        }
+
+        .intercambios-game .offer-card.card-tool {
+            background: #fbf5e8;
+            background-color: #fbf5e8;
+            border-color: #b3804d;
         }
 }
 
-/* ENCABEZADOS DE SECCIONES */
-.publicar h2,
-.disponibles h2 {
-    background: #e6f1ff;
-    padding: 18px;
-    margin: -25px -25px 25px -25px;
-    border-radius: 12px 12px 0 0;
-    text-align: left;
-    font-size: 28px;
-}
+/* Pantallas de escritorio con poca altura */
 
-.disponibles {
-    padding: 25px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    background: white;
-}
-
-/* MEJORAS DE CAMPOS */
-.campo input,
-.campo select {
-    padding: 13px;
-    font-size: 16px;
-}
-
-/* BOTÓN PUBLICAR */
-.btn-publicar {
-    background: #1976d2;
-    color: white;
-    font-size: 17px;
-    padding: 13px;
-}
-
-/* TARJETAS DE INTERCAMBIO */
-.intercambio {
-    background: #fafafa;
-    border: 1px solid #ddd;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-    .intercambio:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+@media (max-height: 650px) and (min-width: 1180px) {
+    .intercambios-game {
+        justify-content: flex-start;
     }
 
-/* BOTÓN COMPRAR */
-.btn-comprar {
-    background: #28a745;
-    color: white;
-    font-size: 16px;
-    padding: 12px;
-}
-.recurso-venta {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 12px 0;
+        .intercambios-game .market-layout {
+            height: 335px;
+            min-height: 335px;
+            flex-basis: 335px;
+        }
 }
 
-.intercambios .publicar h2,
-.intercambios .disponibles h2 {
-    color: #222 !important;
-    text-shadow: none !important;
+
+/* ============================================
+   PPFarmWA - PALETA OFICIAL COMPARTIDA
+   Aplicar a Intercambios sin cambiar su fondo
+   ni la distribución actual de los paneles.
+   ============================================ */
+
+.intercambios-game {
+    color: var(--tf-text, #f7eed7);
 }
 
-.intercambios .disponibles > p {
-    color: #222 !important;
-    text-shadow: none !important;
-}
+    /* Paneles con la madera compartida del proyecto */
 
-.intercambios .intercambio h3,
-.intercambios .intercambio p {
-    color: #222 !important;
-    text-shadow: none !important;
-}
+    .intercambios-game .publish-panel,
+    .intercambios-game .offers-panel {
+        background: var(--tf-panel, #382419);
+        border-color: var(--tf-panel-deep, #140b07);
+        box-shadow: inset 3px 3px 0 var(--tf-panel-bevel-hi, #5c3c28), inset -3px -3px 0 var(--tf-panel-bevel-lo, #22140c), 0 6px 0 rgba(0, 0, 0, .45);
+    }
 
-.intercambios .lista-intercambios > p {
-    color: #222 !important;
-    -webkit-text-fill-color: #222 !important;
-    opacity: 1 !important;
-    text-shadow: none !important;
-}
+    /* Barra del título */
+
+    .intercambios-game .market-title-sign {
+        background: var(--tf-panel, #382419);
+        border-color: var(--tf-panel-deep, #140b07);
+        box-shadow: inset 4px 4px 0 var(--tf-panel-bevel-hi, #5c3c28), inset -4px -4px 0 var(--tf-panel-bevel-lo, #22140c), 0 6px 0 rgba(0, 0, 0, .45);
+    }
+
+    .intercambios-game .market-title-text h1 {
+        color: var(--tf-gold, #ffd84d);
+    }
+
+    .intercambios-game .market-title-text p {
+        color: var(--tf-text-dim, #cfbda8);
+    }
+
+    /* Encabezados */
+
+    .intercambios-game .panel-header h2,
+    .intercambios-game .offers-title h2 {
+        color: var(--tf-gold, #ffd84d);
+    }
+
+    .intercambios-game .panel-header p,
+    .intercambios-game .offers-title p {
+        color: var(--tf-text-dim, #cfbda8);
+    }
+
+    /* Botones principales verdes */
+
+    .intercambios-game .btn-pixel-green,
+    .intercambios-game .btn-publish,
+    .intercambios-game .btn-buy {
+        background: var(--tf-green, #258a46);
+        border-color: var(--tf-green-border, #0d381b);
+        box-shadow: inset 3px 3px 0 var(--tf-green-bevel-hi, #5fe088), inset -3px -3px 0 var(--tf-green-bevel-lo, #135227), 0 4px 0 #000;
+        color: var(--tf-text, #f7eed7);
+        text-shadow: 1px 2px 0 #000;
+    }
+
+        .intercambios-game .btn-pixel-green:hover,
+        .intercambios-game .btn-publish:hover,
+        .intercambios-game .btn-buy:hover {
+            background: var(--tf-green-hover, #2da353);
+        }
+
+    /* Botones secundarios de madera */
+
+    .intercambios-game .btn-pixel-wood {
+        background: var(--tf-slate, #2b3945);
+        border-color: var(--tf-slate-border, #111827);
+        box-shadow: inset 2px 2px 0 var(--tf-slate-bevel-hi, #475569), inset -2px -2px 0 var(--tf-slate-bevel-lo, #0f172a), 0 4px 0 #000;
+        color: var(--tf-gold, #ffd84d);
+    }
+
+        .intercambios-game .btn-pixel-wood:hover {
+            background: var(--tf-slate-hover, #3b4b59);
+        }
+
+    /* Contador de ofertas */
+
+    .intercambios-game .active-offers-panel {
+        background: var(--tf-panel, #382419);
+        border-color: var(--tf-panel-deep, #140b07);
+        box-shadow: inset 3px 3px 0 var(--tf-panel-bevel-hi, #5c3c28), inset -3px -3px 0 var(--tf-panel-bevel-lo, #22140c), 0 4px 0 #000;
+    }
+
+    .intercambios-game .stat-label {
+        color: var(--tf-text-dim, #cfbda8);
+    }
+
+    .intercambios-game .stat-value {
+        color: var(--tf-price, #ffe66d);
+    }
+
+    /* Formulario e inventario */
+
+    .intercambios-game .inner-parchment {
+        background: var(--tf-content, #2c1b12);
+        border-color: var(--tf-fence, #3e2213);
+        box-shadow: inset 2px 2px 0 var(--tf-panel-bevel-hi, #5c3c28), inset -2px -2px 0 var(--tf-panel-bevel-lo, #22140c);
+    }
+
+    .intercambios-game label,
+    .intercambios-game .inventory-integrated-title {
+        color: var(--tf-text, #f7eed7);
+    }
+
+    .intercambios-game .pixel-select,
+    .intercambios-game .pixel-input {
+        background: var(--tf-input-bg, #0f0906);
+        border-color: var(--tf-input-border, #4a2c1b);
+        color: var(--tf-text, #f7eed7);
+    }
+
+        .intercambios-game .pixel-select:focus,
+        .intercambios-game .pixel-input:focus {
+            border-color: var(--tf-input-focus, #ffd84d);
+            outline-color: var(--tf-input-focus, #ffd84d);
+        }
+
+    .intercambios-game .inventory-item {
+        background: var(--tf-card, #1e130c);
+        border-color: var(--tf-fence, #3e2213);
+        color: var(--tf-text, #f7eed7);
+    }
+
+        .intercambios-game .inventory-item:hover,
+        .intercambios-game .inventory-item.selected {
+            background: var(--tf-card-hi, #3a2517);
+            border-color: var(--tf-gold, #ffd84d);
+        }
+
+    .intercambios-game .inventory-item-name,
+    .intercambios-game .inventory-item-qty {
+        color: var(--tf-text, #f7eed7);
+    }
+
+    /* Tarjetas de ofertas con la paleta compartida */
+
+    .intercambios-game .offers-grid .offer-card,
+    .intercambios-game .offers-grid .offer-card.card-wood,
+    .intercambios-game .offers-grid .offer-card.card-stone,
+    .intercambios-game .offers-grid .offer-card.card-crop,
+    .intercambios-game .offers-grid .offer-card.card-tool {
+        background: var(--tf-card, #1e130c);
+        border-color: var(--tf-panel-bevel-hi, #5c3c28);
+        color: var(--tf-text, #f7eed7);
+    }
+
+    .intercambios-game .offer-icon {
+        background: var(--tf-panel, #382419);
+        border-color: var(--tf-gold-lo, #8a5a00);
+    }
+
+    .intercambios-game .offer-name,
+    .intercambios-game .offer-seller,
+    .intercambios-game .offer-qty,
+    .intercambios-game .offer-seller b,
+    .intercambios-game .offer-qty b {
+        color: var(--tf-text, #f7eed7);
+    }
+
+    .intercambios-game .offer-price {
+        background: var(--tf-header, #23160e);
+        border-color: var(--tf-gold, #ffd84d);
+        color: var(--tf-price, #ffe66d);
+    }
+
+    /* Mensajes */
+
+    .intercambios-game .form-message {
+        color: var(--tf-ok-text, #7aff9b);
+    }
+
+    /* Modal de compra */
+
+    .intercambios-game .modal-panel {
+        background: var(--tf-panel, #382419);
+        border-color: var(--tf-panel-deep, #140b07);
+    }
+
+    .intercambios-game .modal-header h3 {
+        color: var(--tf-gold, #ffd84d);
+    }
+
+    .intercambios-game .modal-body {
+        background: var(--tf-content, #2c1b12);
+        border-color: var(--tf-fence, #3e2213);
+        box-shadow: inset 2px 2px 0 var(--tf-panel-bevel-hi, #5c3c28), inset -2px -2px 0 var(--tf-panel-bevel-lo, #22140c);
+    }
+
+    .intercambios-game .modal-label,
+    .intercambios-game .modal-value {
+        color: var(--tf-text, #f7eed7);
+    }
