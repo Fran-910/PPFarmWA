@@ -8,6 +8,8 @@
 
 <PageTitle>Home</PageTitle>
 
+
+
 @if (!mostrarInternet)
 {
     <div style="cursor: @cursorActual;"
@@ -16,9 +18,16 @@
          @onmouseover="RestablecerAMain"
          @onmouseleave="RestablecerAMain"
          class="home-content terrain-bg">
+        
+        <button class="bton-menu" @onclick="BotonSandwich">☰</button>
 
-        <div class="barra-lateral">
+        @if (mostrarMenuLateral)
+        {
+
+            <div class="barra-lateral">
+
             <nav>
+                    
                 <ul>
 
                     <li class="jugador-nombre">
@@ -92,9 +101,11 @@
                 }
             </nav>
         </div>
+        }
 
         @if (recursos is not null)
         {
+
             <div class="game-container">
 
                 <div class="game-header">
@@ -104,7 +115,17 @@
                 <HuertaCeldasComponent />
 
                 <div class="equipped-frame">
-                    <img src="/images/tools/@((jugadorState.__jugador.recurso?.Id == 0) ? "default" : jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-"))/Main.png" />
+                    <img src="/images/tools/@(((jugadorState.__jugador.recurso?.Id ?? 0) == 0) ? "default" : jugadorState.__jugador.recurso.nombre.ToLower().Replace(" ", "-"))/Main.png" />
+                </div>
+                <div class="durability">
+                    @if (jugadorState.__jugador.currentItem != null && jugadorState.__jugador.currentItem.durabilidad > 0)
+                    {
+                        <p>@jugadorState.__jugador.currentItem.durabilidad / @(jugadorState.__jugador.recurso?.durabilidad ?? 0)</p>
+                    }
+                    else
+                    {
+                        <p>0</p>
+                    }
                 </div>
 
             </div>
@@ -130,6 +151,7 @@
 
 @code
 {
+    private bool mostrarMenuLateral = true;
     private bool mostrarTienda;
     private bool mostrarInventario;
     private bool mostrarInternet;
@@ -152,6 +174,9 @@
     string? cursorActual;
     string? currentToolImg;
 
+    private Jugador? jugadorSuscrito;
+    private Action? onSubioNivelGuardado;
+
     protected override async Task OnInitializedAsync()
     {
         if (jugadorState.__jugador is null)
@@ -160,12 +185,19 @@
             return;
         }
 
+        // Se guarda la instancia para desuscribirse exactamente de ella en Dispose.
+        jugadorSuscrito = jugadorState.__jugador;
+
         jugadorState.OnChange += Actualizar;
-        jugadorState.__jugador.OnCambioUltimaHerramienta += SetUpTool;
-        jugadorState.__jugador.OnSubioNivel += async () =>
+        jugadorSuscrito.OnCambioUltimaHerramienta += SetUpTool;
+        jugadorSuscrito.OnItemDestroy += ShowDestroyMessage;
+        jugadorSuscrito.OnItemDestroySave += async () => await jugadorServicio.GuardarPartida(jugadorState.__jugador);
+
+        onSubioNivelGuardado = async () =>
         {
             await GuardarPartidaAsync();
         };
+        jugadorSuscrito.OnSubioNivel += onSubioNivelGuardado;
 
         recursos = await catalogoRecursos.ObtenerRecursosAsync();
 
@@ -177,15 +209,36 @@
         InvokeAsync(StateHasChanged);
     }
 
+    public void ShowDestroyMessage(ItemDTO item)
+    {
+        InvokeAsync(async () =>
+        {
+            string nombre = recursos?
+                .FirstOrDefault(r => r.Id == item?.idRecurso)?.nombre
+                ?? "Herramienta desconocida";
+
+            await MostrarMensajeTemporal(
+                $"La herramienta {nombre} se ha roto.",
+                false,
+                5000);
+        });
+    }
+
     public void SetUpTool()
     {
-        int idUltimoRecurso = jugadorState.__jugador.idUltimoRecurso;
-        if (idUltimoRecurso == 0 && jugadorState.__jugador.idUltimaHerramienta != 0)
+        var jugador = jugadorState.__jugador;
+
+        if (jugador is null)
+            return;
+
+        // Si quedó un id de herramienta guardado pero el item no está en memoria,
+        // se recupera desde la lista de items (antes se desreferenciaba null acá).
+        if (jugador.currentItem is null && jugador.idUltimaHerramienta != 0)
         {
-            var it = jugadorState.__jugador.items?.FirstOrDefault(i => i.Id == jugadorState.__jugador.idUltimaHerramienta);
-            idUltimoRecurso = it?.idRecurso ?? 0;
-            jugadorState.__jugador.idUltimoRecurso = idUltimoRecurso;
+            jugador.currentItem = jugador.items?.FirstOrDefault(i => i.Id == jugador.idUltimaHerramienta);
         }
+
+        int idUltimoRecurso = jugador.currentItem?.idRecurso ?? 0;
         RecursoDTO dataHerramienta =
             recursos?.FirstOrDefault(r => r.Id == idUltimoRecurso)
             ??
@@ -332,5 +385,22 @@
         ctsMensaje?.Dispose();
 
         jugadorState.OnChange -= Actualizar;
+
+        if (jugadorSuscrito is not null)
+        {
+            jugadorSuscrito.OnCambioUltimaHerramienta -= SetUpTool;
+            jugadorSuscrito.OnItemDestroy -= ShowDestroyMessage;
+
+            if (onSubioNivelGuardado is not null)
+                jugadorSuscrito.OnSubioNivel -= onSubioNivelGuardado;
+
+            jugadorSuscrito = null;
+            onSubioNivelGuardado = null;
+        }
+    }
+
+   private void BotonSandwich()
+    {
+        mostrarMenuLateral = !mostrarMenuLateral; 
     }
 }

@@ -33,7 +33,9 @@ namespace PPFramWA.Client.Services
                 experiencia = jugador.experiencia,
                 ppCoins = jugador.ppCoins,
                 points = jugador.points,
-                idUltimaHerramienta = jugador.idUltimaHerramienta
+                idUltimaHerramienta = jugador.idUltimaHerramienta,
+                items = jugador.items
+                
             };
 
             var respuesta = await _api.PutAsync<JugadorPutDTO>(

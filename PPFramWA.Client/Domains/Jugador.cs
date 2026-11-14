@@ -12,6 +12,7 @@ namespace PPFramWA.Client.Domains
         public double ppCoins { get; set; }
         public int points { get; set; }
         public List<ItemDTO> items { get; set; } = new List<ItemDTO>();
+        public ItemDTO currentItem { get; set; }
         private int _idUltimaHerramienta;
         public int idUltimaHerramienta 
         { 
@@ -25,11 +26,11 @@ namespace PPFramWA.Client.Domains
                 }
             }
         }
-        public int idUltimoRecurso { get; set; }
         public event Action? OnCambioUltimaHerramienta;
         public int experienciaParaSubir { get; set; }
-
         public event Action? OnSubioNivel;
+        public event Action<ItemDTO>? OnItemDestroy;
+        public event Action? OnItemDestroySave;
 
         // RECURSODTO
 
@@ -46,13 +47,20 @@ namespace PPFramWA.Client.Domains
             idUltimaHerramienta = dto.IdUltimaHerramienta;
             items = dto.Items;
             calcularExpNecesaria();
+
+            currentItem = items.Where(x => x.Id == idUltimaHerramienta).FirstOrDefault();
         }
 
-        public void CambioUltimaHerramienta(int idItem, int idRecurso)
+        public void CambioUltimaHerramienta(int idItem)
         {
-            idUltimaHerramienta = idItem;
-            idUltimoRecurso = idRecurso;
-            OnCambioUltimaHerramienta?.Invoke();
+            // El currentItem se actualiza ANTES de disparar el evento:
+            // si no, SetUpTool corre con la herramienta anterior (o con null).
+            currentItem = items.FirstOrDefault(x => x.Id == idItem);
+
+            if (_idUltimaHerramienta == idItem)
+                OnCambioUltimaHerramienta?.Invoke();
+            else
+                idUltimaHerramienta = idItem; // el setter dispara el evento una sola vez
         }
         public void calcularExpNecesaria()
         {
@@ -67,6 +75,24 @@ namespace PPFramWA.Client.Domains
                 calcularExpNecesaria();
                 OnSubioNivel?.Invoke();
             }
+        }
+        public void RefrescarItems(List<ItemDTO> items)
+        {
+            this.items = items;
+            currentItem = items.Where(x => x.Id == idUltimaHerramienta).FirstOrDefault();
+        }
+
+        public void ItemDestroy(ItemDTO item)
+        {
+            items.Remove(item);
+            if (currentItem != null && currentItem.Id == item.Id)
+            {
+                currentItem = null;
+                idUltimaHerramienta = 0;
+            }
+
+            OnItemDestroySave?.Invoke();
+            OnItemDestroy?.Invoke(item);
         }
     }
 }

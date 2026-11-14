@@ -4,7 +4,7 @@
 @inject ItemServicio ItemService
 @inject JugadorServicio JugadorService
 @inject ComercioServicio ComercioService
-@inject JugadorState JugadorState
+@inject JugadorState jugadorState
 
 <div class="modal-fondo" @onclick="Cerrar">
 
@@ -295,8 +295,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        idJugador = JugadorState.__jugador?.Id > 0
-            ? JugadorState.__jugador.Id
+        idJugador = jugadorState.__jugador?.Id > 0
+            ? jugadorState.__jugador.Id
             : 0;
 
         if (idJugador <= 0)
@@ -306,6 +306,25 @@
             claseMensaje = "mensaje-error";
             return;
         }
+
+        jugadorState.__jugador.OnItemDestroy += async (item) =>
+        {
+            if (item is not null && items is not null)
+            {
+                var itemExistente = items.FirstOrDefault(i => i.Id == item.Id);
+                if (itemExistente is not null)
+                {
+                    items.Remove(itemExistente);
+                    await Recargar();
+                    StateHasChanged();
+                }
+            }
+        };
+
+        jugadorState.__jugador.OnItemDestroySave += async () =>
+        {
+            await Recargar();     
+        };
 
         await Recargar();
     }
@@ -320,10 +339,10 @@
         {
             saldo = jugador.ppCoins;
 
-            if (JugadorState.__jugador is not null)
+            if (jugadorState.__jugador is not null)
             {
-                JugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
-                JugadorState.NotificarCambios();
+                jugadorState.__jugador.ppCoins = (int)jugador.ppCoins;
+                jugadorState.NotificarCambios();
             }
         }
     }
@@ -331,6 +350,8 @@
     private void Seleccionar(InventarioDTO item)
     {
         seleccionado = item;
+        seleccionado.durabilidadItem = jugadorState.__jugador?.items?.FirstOrDefault(i => i.Id == item.Id)?.durabilidad ?? item.durabilidad;
+        seleccionado.durabilidad = jugadorState.__jugador?.recurso?.durabilidad ?? item.durabilidad;
         cantidadVenta = 1;
         mostrarConfirmacion = false;
         mensaje = null;
@@ -418,14 +439,14 @@
 
     private Task EquiparSeleccionado()
     {
-        if (seleccionado is null || JugadorState.__jugador is null)
+        if (seleccionado is null || jugadorState.__jugador is null)
             return Task.CompletedTask;
 
-        JugadorState.__jugador.CambioUltimaHerramienta(
-            seleccionado.Id,
-            seleccionado.idRecurso);
+        jugadorState.__jugador.CambioUltimaHerramienta(
+            seleccionado.Id
+            );
 
-        JugadorState.NotificarCambios();
+        jugadorState.NotificarCambios();
 
         mensaje = $"Equipaste: {seleccionado.nombre}";
         claseMensaje = "mensaje-exito";

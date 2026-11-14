@@ -12,5 +12,6 @@ namespace PPFarmWA.Shared.DTO
         public int level { get; set; }
         public int experiencia { get; set; }
         public int idUltimaHerramienta { get; set; }
+        public List<ItemDTO> items { get; set; } = new List<ItemDTO>();
     }
 }

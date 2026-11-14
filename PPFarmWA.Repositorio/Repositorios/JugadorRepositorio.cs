@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PPFarmWA.BD.Datos;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Shared.DTO;
@@ -210,6 +210,51 @@ namespace PPFarmWA.Repositorio.Repositorios
                 IdUltimaHerramienta = jugador.idUltimaHerramienta,
                 Items = item
             };
+        }
+        public async Task<List<Item>> GetPlayerInv(int id)
+        {
+            var inv = await _context.Items.Where(x => x.JugadorId == id).ToListAsync();
+
+            if(inv is not null)
+            {
+                return inv;
+            }
+
+            return new List<Item>();
+        }
+
+        public async Task<bool> UpdatePlayerInvAsync(List<ItemDTO> newTable, List<Item> bdTable)
+        {
+            bool changed = false;
+
+            foreach (var item in newTable)
+            {
+                var matchedId = bdTable.Where(x => x.Id == item.Id).FirstOrDefault();
+
+                if (matchedId is null) continue;
+                changed = true;
+
+                matchedId.durabilidad = item.durabilidad;
+            }
+
+            foreach (var bdItem in bdTable)
+            {
+                if (bdItem.RecursoId != 1 && !newTable.Any(x => x.Id == bdItem.Id))
+                {
+                    _context.Items.Remove(bdItem);
+                    changed = true;
+                }
+            }
+
+            if(changed)
+            {
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+
         }
 
     }

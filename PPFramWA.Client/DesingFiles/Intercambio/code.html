@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mercado de Intercambios - PPFarmWA</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Pixel Typography -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Silkscreen:wght@400;700&amp;family=VT323&amp;family=Nunito:wght@700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            game: {
+              bg: '#1b4d27',
+              bgPattern: '#164020',
+              woodBorder: '#4a2505',
+              woodOuter: '#663309',
+              woodMain: '#8c4b12',
+              woodLight: '#af6420',
+              woodHighlight: '#cf8132',
+              parchment: '#f8eed9',
+              parchmentLight: '#fdf7eb',
+              parchmentBorder: '#d9be95',
+              gold: '#ffd214',
+              goldShadow: '#b07800',
+              greenBtn: '#28bb46',
+              greenBtnHover: '#33d653',
+              greenBtnShadow: '#156b26',
+              cyanBtn: '#0099cc',
+              cyanBtnHover: '#00b4f0',
+              cyanBtnShadow: '#005f80'
+            }
+          },
+          fontFamily: {
+            pixel: ['"Silkscreen"', 'monospace'],
+            retro: ['"Press Start 2P"', 'monospace'],
+            vt: ['"VT323"', 'monospace'],
+            sans: ['"Nunito"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Pixel Art CSS -->
+<style data-purpose="pixel-theme-rules">
+    /* Pixel Perfect Rendering */
+    * {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      -webkit-font-smoothing: none;
+    }
+
+    body {
+      background-color: #1a4d27;
+      background-image: radial-gradient(#143d1f 15%, transparent 16%), radial-gradient(#174523 15%, transparent 16%);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      user-select: none;
+    }
+
+    /* Chunky Pixel Borders */
+    .pixel-wood-panel {
+      background: #8b4513;
+      border: 4px solid #3d1c02;
+      box-shadow: 
+        inset 4px 4px 0px 0px #b86720,
+        inset -4px -4px 0px 0px #5c2703,
+        0 8px 0 rgba(0, 0, 0, 0.45);
+      position: relative;
+    }
+
+    .pixel-inner-parchment {
+      background-color: #faebd7;
+      border: 3px solid #855325;
+      box-shadow: 
+        inset 3px 3px 0px 0px #fff4e0,
+        inset -3px -3px 0px 0px #d4b88f;
+    }
+
+    /* Wooden Pixel Buttons */
+    .btn-pixel-wood {
+      background: linear-gradient(to bottom, #a35617, #773809);
+      border: 3px solid #361702;
+      box-shadow: 
+        inset 2px 2px 0px 0px #cf7729,
+        inset -2px -2px 0px 0px #4d2104,
+        0 4px 0px rgba(0,0,0,0.5);
+      transition: transform 0.05s ease, filter 0.05s ease;
+    }
+    .btn-pixel-wood:active {
+      transform: translateY(3px);
+      box-shadow: 
+        inset 2px 2px 0px 0px #4d2104,
+        inset -2px -2px 0px 0px #cf7729,
+        0 1px 0px rgba(0,0,0,0.5);
+    }
+
+    /* Vibrant Green Pixel Button */
+    .btn-pixel-green {
+      background: linear-gradient(to bottom, #39d959, #22a83f);
+      border: 3px solid #0f4f1d;
+      box-shadow: 
+        inset 3px 3px 0px 0px #67f282,
+        inset -3px -3px 0px 0px #156d29,
+        0 5px 0px #0b3814;
+      text-shadow: 2px 2px 0px #0a3d16;
+      transition: all 0.06s ease;
+    }
+    .btn-pixel-green:hover {
+      background: linear-gradient(to bottom, #45e866, #28bd48);
+      filter: brightness(1.05);
+    }
+    .btn-pixel-green:active {
+      transform: translateY(4px);
+      box-shadow: 
+        inset 3px 3px 0px 0px #156d29,
+        inset -3px -3px 0px 0px #67f282,
+        0 1px 0px #0b3814;
+    }
+
+    /* Vibrant Cyan Inventory Button */
+    .btn-pixel-cyan {
+      background: linear-gradient(to bottom, #11b1e6, #0084b5);
+      border: 3px solid #004561;
+      box-shadow: 
+        inset 2px 2px 0px 0px #43cbf9,
+        inset -2px -2px 0px 0px #005f82,
+        0 4px 0px #003043;
+      text-shadow: 1px 1px 0px #00364d;
+    }
+    .btn-pixel-cyan:hover {
+      filter: brightness(1.08);
+    }
+    .btn-pixel-cyan:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0px #003043;
+    }
+
+    /* Gold Pixel Text Effect */
+    .pixel-text-gold {
+      color: #ffe600;
+      text-shadow: 
+        2px 2px 0px #7d4400,
+        -1px -1px 0px #fffaad,
+        0px 3px 0px #502c00;
+    }
+    .pixel-text-dark {
+      color: #3b1d03;
+      text-shadow: 1px 1px 0px #faeccb;
+    }
+
+    /* Custom Item Card Borders based on item themes */
+    .card-wood {
+      background: #fbf5e8;
+      border: 2px solid #b3804d;
+    }
+    .card-wood:hover { border-color: #8c4c11; }
+
+    .card-stone {
+      background: #f2f7fc;
+      border: 2px solid #94b8e3;
+    }
+    .card-stone:hover { border-color: #4b88d1; }
+
+    .card-crop {
+      background: #fffdf0;
+      border: 2px solid #dec659;
+    }
+    .card-crop:hover { border-color: #bfa024; }
+
+    .card-tool {
+      background: #fdf2f7;
+      border: 2px solid #e5a4ca;
+    }
+    .card-tool:hover { border-color: #cb5e9c; }
+
+    /* Corner foliage decoration mock */
+    .corner-leaf-tl {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 14px;
+      height: 14px;
+      background: #4ade80;
+      border: 2px solid #166534;
+      box-shadow: 4px 4px 0 #15803d;
+      z-index: 20;
+    }
+    .corner-leaf-br {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 14px;
+      height: 14px;
+      background: #4ade80;
+      border: 2px solid #166534;
+      box-shadow: -4px -4px 0 #15803d;
+      z-index: 20;
+    }
+  </style>
+<!-- END: Custom Pixel Art CSS -->
+</head>
+<body class="min-h-screen text-slate-800 flex items-center justify-center p-3 sm:p-5">
+<!-- BEGIN: GameContainer -->
+<div class="w-full max-w-[1440px] flex flex-col gap-4" data-purpose="game-wrapper">
+<!-- BEGIN: TopBarNavAndStats -->
+<header class="flex flex-wrap items-center justify-between gap-3 w-full" data-purpose="top-header">
+<!-- Back Button -->
+<button class="btn-pixel-wood px-5 py-2.5 flex items-center gap-2 rounded text-amber-100 font-pixel text-xs tracking-wider uppercase font-bold hover:text-white transition" data-purpose="back-button">
+<svg class="w-4 h-4 fill-amber-200" viewbox="0 0 24 24">
+<path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+</svg>
+<span>Volver</span>
+</button>
+<!-- Central Grand Wooden Sign -->
+<div class="pixel-wood-panel px-6 py-2.5 rounded-lg flex items-center gap-4 border-[4px] border-[#3a1b02] relative" data-purpose="market-title-sign">
+<div class="corner-leaf-tl"></div>
+<div class="corner-leaf-br"></div>
+<!-- Mini Pixel Stall / Cart Icon -->
+<div class="relative w-11 h-11 flex-shrink-0 flex items-center justify-center bg-[#542907] rounded border-2 border-[#ffb03b]">
+<!-- Stall Roof Graphics (Striped Awning) -->
+<div class="absolute -top-1 w-10 h-3 flex overflow-hidden rounded-t border border-[#3b1702]">
+<span class="w-2 h-full bg-red-600"></span>
+<span class="w-2 h-full bg-amber-100"></span>
+<span class="w-2 h-full bg-red-600"></span>
+<span class="w-2 h-full bg-amber-100"></span>
+<span class="w-2 h-full bg-red-600"></span>
+</div>
+<!-- Veggie/Crate Box -->
+<div class="mt-2 text-base">🧺</div>
+</div>
+<!-- Exchange Title & Subtitle -->
+<div class="text-center">
+<h1 class="font-retro text-lg md:text-xl lg:text-2xl font-bold pixel-text-gold tracking-wide leading-tight">
+            MERCADO DE INTERCAMBIOS
+          </h1>
+<p class="font-pixel text-[10px] md:text-xs text-amber-200 mt-1 uppercase tracking-wider font-semibold">
+            Compra y vende recursos con otros jugadores de PPFarmWA
+          </p>
+</div>
+</div>
+<!-- Player Stats Dashboard -->
+<div class="pixel-wood-panel py-2 px-4 rounded-md flex items-center gap-4 text-xs font-pixel" data-purpose="player-stats-panel">
+<!-- PP Coins Balance -->
+<div class="flex items-center gap-2 pr-3 border-r-2 border-[#572704]">
+<!-- Gold Coin Pixel SVG -->
+<div class="w-8 h-8 rounded-full bg-amber-400 border-2 border-amber-800 flex items-center justify-center shadow-[inset_-2px_-2px_0px_#b37400,inset_2px_2px_0px_#fff38a]">
+<span class="text-amber-900 font-retro text-[9px] font-bold">P</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wide">PP Coins</span>
+<span class="font-retro text-sm text-yellow-300 font-bold">1,450</span>
+</div>
+</div>
+<!-- Player Current Listings -->
+<div class="flex items-center gap-2 pr-3 border-r-2 border-[#572704]">
+<div class="w-7 h-7 bg-[#472204] border border-[#ffaf38] flex items-center justify-center rounded">
+<span class="text-sm">📦</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-stone-300 uppercase">Mis ofertas</span>
+<span class="font-retro text-xs text-amber-200 font-bold">0</span>
+</div>
+</div>
+<!-- Commission Fee Rate -->
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 bg-[#472204] border border-[#ffaf38] flex items-center justify-center rounded">
+<span class="text-sm">⚖️</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-stone-300 uppercase">Comisión</span>
+<span class="font-retro text-xs text-emerald-300 font-bold">0%</span>
+</div>
+</div>
+</div>
+</header>
+<!-- END: TopBarNavAndStats -->
+<!-- BEGIN: MainPanelsLayout -->
+<main class="grid grid-cols-1 lg:grid-cols-12 gap-5 w-full items-start" data-purpose="market-two-columns">
+<!-- ======================================================== -->
+<!-- LEFT PANEL: PUBLICAR INTERCAMBIO (SELL FORM)              -->
+<!-- ======================================================== -->
+<section class="lg:col-span-4 pixel-wood-panel p-4 rounded-lg" data-purpose="publish-listing-panel">
+<div class="corner-leaf-tl"></div>
+<div class="corner-leaf-br"></div>
+<!-- Panel Header -->
+<div class="flex items-start gap-3 pb-3 mb-4 border-b-2 border-[#572704]">
+<div class="w-10 h-10 bg-[#3a1b02] border-2 border-[#e69830] rounded flex-shrink-0 flex items-center justify-center text-lg">
+            🏪
+          </div>
+<div>
+<h2 class="font-retro text-sm text-amber-300 tracking-wide font-bold">
+              PUBLICAR INTERCAMBIO
+            </h2>
+<p class="font-pixel text-[10px] text-amber-100 mt-1 leading-snug">
+              Selecciona un recurso de tu inventario y establece la cantidad y el precio.
+            </p>
+</div>
+</div>
+<!-- Inside Form (Parchment Tone Container) -->
+<div class="pixel-inner-parchment p-3.5 rounded flex flex-col gap-3.5 text-stone-900">
+<!-- Recurso Row & Backpack Inventory Button -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<label class="font-pixel text-[11px] font-bold text-amber-950 uppercase tracking-wide">
+                Recurso
+              </label>
+<!-- Quick Inventory Status Badge -->
+<div class="btn-pixel-cyan px-2.5 py-1 rounded flex items-center gap-2 text-white">
+<span class="text-xs">🎒</span>
+<span class="font-pixel text-[9px] tracking-wider uppercase font-bold">Inventario:</span>
+<span class="font-retro text-[10px] font-bold text-yellow-200">12</span>
+</div>
+</div>
+<!-- Custom Dropdown Selector -->
+<div class="relative w-full">
+<select class="w-full bg-[#fdf5e6] border-2 border-[#8a511e] rounded py-2 pl-10 pr-8 font-sans font-extrabold text-sm text-amber-950 shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer appearance-none">
+<option value="madera">Madera</option>
+<option value="piedra">Piedra</option>
+<option value="hierro">Hierro</option>
+<option value="semillas">Semillas</option>
+<option value="trigo">Trigo</option>
+<option value="maiz">Maíz</option>
+</select>
+<!-- Icon inside selector -->
+<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">🪵</span>
+<!-- Pixel Chevron Icon -->
+<div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-amber-900 font-pixel text-xs">▼</div>
+</div>
+</div>
+<!-- Quantity & Unit Price Inputs -->
+<div class="grid grid-cols-2 gap-3">
+<!-- Cantidad a vender -->
+<div class="flex flex-col gap-1">
+<label class="font-pixel text-[9px] font-bold text-amber-950 uppercase tracking-tight">
+                Cantidad a vender
+              </label>
+<div class="relative">
+<input class="w-full bg-[#fdf5e6] border-2 border-[#8a511e] rounded py-1.5 px-3 font-retro text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500" max="999" min="1" type="number" value="1"/>
+</div>
+</div>
+<!-- Precio (PP Coins) -->
+<div class="flex flex-col gap-1">
+<label class="font-pixel text-[9px] font-bold text-amber-950 uppercase tracking-tight">
+                Precio (PP Coins)
+              </label>
+<div class="relative">
+<span class="absolute left-2 top-1/2 -translate-y-1/2 text-sm pointer-events-none">🪙</span>
+<input class="w-full bg-[#fdf5e6] border-2 border-[#8a511e] rounded py-1.5 pl-8 pr-2 font-retro text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500" min="0" type="number" value="0"/>
+</div>
+</div>
+</div>
+<!-- Total Calculated Box -->
+<div class="bg-gradient-to-b from-[#f5d9a4] to-[#ecc98b] border-2 border-[#945d25] rounded-md p-3 flex items-center justify-between shadow-[inset_1px_1px_0px_#ffebc9,0_2px_0px_rgba(0,0,0,0.1)]">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded bg-[#d69d3e] border border-[#7a4812] flex items-center justify-center text-xl shadow-inner">
+                💰
+              </div>
+<span class="font-retro text-xs font-bold text-[#4d2602]">PRECIO TOTAL</span>
+</div>
+<div class="font-retro text-base font-bold text-amber-950 flex items-center gap-1">
+<span>0</span>
+<span class="text-xs text-amber-800">PP</span>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="btn-pixel-green w-full py-3 rounded-md flex items-center justify-center gap-3 font-retro text-xs uppercase tracking-wider text-white" data-purpose="submit-listing-btn" type="button">
+<span class="text-base">🛒</span>
+<span>PUBLICAR INTERCAMBIO</span>
+</button>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- RIGHT PANEL: OFERTAS DISPONIBLES (MARKET BROWSER)         -->
+<!-- ======================================================== -->
+<section class="lg:col-span-8 pixel-wood-panel p-4 rounded-lg" data-purpose="available-offers-panel">
+<div class="corner-leaf-tl"></div>
+<div class="corner-leaf-br"></div>
+<!-- Offers Header & Filtering Toolbar -->
+<div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b-2 border-[#572704]">
+<!-- Header Title with Chest Icon -->
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 bg-[#381a02] border-2 border-amber-400 rounded flex items-center justify-center text-lg">
+              💎
+            </div>
+<div>
+<h2 class="font-retro text-sm text-amber-300 font-bold tracking-wide">
+                OFERTAS DISPONIBLES
+              </h2>
+<p class="font-pixel text-[10px] text-amber-100">
+                Intercambios publicados por otros jugadores.
+              </p>
+</div>
+</div>
+<!-- Search & Filter Controls -->
+<div class="flex items-center gap-2 w-full sm:w-auto">
+<!-- Search Input -->
+<div class="relative flex-1 sm:w-52">
+<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-amber-800 pointer-events-none">🔍</span>
+<input class="w-full bg-[#faebd7] border-2 border-[#693506] rounded py-1 pl-8 pr-2 font-pixel text-xs text-amber-950 placeholder-amber-800/70 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="Buscar recurso..." type="text"/>
+</div>
+<!-- Category Filter Dropdown -->
+<div class="relative">
+<select class="bg-[#faebd7] border-2 border-[#693506] rounded py-1 pl-2.5 pr-7 font-pixel text-xs text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer appearance-none">
+<option>Todos</option>
+<option>Madera / Minerales</option>
+<option>Cultivos / Semillas</option>
+<option>Herramientas</option>
+</select>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-amber-900 font-pixel text-[10px]">▼</div>
+</div>
+</div>
+</div>
+<!-- Offers Grid: 2 rows x 4 columns = 8 cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5" data-purpose="market-cards-grid">
+<!-- Card 1: Madera -->
+<article class="card-wood rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<!-- Pixel Item Icon -->
+<div class="w-11 h-11 bg-amber-100 border-2 border-amber-900/40 rounded flex items-center justify-center text-2xl shadow-inner">
+                🪵
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Madera</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Juan</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-amber-800">20</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-amber-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>50 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 2: Piedra -->
+<article class="card-stone rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-blue-100 border-2 border-blue-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                🪨
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Piedra</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Ana</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-sky-800">15</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-blue-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>40 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 3: Semillas -->
+<article class="card-crop rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-yellow-100 border-2 border-amber-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                🌱
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Semillas</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Mateo</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-emerald-700">10</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-yellow-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>60 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 4: Pala -->
+<article class="card-tool rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-pink-100 border-2 border-pink-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                🥄
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Pala</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Lucas</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-rose-800">5</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-pink-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>120 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 5: Hierro -->
+<article class="card-tool rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-indigo-100 border-2 border-indigo-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                🧊
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Hierro</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Sofia</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-indigo-800">8</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-indigo-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>100 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 6: Pico de Hierro -->
+<article class="card-stone rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-sky-100 border-2 border-sky-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                ⛏️
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900 leading-tight">Pico de Hierro</span>
+<span class="font-pixel text-[9px] text-stone-600 mt-0.5">Vendedor: <b class="text-stone-800">Tomas</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-sky-800">3</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-sky-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>250 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 7: Trigo -->
+<article class="card-crop rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-yellow-100 border-2 border-amber-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                🌾
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Trigo</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Valen</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-amber-800">25</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-yellow-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>35 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+<!-- Card 8: Maíz -->
+<article class="card-crop rounded-md p-2.5 flex flex-col justify-between shadow-sm border-2">
+<div class="flex items-start gap-2.5">
+<div class="w-11 h-11 bg-lime-100 border-2 border-emerald-900/30 rounded flex items-center justify-center text-2xl shadow-inner">
+                🌽
+              </div>
+<div class="flex flex-col">
+<span class="font-sans font-black text-sm text-stone-900">Maíz</span>
+<span class="font-pixel text-[9px] text-stone-600">Vendedor: <b class="text-stone-800">Cami</b></span>
+<span class="font-pixel text-[9px] text-stone-600">Cantidad: <b class="text-lime-800">18</b></span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-lime-200 flex flex-col gap-1.5">
+<div class="bg-amber-100/90 rounded px-2 py-0.5 border border-amber-300 flex items-center justify-center gap-1 font-retro text-[10px] text-amber-900 font-bold">
+<span>🪙</span>
+<span>45 PP</span>
+</div>
+<button class="btn-pixel-green w-full py-1.5 rounded flex items-center justify-center gap-1 font-retro text-[9px] text-white">
+<span>🛒</span>
+<span>COMPRAR</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Pagination Bar Bottom Right -->
+<nav class="flex justify-end items-center gap-1.5 mt-3 pt-2 border-t border-[#572704]" data-purpose="pagination-controls">
+<button class="w-8 h-8 btn-pixel-wood rounded flex items-center justify-center font-retro text-xs text-amber-200 hover:text-white">
+            ‹
+          </button>
+<button class="w-8 h-8 rounded bg-emerald-800 border-2 border-emerald-400 font-retro text-xs text-white shadow-inner font-bold">
+            1
+          </button>
+<button class="w-8 h-8 btn-pixel-wood rounded flex items-center justify-center font-retro text-xs text-amber-200 hover:text-white">
+            2
+          </button>
+<button class="w-8 h-8 btn-pixel-wood rounded flex items-center justify-center font-retro text-xs text-amber-200 hover:text-white">
+            3
+          </button>
+<button class="w-8 h-8 btn-pixel-wood rounded flex items-center justify-center font-retro text-xs text-amber-200 hover:text-white">
+            ›
+          </button>
+</nav>
+</section>
+</main>
+<!-- END: MainPanelsLayout -->
+</div>
+<!-- END: GameContainer -->
+</body></html>

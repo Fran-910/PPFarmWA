@@ -1,0 +1,58 @@
+﻿@if (Mostrar)
+{
+    <div class="modal-overlay">
+        <div class="modal-window">
+            
+            <div class="modal-header">
+                <span>⚙️ Configuración del Sistema</span>
+                <button class="close-btn" @onclick="Cerrar">X</button>
+            </div>
+
+            <!-- Contenido del modal -->
+            <div class="modal-body">
+                <h3>Audio y Sonido</h3>
+
+                <div class="form-group">
+                    <label>Volumen General:</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" @bind="Volumen" @bind:event="oninput" disabled="@Silenciado" />
+                        <span class="vol-display">@(Volumen)%</span>
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="muteSound" @bind="Silenciado" />
+                    <label for="muteSound">Silenciar todos los sonidos</label>
+                </div>
+            </div>
+
+            <!-- Botonera -->
+            <div class="modal-footer">
+                <button class="action-btn" @onclick="GuardarConfiguracion">Aplicar</button>
+                <button class="action-btn" @onclick="Cerrar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Mostrar { get; set; }
+    [Parameter] public EventCallback<bool> MostrarChanged { get; set; }
+
+    // Variables para el sonido
+    private int Volumen { get; set; } = 50;
+    private bool Silenciado { get; set; } = false;
+
+    private async Task Cerrar()
+    {
+        Mostrar = false;
+        await MostrarChanged.InvokeAsync(Mostrar);
+    }
+
+    private async Task GuardarConfiguracion()
+    {
+        
+        Console.WriteLine($"Guardando... Volumen: {Volumen}, Silenciado: {Silenciado}");
+        await Cerrar();
+    }
+} 

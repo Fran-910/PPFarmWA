@@ -4,175 +4,263 @@
 @inject JugadorState JugadorState
 @inject NavigationManager NavigationManager
 
-<PageTitle>Intercambios</PageTitle>
+<PageTitle>Mercado de Intercambios - PPFarmWA</PageTitle>
 
-<button class="btn-volver" @onclick="VolverAlHome">
-    ← Volver
-</button>
-<div class="intercambios">
-
-    <h1>Intercambios</h1>
-
-    <!-- PUBLICAR INTERCAMBIO -->
-    <div class="publicar">
-
-        <h2>Publicar intercambio</h2>
-
-        <div class="campo">
-            <label>Recurso</label>
-
-            <select @bind="itemSeleccionadoId">
-                <option value="">Seleccionar recurso</option>
-
-                @foreach (var item in inventarioJugador)
-                {
-                    <option value="@item.Id">
-                        @IconoRecurso(item.nombre) @item.nombre - Cantidad: @item.cantidad
-                    </option>
-                }
-            </select>
-        </div>
-
-        <div class="campo">
-            <label>Cantidad</label>
-
-            <input type="number"
-                   min="1"
-                   @bind="cantidadVenta"
-                   placeholder="Cantidad" />
-        </div>
-
-        <div class="campo">
-            <label>Precio</label>
-
-            <input type="number"
-                   min="0"
-                   @bind="precioVenta"
-                   placeholder="PP Coins" />
-        </div>
-
-        <button class="btn-publicar" @onclick="PublicarIntercambio">
-            Publicar intercambio
+<div class="intercambios-game">
+    <header class="top-bar">
+        <button class="btn-pixel-wood btn-volver" @onclick="VolverAlHome">
+            <svg class="icon-arrow" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+            </svg>
+            <span>Volver</span>
         </button>
 
-        @if (!string.IsNullOrWhiteSpace(mensajePublicacion))
-        {
-            <p>@mensajePublicacion</p>
-        }
+        <div class="active-offers-panel">
+            <div class="active-offers-item">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info">
+                    <span class="stat-label">Ofertas activas</span>
+                    <span class="stat-value">@ventasDisponibles.Count</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    </div>
-    <!-- INTERCAMBIOS DISPONIBLES -->
-    <div class="disponibles">
+    <div class="market-title-sign">
+        <div class="corner-leaf tl"></div>
+        <div class="corner-leaf br"></div>
 
-        <h2>Intercambios disponibles</h2>
-
-        <div class="lista-intercambios">
-
-            @if (cargando)
-            {
-                <p>Cargando intercambios...</p>
-            }
-            else if (error)
-            {
-                <p>Ocurrió un error al cargar los intercambios.</p>
-            }
-            else if (ventasDisponibles.Count == 0)
-            {
-                <p>No hay intercambios disponibles.</p>
-            }
-            else
-            {
-                @foreach (var venta in ventasDisponibles)
-                {
-                    <div class="intercambio">
-
-                        <h3>
-                            👤 @(string.IsNullOrWhiteSpace(venta.nombreJugadorVendedor)
-                                    ? $"Jugador {venta.idJugadorVendedor}"
-                                    : venta.nombreJugadorVendedor) publicó un recurso
-                        </h3>
-
-                        <p class="recurso-venta">
-                            @IconoRecurso(venta.nombreRecurso ?? "") @venta.nombreRecurso
-                        </p>
-
-                        <p>
-                            <strong>Cantidad:</strong>
-                            @venta.cantidadVenta
-                        </p>
-
-                        <p>
-                            <strong>Precio:</strong>
-                            🪙 @venta.precioVenta PP Coins
-                        </p>
-
-                        <button class="btn-comprar"
-                                @onclick="() => PrepararCompra(venta)">
-                            🛒 Comprar
-                        </button>
-
-                    </div>
-                }
-            }
-
+        <div class="stall-icon">
+            <div class="stall-awning">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="stall-crate">🧺</div>
         </div>
 
+        <div class="market-title-text">
+            <h1>MERCADO DE INTERCAMBIOS</h1>
+            <p>Compra y vende recursos con otros jugadores de PPFarmWA</p>
+        </div>
     </div>
+
+    <main class="market-layout">
+        <section class="publish-panel">
+            <div class="corner-leaf tl"></div>
+            <div class="corner-leaf br"></div>
+
+            <div class="panel-header">
+                <div class="panel-header-icon">🏪</div>
+                <div>
+                    <h2>PUBLICAR INTERCAMBIO</h2>
+                    <p>Selecciona un recurso de tu inventario y establece la cantidad y el precio.</p>
+                </div>
+            </div>
+
+            <div class="inner-parchment">
+                <div class="form-row">
+                    <div class="form-group full">
+                        <div class="label-row">
+                            <label>Recurso</label>
+                            <div class="inventory-badge">
+                                <span>🎒</span>
+                                <span>Inventario:</span>
+                                <span class="inventory-count">@inventarioAgrupado.Sum(x => x.cantidadTotal)</span>
+                            </div>
+                        </div>
+
+                        <div class="select-wrapper">
+                            <span class="select-icon">@IconoRecurso(itemSeleccionadoId == 0 ? "" : (inventarioAgrupado.FirstOrDefault(x => x.IdRepresentativo == itemSeleccionadoId)?.nombre ?? ""))</span>
+
+                            <select class="pixel-select" @bind="itemSeleccionadoId">
+                                <option value="0">Seleccionar recurso</option>
+                                @foreach (var item in inventarioAgrupado.Where(x => x.cantidadTotal > 0))
+                                {
+                                    <option value="@item.IdRepresentativo">
+                                        @IconoRecurso(item.nombre) @item.nombre - Cantidad: @item.cantidadTotal
+                                    </option>
+                                }
+                            </select>
+
+                            <span class="select-chevron">▼</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-integrated">
+                    <div class="inventory-integrated-header">
+                        <span class="inventory-integrated-title">MI INVENTARIO DISPONIBLE</span>
+                    </div>
+
+                    <div class="inventory-list inventory-list-integrated">
+                        @if (inventarioAgrupado.Count == 0)
+                        {
+                            <div class="inventory-empty">No tienes recursos en inventario.</div>
+                        }
+                        else
+                        {
+                            @foreach (var inv in inventarioAgrupado.Where(x => x.cantidadTotal > 0))
+                            {
+                                <button type="button"
+                                        class="inventory-item inventory-item-integrated @(itemSeleccionadoId == inv.IdRepresentativo ? "selected" : "")"
+                                        @onclick="() => SeleccionarRecursoInventario(inv.IdRepresentativo)">
+                                    <div class="inventory-item-icon">@IconoRecurso(inv.nombre)</div>
+                                    <div class="inventory-item-info">
+                                        <div class="inventory-item-name">@inv.nombre</div>
+                                        <div class="inventory-item-qty">x @inv.cantidadTotal</div>
+                                    </div>
+                                </button>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="form-row two">
+                    <div class="form-group">
+                        <label>Cantidad a vender</label>
+                        <input type="number" class="pixel-input" min="1" @bind="cantidadVenta" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio (PP Coins)</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🪙</span>
+                            <input type="number" class="pixel-input has-icon" min="0" @bind="precioVenta" />
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-pixel-green btn-publish" @onclick="PublicarIntercambio">
+                    <span>🛒</span>
+                    <span>PUBLICAR INTERCAMBIO</span>
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(mensajePublicacion))
+                {
+                    <div class="form-message">@mensajePublicacion</div>
+                }
+            </div>
+        </section>
+
+        <section class="offers-panel">
+            <div class="corner-leaf tl"></div>
+            <div class="corner-leaf br"></div>
+
+            <div class="offers-header">
+                <div class="offers-title">
+                    <div class="offers-title-icon">💎</div>
+                    <div>
+                        <h2>OFERTAS DISPONIBLES</h2>
+                        <p>Intercambios publicados por otros jugadores.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="offers-grid">
+                @if (cargando)
+                {
+                    <div class="offers-empty">Cargando intercambios...</div>
+                }
+                else if (error)
+                {
+                    <div class="offers-empty">Ocurrió un error al cargar los intercambios.</div>
+                }
+                else if (ventasDisponibles.Count == 0)
+                {
+                    <div class="offers-empty">No hay intercambios disponibles.</div>
+                }
+                else
+                {
+                    @foreach (var venta in ventasDisponibles)
+                    {
+                        <article class="offer-card @GetCardClass(venta.nombreRecurso ?? "")">
+                            <div class="offer-card-top">
+                                <div class="offer-icon">@IconoRecurso(venta.nombreRecurso ?? "")</div>
+
+                                <div class="offer-info">
+                                    <div class="offer-name">@(venta.nombreRecurso ?? "Recurso")</div>
+                                    <div class="offer-seller">
+                                        Vendedor:
+                                        <b>@(string.IsNullOrWhiteSpace(venta.nombreJugadorVendedor) ? $"Jugador {venta.idJugadorVendedor}" : venta.nombreJugadorVendedor)</b>
+                                    </div>
+                                    <div class="offer-qty">
+                                        Cantidad: <b>@venta.cantidadVenta</b>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="offer-card-bottom">
+                                <div class="offer-price">
+                                    <span>🪙</span>
+                                    <span>@venta.precioVenta PP</span>
+                                </div>
+
+                                <button class="btn-pixel-green btn-buy" @onclick="() => PrepararCompra(venta)">
+                                    <span>🛒</span>
+                                    <span>COMPRAR</span>
+                                </button>
+                            </div>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    </main>
 
     @if (mostrarConfirmacion && ventaSeleccionada != null)
     {
-        <div class="modal-fondo">
+        <div class="modal-backdrop">
+            <div class="modal-panel">
+                <div class="corner-leaf tl"></div>
+                <div class="corner-leaf br"></div>
 
-            <div class="modal-compra">
+                <div class="modal-header">
+                    <div class="modal-header-icon">✅</div>
+                    <h3>CONFIRMAR COMPRA</h3>
+                </div>
 
-                <h2>Confirmar compra</h2>
-                <p class="recurso-venta">
-                    @IconoRecurso(ventaSeleccionada.nombreRecurso ?? "") @ventaSeleccionada.nombreRecurso
-                </p>
+                <div class="modal-body">
+                    <div class="modal-row">
+                        <span class="modal-label">Recurso</span>
+                        <span class="modal-value">
+                            @IconoRecurso(ventaSeleccionada.nombreRecurso ?? "")
+                            @(ventaSeleccionada.nombreRecurso ?? "")
+                        </span>
+                    </div>
 
-                <p>
-                    <strong>Cantidad:</strong>
-                    @ventaSeleccionada.cantidadVenta
-                </p>
+                    <div class="modal-row">
+                        <span class="modal-label">Cantidad</span>
+                        <span class="modal-value">@ventaSeleccionada.cantidadVenta</span>
+                    </div>
 
-                <p>
-                    <strong>Precio:</strong>
-                    🪙 @ventaSeleccionada.precioVenta PP Coins
-                </p>
+                    <div class="modal-row">
+                        <span class="modal-label">Precio</span>
+                        <span class="modal-value">🪙 @ventaSeleccionada.precioVenta PP</span>
+                    </div>
 
-                <p>
-                    <p>
-                        <strong>Vendedor:</strong>
-                        @(string.IsNullOrWhiteSpace(ventaSeleccionada.nombreJugadorVendedor)
-                            ? $"Jugador {ventaSeleccionada.idJugadorVendedor}"
-                            : ventaSeleccionada.nombreJugadorVendedor)
-                    </p>
-                </p>
+                    <div class="modal-row">
+                        <span class="modal-label">Vendedor</span>
+                        <span class="modal-value">
+                            @(string.IsNullOrWhiteSpace(ventaSeleccionada.nombreJugadorVendedor)
+                                ? $"Jugador {ventaSeleccionada.idJugadorVendedor}"
+                                : ventaSeleccionada.nombreJugadorVendedor)
+                        </span>
+                    </div>
+                </div>
 
-                <div class="modal-botones">
-
-                    <button class="btn-cancelar"
-                            @onclick="CancelarCompra">
+                <div class="modal-actions">
+                    <button class="btn-pixel-wood btn-modal" @onclick="CancelarCompra">
                         Cancelar
                     </button>
 
-                    <button class="btn-confirmar"
-                            @onclick="ConfirmarCompra">
-                        Comprar
+                    <button class="btn-pixel-green btn-modal" @onclick="ConfirmarCompra">
+                        <span>🛒</span>
+                        <span>Comprar</span>
                     </button>
-
                 </div>
-
             </div>
-
         </div>
     }
-
 </div>
-
-
-
-
 
 @code {
     private string IconoRecurso(string nombre)
@@ -180,28 +268,79 @@
         return nombre switch
         {
             "Pala" => "🪏",
-            "Pico de Bronce" => "⛏️",
-            "Pico de Diamante" => "⛏️",
-            "Hoz Dorada" => "🌾",
+            "Pico" => "⛏️",
+            "Pala de Oro" => "🪏",
             _ => "📦"
+        };
+    }
+    private string GetCardClass(string nombre)
+    {
+        return nombre switch
+        {
+            "Madera" => "card-wood",
+            "Piedra" => "card-stone",
+            "Hierro" => "card-tool",
+            "Semillas" => "card-crop",
+            "Trigo" => "card-crop",
+            "Maíz" => "card-crop",
+            "Zanahorias" => "card-crop",
+            "Patata" => "card-crop",
+            "Papa" => "card-crop",
+            "Pala" => "card-tool",
+            "Pico de Bronce" => "card-tool",
+            "Pico de Diamante" => "card-tool",
+            "Hoz Dorada" => "card-tool",
+            _ => "card-wood"
         };
     }
 
     private void VolverAlHome()
-{
-    NavigationManager.NavigateTo("/");
-}
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
     private List<VentaDTO> ventasDisponibles = new();
     private List<InventarioDTO> inventarioJugador = new();
+    private List<InventarioAgrupado> inventarioAgrupado = new();
+
     private int itemSeleccionadoId;
     private int cantidadVenta;
     private double precioVenta;
     private string mensajePublicacion = "";
+
     private bool mostrarConfirmacion = false;
     private VentaDTO? ventaSeleccionada;
-
     private bool cargando = true;
     private bool error = false;
+
+    private class InventarioAgrupado
+    {
+        public int IdRepresentativo { get; set; }
+        public int idRecurso { get; set; }
+        public string nombre { get; set; } = string.Empty;
+        public int cantidadTotal { get; set; }
+    }
+
+    private void ActualizarInventarioAgrupado()
+    {
+        inventarioAgrupado = inventarioJugador
+            .Where(x => !string.IsNullOrWhiteSpace(x.nombre))
+            .GroupBy(x => x.idRecurso)
+            .Select(g =>
+            {
+                var primero = g.First();
+
+                return new InventarioAgrupado
+                {
+                    IdRepresentativo = primero.Id,
+                    idRecurso = g.Key,
+                    nombre = primero.nombre,
+                    cantidadTotal = g.Sum(x => x.cantidad)
+                };
+            })
+            .OrderBy(x => x.nombre)
+            .ToList();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -217,6 +356,7 @@
         {
             ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+            ActualizarInventarioAgrupado();
         }
         catch
         {
@@ -258,8 +398,6 @@
 
         int jugadorId = JugadorState.__jugador.Id;
 
-      
-
         var venta = new VentaDTO
         {
             idJugadorVendedor = jugadorId,
@@ -275,8 +413,15 @@
         if (creada)
         {
             mensajePublicacion = "Intercambio publicado correctamente.";
+
             ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
-            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId); ;
+
+            inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+            ActualizarInventarioAgrupado();
+
+            itemSeleccionadoId = 0;
+            cantidadVenta = 0;
+            precioVenta = 0;
         }
         else
         {
@@ -284,14 +429,15 @@
         }
     }
 
-
-
-
-
     private void PrepararCompra(VentaDTO venta)
     {
         ventaSeleccionada = venta;
         mostrarConfirmacion = true;
+    }
+
+    private void SeleccionarRecursoInventario(int itemId)
+    {
+        itemSeleccionadoId = itemId;
     }
 
     private void CancelarCompra()
@@ -310,20 +456,23 @@
 
         int jugadorId = JugadorState.__jugador.Id;
 
-       
+        if (ventaSeleccionada == null)
+        {
+            return;
+        }
+
         var comprado = await VentaServicio.ComprarIntercambio(
             ventaSeleccionada.Id,
-            jugadorId
-        );
+            jugadorId);
 
         mostrarConfirmacion = false;
 
         if (comprado)
         {
             mensajePublicacion = "Compra realizada correctamente.";
-
             ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+            ActualizarInventarioAgrupado();
         }
         else
         {
@@ -340,27 +489,23 @@
             NavigationManager.NavigateTo("/login");
             return;
         }
+
         int jugadorId = JugadorState.__jugador.Id;
 
         var comprado = await VentaServicio.ComprarIntercambio(
             idVenta,
-            jugadorId
-        );
+            jugadorId);
 
         if (comprado)
         {
             mensajePublicacion = "Compra realizada correctamente.";
-
             ventasDisponibles = await VentaServicio.ObtenerDisponibles(jugadorId);
-
             inventarioJugador = await ItemServicio.ObtenerInventario(jugadorId);
+            ActualizarInventarioAgrupado();
         }
         else
         {
             mensajePublicacion = "No se pudo realizar la compra.";
         }
     }
-
-
-
 }

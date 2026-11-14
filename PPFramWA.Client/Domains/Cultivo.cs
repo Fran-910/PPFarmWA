@@ -48,8 +48,35 @@ namespace PPFramWA.Client.Domains
         //Logica de hit para reducir la vida de los cultivos y ejecutar cosechado
         public void Golpeado(int damage)
         {
+            var currentTool = jugadorStateCultivo.__jugador.currentItem;
+
+
+            if (currentTool is null)
+            {
+                return;
+            }
+
+            if(!(currentTool.durabilidad > 0) && (currentTool.durabilidad != -1))
+            {
+                return;
+
+            }
+
             if (vida > 0)
             {
+
+                if(!(currentTool.durabilidad == -1))
+                {
+                    currentTool.durabilidad = currentTool.durabilidad - 1;
+
+                    if (currentTool.durabilidad <= 0)
+                    {
+                        currentTool.durabilidad = 0;
+                        jugadorStateCultivo.__jugador.CambioUltimaHerramienta(0);
+                        jugadorStateCultivo.__jugador.ItemDestroy(currentTool);
+                    }
+                }
+
                 vida -= damage;
 
                 if (vida <= 0)

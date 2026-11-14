@@ -45,6 +45,7 @@ namespace PPFarmWA.Server.Controllers
             var items = await _repositorio.GetInventarioJugadorAsync(idJugador);
 
             var resultado = items
+                .Where(item => item.VentaId == null)
                 .Join(
                     _context.Recursos,
                     item => item.RecursoId,
