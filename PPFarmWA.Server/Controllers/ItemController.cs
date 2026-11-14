@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PPFarmWA.BD.Datos;
 using PPFarmWA.BD.Datos.Entity;
@@ -14,11 +15,16 @@ namespace PPFarmWA.Server.Controllers
     {
         private readonly IItemRepositorio _repositorio;
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ItemController(IItemRepositorio repositorio, AppDbContext context)
+        public ItemController(
+            IItemRepositorio repositorio,
+            AppDbContext context,
+            IConfiguration configuration)
         {
             _repositorio = repositorio;
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -56,15 +62,12 @@ namespace PPFarmWA.Server.Controllers
                         cantidad = item.cantidad,
                         idJugador = item.JugadorId,
                         idRecurso = item.RecursoId,
-
                         nombre = recurso.nombre,
                         descripcion = recurso.descripcion,
-
                         eficiencia = recurso.eficiencia,
                         durabilidad = recurso.durabilidad,
                         durabilidadItem = item.durabilidad,
                         valor = recurso.valor,
-
                         tipo = recurso.tipo,
                         idRareza = recurso.idRareza
                     })
@@ -103,17 +106,18 @@ namespace PPFarmWA.Server.Controllers
                 durabilidad = dto.durabilidad,
                 JugadorId = dto.idJugador,
                 RecursoId = dto.idRecurso,
-                VentaId = (dto.idVenta.HasValue && dto.idVenta.Value > 0) ? dto.idVenta : null
+                VentaId = (dto.idVenta.HasValue && dto.idVenta.Value > 0)
+                    ? dto.idVenta
+                    : null
             };
 
-            // Si no se especifica durabilidad, tomar la del recurso base
+            // Si no se especifica durabilidad, tomar la del recurso base.
             if (item.durabilidad == 0)
             {
                 var recursoBase = await _context.Recursos.FindAsync(item.RecursoId);
+
                 if (recursoBase != null)
-                {
                     item.durabilidad = recursoBase.durabilidad;
-                }
             }
 
             var creado = await _repositorio.AddAsync(item);
@@ -130,13 +134,27 @@ namespace PPFarmWA.Server.Controllers
         [HttpPost("vender")]
         public async Task<IActionResult> Vender(VenderItemDTO dto)
         {
-            if (dto.idJugador <= 0 || dto.idItem <= 0 || dto.cantidad < 1)
+            if (dto == null ||
+                dto.idJugador <= 0 ||
+                dto.idItem <= 0 ||
+                dto.cantidad < 1)
             {
                 return BadRequest("Los datos de la venta no son válidos.");
             }
 
-            // La transacción comienza antes de consultar el inventario
-            // para proteger la operación ante ventas simultáneas.
+            // Leer el porcentaje de recompensa desde la configuración.
+            double porcentajeVenta = _configuration.GetValue<double>(
+                "EconomiaJuego:PorcentajeVentaSistema");
+
+            if (!double.IsFinite(porcentajeVenta) ||
+                porcentajeVenta < 0 ||
+                porcentajeVenta > 1)
+            {
+                return BadRequest(
+                    "La configuración del porcentaje de venta no es válida.");
+            }
+
+            // La transacción protege la operación ante ventas simultáneas.
             await using var transaccion =
                 await _context.Database.BeginTransactionAsync(
                     System.Data.IsolationLevel.Serializable);
@@ -177,19 +195,26 @@ namespace PPFarmWA.Server.Controllers
                 }
 
                 // El servidor obtiene el valor real del recurso.
-                // Se paga el 50 % del valor por cada unidad vendida.
-                var valorUnitario = item.Recurso.valor;
+                double valorUnitario = item.Recurso.valor;
 
-                if (valorUnitario < 0)
+                if (!double.IsFinite(valorUnitario) ||
+                    valorUnitario < 0)
                 {
                     await transaccion.RollbackAsync();
                     return BadRequest("El valor del recurso no es válido.");
                 }
 
-                var precioVenta = Math.Round(
-                    valorUnitario * dto.cantidad * 0.50,
+                // Calcular la recompensa utilizando el porcentaje configurable.
+                double precioVenta = Math.Round(
+                    valorUnitario * dto.cantidad * porcentajeVenta,
                     2,
                     MidpointRounding.AwayFromZero);
+
+                if (!double.IsFinite(precioVenta) || precioVenta < 0)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest("El importe de la venta no es válido.");
+                }
 
                 // Descontar las unidades vendidas.
                 item.cantidad -= dto.cantidad;
@@ -227,7 +252,7 @@ namespace PPFarmWA.Server.Controllers
                 return Ok(
                     $"Venta realizada correctamente. Recibiste {precioVenta} PP Coins.");
             }
-            catch (Exception)
+            catch
             {
                 await transaccion.RollbackAsync();
 
