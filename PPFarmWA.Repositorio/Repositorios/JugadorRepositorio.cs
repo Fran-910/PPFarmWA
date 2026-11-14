@@ -1,35 +1,99 @@
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PPFarmWA.BD.Datos;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Shared.DTO;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Data;
 
 namespace PPFarmWA.Repositorio.Repositorios
 {
     public class JugadorRepositorio : Repositorio<Jugador>, IJugadorRepositorio
     {
-        public JugadorRepositorio(AppDbContext context)
+        private readonly IConfiguration _configuration;
+
+        public JugadorRepositorio(
+            AppDbContext context,
+            IConfiguration configuration)
             : base(context)
         {
+            _configuration = configuration;
         }
 
-        public async Task<bool> ModificarCoinsAsync(int idJugador, double cantidad)
+        // Modifica PP Coins respetando el límite global.
+        public async Task<bool> ModificarCoinsAsync(
+            int idJugador,
+            double cantidad)
         {
-            var jugador = await _dbSet.FindAsync(idJugador);
-            if (jugador == null)
+            if (idJugador <= 0 ||
+                double.IsNaN(cantidad) ||
+                double.IsInfinity(cantidad))
+            {
                 return false;
+            }
 
-            jugador.ppCoins += cantidad;
-            await _context.SaveChangesAsync();
-            return true;
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(
+                    IsolationLevel.Serializable);
+
+            try
+            {
+                var jugador = await _dbSet
+                    .FirstOrDefaultAsync(j => j.Id == idJugador);
+
+                if (jugador == null)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                double limiteGlobal = _configuration.GetValue<double>(
+                    "EconomiaJuego:LimiteGlobalPPCoins");
+
+                if (limiteGlobal <= 0)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                double totalCoins = await _context.Jugadores
+                    .SumAsync(j => j.ppCoins);
+
+                double nuevoSaldo = jugador.ppCoins + cantidad;
+                double nuevoTotal = totalCoins + cantidad;
+
+                if (nuevoSaldo < 0 ||
+                    nuevoTotal < 0 ||
+                    nuevoTotal > limiteGlobal)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                jugador.ppCoins = nuevoSaldo;
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
-       public async Task<bool> ExisteEmailOusuarioAsync(string emailOusuario)
+
+        public async Task<bool> ExisteEmailOusuarioAsync(
+            string emailOusuario)
         {
-            return await _dbSet.AnyAsync(j => j.email == emailOusuario || j.userName == emailOusuario);
+            return await _dbSet.AnyAsync(
+                j => j.email == emailOusuario ||
+                     j.userName == emailOusuario);
         }
-        public async Task<SesionDTO> RegistrarJugadorAsync(RegistroDTO dto)
+
+        public async Task<SesionDTO> RegistrarJugadorAsync(
+            RegistroDTO dto)
         {
             var jugador = new Jugador
             {
@@ -43,6 +107,7 @@ namespace PPFarmWA.Repositorio.Repositorios
                 esTienda = false,
                 esAdmin = false
             };
+
             _dbSet.Add(jugador);
 
             await _context.SaveChangesAsync();
@@ -55,7 +120,7 @@ namespace PPFarmWA.Repositorio.Repositorios
                 durabilidad = recursoInicial?.durabilidad ?? 0,
                 JugadorId = jugador.Id,
                 RecursoId = 1
-            };  
+            };
 
             _context.Items.Add(itemInicial);
 
@@ -65,7 +130,9 @@ namespace PPFarmWA.Repositorio.Repositorios
 
             await _context.SaveChangesAsync();
 
-            var items = await _context.Items.Where(i => i.JugadorId == jugador.Id).ToListAsync();
+            var items = await _context.Items
+                .Where(i => i.JugadorId == jugador.Id)
+                .ToListAsync();
 
             return new SesionDTO
             {
@@ -88,12 +155,22 @@ namespace PPFarmWA.Repositorio.Repositorios
                 }).ToList()
             };
         }
-        public async Task<SesionDTO> ObtenerSesionConItemsAsync(int idJugador)
+
+        public async Task<SesionDTO> ObtenerSesionConItemsAsync(
+            int idJugador)
         {
-            var jugador = await _context.Jugadores.Where(j => j.Id == idJugador)
-                .FirstOrDefaultAsync();
-            var items = await _context.Items.Where(i => i.JugadorId == idJugador).ToListAsync();
+            var jugador = await _context.Jugadores
+                .FirstOrDefaultAsync(j => j.Id == idJugador);
+
+            if (jugador == null)
+                return null;
+
+            var items = await _context.Items
+                .Where(i => i.JugadorId == idJugador)
+                .ToListAsync();
+
             List<ItemDTO> item = new List<ItemDTO>();
+
             foreach (var i in items)
             {
                 item.Add(new ItemDTO
@@ -106,9 +183,6 @@ namespace PPFarmWA.Repositorio.Repositorios
                     durabilidad = i.durabilidad
                 });
             }
-
-            if (jugador == null)
-                return null;
 
             return new SesionDTO
             {
@@ -123,23 +197,26 @@ namespace PPFarmWA.Repositorio.Repositorios
                 Items = item
             };
         }
-        public async Task<SesionDTO> ObtenerSesionConItemsPorEmailYPasswordAsync(string email, string password)
-        {
-            // 1. Buscamos el jugador que coincida en EMAIL Y CONTRASEÑA
-            var jugador = await _context.Jugadores
-                .FirstOrDefaultAsync(j => j.email.ToLower() == email.ToLower()
-                                       && j.password == password);
 
-            // Si las credenciales son incorrectas (no existe la combinación), devolvemos null
+        public async Task<SesionDTO>
+            ObtenerSesionConItemsPorEmailYPasswordAsync(
+                string email,
+                string password)
+        {
+            var jugador = await _context.Jugadores
+                .FirstOrDefaultAsync(j =>
+                    j.email.ToLower() == email.ToLower() &&
+                    j.password == password);
+
             if (jugador == null)
                 return null;
 
-            // 2. Traemos sus ítems
             var items = await _context.Items
                 .Where(i => i.JugadorId == jugador.Id)
                 .ToListAsync();
 
             List<ItemDTO> item = new List<ItemDTO>();
+
             foreach (var i in items)
             {
                 item.Add(new ItemDTO
@@ -153,7 +230,6 @@ namespace PPFarmWA.Repositorio.Repositorios
                 });
             }
 
-            // 3. Mapeamos y devolvemos la sesión
             return new SesionDTO
             {
                 JugadorId = jugador.Id,
@@ -168,22 +244,22 @@ namespace PPFarmWA.Repositorio.Repositorios
             };
         }
 
-        public async Task<SesionDTO> ObtenerSesionConItemsPorEmailAsync(string email)
+        public async Task<SesionDTO> ObtenerSesionConItemsPorEmailAsync(
+            string email)
         {
-            // 1. Buscamos el jugador por su email (ignorando mayúsculas/minúsculas)
             var jugador = await _context.Jugadores
-                .FirstOrDefaultAsync(j => j.email.ToLower() == email.ToLower());
+                .FirstOrDefaultAsync(j =>
+                    j.email.ToLower() == email.ToLower());
 
-            // Si no existe el email, retornamos null
             if (jugador == null)
                 return null;
 
-            // 2. Traemos sus ítems usando el Id que obtuvimos del jugador
             var items = await _context.Items
                 .Where(i => i.JugadorId == jugador.Id)
                 .ToListAsync();
 
             List<ItemDTO> item = new List<ItemDTO>();
+
             foreach (var i in items)
             {
                 item.Add(new ItemDTO
@@ -197,7 +273,6 @@ namespace PPFarmWA.Repositorio.Repositorios
                 });
             }
 
-            // 3. Mapeamos y devolvemos la SesionDTO con los datos requeridos
             return new SesionDTO
             {
                 JugadorId = jugador.Id,
@@ -211,51 +286,132 @@ namespace PPFarmWA.Repositorio.Repositorios
                 Items = item
             };
         }
+
         public async Task<List<Item>> GetPlayerInv(int id)
         {
-            var inv = await _context.Items.Where(x => x.JugadorId == id).ToListAsync();
-
-            if(inv is not null)
-            {
-                return inv;
-            }
-
-            return new List<Item>();
+            return await _context.Items
+                .Where(x => x.JugadorId == id)
+                .ToListAsync();
         }
 
-        public async Task<bool> UpdatePlayerInvAsync(List<ItemDTO> newTable, List<Item> bdTable)
+        public async Task<bool> UpdatePlayerInvAsync(
+            List<ItemDTO> newTable,
+            List<Item> bdTable)
         {
             bool changed = false;
 
             foreach (var item in newTable)
             {
-                var matchedId = bdTable.Where(x => x.Id == item.Id).FirstOrDefault();
+                var matchedId = bdTable
+                    .FirstOrDefault(x => x.Id == item.Id);
 
-                if (matchedId is null) continue;
+                if (matchedId == null)
+                    continue;
+
                 changed = true;
-
                 matchedId.durabilidad = item.durabilidad;
             }
 
             foreach (var bdItem in bdTable)
             {
-                if (bdItem.RecursoId != 1 && !newTable.Any(x => x.Id == bdItem.Id))
+                if (bdItem.RecursoId != 1 &&
+                    !newTable.Any(x => x.Id == bdItem.Id))
                 {
                     _context.Items.Remove(bdItem);
                     changed = true;
                 }
             }
 
-            if(changed)
+            if (changed)
             {
                 await _context.SaveChangesAsync();
-
                 return true;
             }
 
             return false;
-
         }
 
+        // Acredita Points por cosecha exclusivamente desde el servidor.
+        public async Task<(
+            bool Exito,
+            string Mensaje,
+            int Points,
+            int Recompensa)> AcreditarPointsPorCosechaAsync(
+                int idJugador)
+        {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(
+                    IsolationLevel.Serializable);
+
+            try
+            {
+                var jugador = await _dbSet
+                    .FirstOrDefaultAsync(j => j.Id == idJugador);
+
+                if (jugador == null)
+                {
+                    await transaction.RollbackAsync();
+
+                    return (
+                        false,
+                        "No se encontró el jugador.",
+                        0,
+                        0
+                    );
+                }
+
+                int pointsPorNivel = _configuration.GetValue<int>(
+                    "EconomiaJuego:PointsPorNivelCosecha",
+                    2);
+
+                if (jugador.level < 1 || pointsPorNivel <= 0)
+                {
+                    await transaction.RollbackAsync();
+
+                    return (
+                        false,
+                        "La configuración de recompensa no es válida.",
+                        jugador.points,
+                        0
+                    );
+                }
+
+                long recompensaCalculada =
+                    (long)jugador.level * pointsPorNivel;
+
+                if (recompensaCalculada > int.MaxValue ||
+                    recompensaCalculada < 1 ||
+                    jugador.points > int.MaxValue - recompensaCalculada)
+                {
+                    await transaction.RollbackAsync();
+
+                    return (
+                        false,
+                        "La cantidad de Points supera el límite permitido.",
+                        jugador.points,
+                        0
+                    );
+                }
+
+                int recompensa = (int)recompensaCalculada;
+
+                jugador.points += recompensa;
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return (
+                    true,
+                    $"Se acreditaron {recompensa} Points correctamente.",
+                    jugador.points,
+                    recompensa
+                );
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

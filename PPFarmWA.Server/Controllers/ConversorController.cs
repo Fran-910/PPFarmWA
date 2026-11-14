@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using PPFarmWA.Server.Services;
-using System.Threading.Tasks;
 
 namespace PPFarmWA.Server.Controllers
 {
@@ -16,23 +16,37 @@ namespace PPFarmWA.Server.Controllers
         }
 
         [HttpPost("convertir")]
-        public async Task<IActionResult> Convertir([FromBody] ConversionRequestDTO request)
+        public async Task<IActionResult> Convertir(
+            [FromBody] ConversionRequestDTO request)
         {
-            
-            var resultado = await _conversorServicio.ConvertirPointsAsync(request.IdJugador, request.PuntosAConvertir);
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "Los datos de conversión son obligatorios."
+                });
+            }
+
+            var resultado =
+                await _conversorServicio.ConvertirPointsAsync(
+                    request.IdJugador,
+                    request.PuntosAConvertir);
 
             if (!resultado.Exito)
             {
-                
-                return BadRequest(new { mensaje = resultado.Mensaje });
+                return BadRequest(new
+                {
+                    mensaje = resultado.Mensaje
+                });
             }
 
-            
-            return Ok(new { mensaje = resultado.Mensaje });
+            return Ok(new
+            {
+                mensaje = resultado.Mensaje
+            });
         }
     }
 
-    
     public class ConversionRequestDTO
     {
         public int IdJugador { get; set; }

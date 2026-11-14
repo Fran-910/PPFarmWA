@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using PPFarmWA.BD.Datos.Entity;
 using PPFarmWA.Repositorio.Repositorios;
 using PPFarmWA.Shared.DTO;
+using PPFarmWA.Server.Services;
 
 namespace PPFarmWA.Server.Controllers
 {
@@ -10,17 +12,20 @@ namespace PPFarmWA.Server.Controllers
     public class JugadorController : ControllerBase
     {
         private readonly IJugadorRepositorio _repositorio;
+        private readonly ConversorServicio _conversorServicio;
 
-        public JugadorController(IJugadorRepositorio repositorio)
+        public JugadorController(
+            IJugadorRepositorio repositorio,
+            ConversorServicio conversorServicio)
         {
             _repositorio = repositorio;
+            _conversorServicio = conversorServicio;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<JugadorDTO>>> Get()
         {
             var jugadores = await _repositorio.GetAllAsync();
-
             return Ok(jugadores.Select(Proyectar));
         }
 
@@ -43,8 +48,11 @@ namespace PPFarmWA.Server.Controllers
                 userName = dto.userName,
                 password = dto.password,
                 email = dto.email,
-                ppCoins = dto.ppCoins,
-                points = dto.points,
+
+                // Los saldos iniciales siempre se establecen desde el servidor.
+                ppCoins = 0,
+                points = 0,
+
                 level = dto.level,
                 experiencia = dto.experiencia,
                 esTienda = dto.esTienda,
@@ -55,34 +63,35 @@ namespace PPFarmWA.Server.Controllers
             };
 
             var creado = await _repositorio.AddAsync(jugador);
-
             dto.Id = creado.Id;
 
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = creado.Id },
-                dto
-            );
+                Proyectar(creado));
         }
 
+        // Actualiza el progreso y el inventario.
+        // Los saldos se modifican mediante operaciones específicas del servidor.
         [HttpPut("{id}")]
-        public async Task<ActionResult<JugadorPutDTO>> Actualizar(
+        public async Task<ActionResult<JugadorDTO>> Actualizar(
             int id,
             JugadorPutDTO dto)
         {
             var jugador = await _repositorio.GetByIdAsync(id);
-            var jugadorInv = await _repositorio.GetPlayerInv(id);
-            var update = await _repositorio.UpdatePlayerInvAsync(dto.items, jugadorInv);
-           
+
             if (jugador == null)
                 return NotFound();
 
+            var jugadorInv = await _repositorio.GetPlayerInv(id);
+
+            await _repositorio.UpdatePlayerInvAsync(
+                dto.items,
+                jugadorInv);
+
             jugador.level = dto.level;
             jugador.experiencia = dto.experiencia;
-            jugador.ppCoins = dto.ppCoins;
-            jugador.points = dto.points;
             jugador.idUltimaHerramienta = dto.idUltimaHerramienta;
-
 
             await _repositorio.UpdateAsync(jugador);
 
@@ -94,27 +103,65 @@ namespace PPFarmWA.Server.Controllers
             int id,
             [FromQuery] double cantidad)
         {
-            var resultado = await _repositorio.ModificarCoinsAsync(id, cantidad);
+            var resultado =
+                await _repositorio.ModificarCoinsAsync(id, cantidad);
 
             if (!resultado)
-                return NotFound();
+                return BadRequest(new
+                {
+                    Mensaje = "No se pudieron modificar los PP Coins. Verificá el saldo y el límite global."
+                });
 
-            return Ok();
+            return Ok(new
+            {
+                Mensaje = "PP Coins actualizados correctamente."
+            });
         }
 
-        [HttpPut("{id}/convertir-points")]
-        
-        public async Task<IActionResult> ConvertirPoints(int id, int puntos, [FromServices] PPFarmWA.Server.Services.ConversorServicio conversorServicio)
+        [HttpPost("{id}/recompensa-points")]
+        public async Task<IActionResult> AcreditarPointsPorCosecha(int id)
         {
-            
-            var resultado = await conversorServicio.ConvertirPointsAsync(id, puntos);
+            var resultado =
+                await _repositorio.AcreditarPointsPorCosechaAsync(id);
 
             if (!resultado.Exito)
             {
-                return BadRequest(resultado.Mensaje);
+                return BadRequest(new
+                {
+                    Mensaje = resultado.Mensaje,
+                    Points = resultado.Points,
+                    Recompensa = resultado.Recompensa
+                });
             }
 
-            return Ok(resultado.Mensaje);
+            return Ok(new
+            {
+                Mensaje = resultado.Mensaje,
+                Points = resultado.Points,
+                Recompensa = resultado.Recompensa
+            });
+        }
+
+        [HttpPut("{id}/convertir-points")]
+        public async Task<IActionResult> ConvertirPoints(
+            int id,
+            [FromQuery] int puntos)
+        {
+            var resultado =
+                await _conversorServicio.ConvertirPointsAsync(id, puntos);
+
+            if (!resultado.Exito)
+            {
+                return BadRequest(new
+                {
+                    Mensaje = resultado.Mensaje
+                });
+            }
+
+            return Ok(new
+            {
+                Mensaje = resultado.Mensaje
+            });
         }
 
         [HttpPost("registrar")]
@@ -128,7 +175,8 @@ namespace PPFarmWA.Server.Controllers
                     "El email o el nombre de usuario ya están en uso.");
             }
 
-            var sesion = await _repositorio.RegistrarJugadorAsync(dto);
+            var sesion =
+                await _repositorio.RegistrarJugadorAsync(dto);
 
             return Ok(sesion);
         }
@@ -148,20 +196,21 @@ namespace PPFarmWA.Server.Controllers
 
         [HttpPost("login1")]
         public async Task<ActionResult<SesionDTO>>
-            ObtenerSesionConItemsPorEmailAsync([FromBody] Login1DTO dto)
+            ObtenerSesionConItemsPorEmailAsync(
+                [FromBody] Login1DTO dto)
         {
-            if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
+            if (dto == null ||
+                string.IsNullOrWhiteSpace(dto.Email))
             {
                 return BadRequest("El mail es obligatorio.");
             }
 
             var sesion =
-                await _repositorio.ObtenerSesionConItemsPorEmailAsync(dto.Email);
+                await _repositorio.ObtenerSesionConItemsPorEmailAsync(
+                    dto.Email);
 
             if (sesion == null)
-            {
                 return NotFound("Usuario o contraseña no válidos.");
-            }
 
             return Ok(sesion);
         }
@@ -180,16 +229,13 @@ namespace PPFarmWA.Server.Controllers
             }
 
             var sesion =
-                await _repositorio
-                    .ObtenerSesionConItemsPorEmailYPasswordAsync(
-                        dto.Email,
-                        dto.Password);
+                await _repositorio.ObtenerSesionConItemsPorEmailYPasswordAsync(
+                    dto.Email,
+                    dto.Password);
 
             if (sesion == null)
-            {
                 return NotFound(
                     "Correo electrónico o contraseña incorrectos.");
-            }
 
             return Ok(sesion);
         }

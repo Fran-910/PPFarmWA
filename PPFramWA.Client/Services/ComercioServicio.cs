@@ -1,9 +1,9 @@
-﻿using PPFarmWA.Shared.DTO;
-using PPFramWA.Client.Services;
+﻿
+using PPFarmWA.Shared.DTO;
 using System.Net.Http;
-using System.Net.Http.Json;
+using System.Text.Json;
 
-namespace PPFarmWA.Client.Services
+namespace PPFramWA.Client.Services
 {
     public class ComercioServicio
     {
@@ -14,9 +14,12 @@ namespace PPFarmWA.Client.Services
             _api = api;
         }
 
-        public async Task<(bool Exito, string Mensaje)> Comprar(CompraDTO compra)
+        public async Task<(bool Exito, string Mensaje)> Comprar(
+            CompraDTO compra)
         {
-            var respuesta = await _api.PostAsync("api/Compra", compra);
+            var respuesta = await _api.PostAsync(
+                "api/Compra",
+                compra);
 
             return (
                 respuesta.IsSuccessStatusCode,
@@ -24,9 +27,12 @@ namespace PPFarmWA.Client.Services
             );
         }
 
-        public async Task<(bool Exito, string Mensaje)> Vender(VenderItemDTO venta)
+        public async Task<(bool Exito, string Mensaje)> Vender(
+            VenderItemDTO venta)
         {
-            var respuesta = await _api.PostAsync("api/Item/vender", venta);
+            var respuesta = await _api.PostAsync(
+                "api/Item/vender",
+                venta);
 
             return (
                 respuesta.IsSuccessStatusCode,
@@ -34,58 +40,77 @@ namespace PPFarmWA.Client.Services
             );
         }
 
-
-        public async Task<(bool Exito, string Mensaje)> ConvertirPoints(int idJugador, int puntosAConvertir)
+        // Conversión de Points a PP Coins.
+        // Utiliza POST api/Conversor/convertir.
+        public async Task<(bool Exito, string Mensaje)> ConvertirPoints(
+            int idJugador,
+            int puntosAConvertir)
         {
+            if (idJugador <= 0 || puntosAConvertir <= 0)
+            {
+                return (
+                    false,
+                    "Los datos de conversión no son válidos."
+                );
+            }
+
             var request = new
             {
                 IdJugador = idJugador,
                 PuntosAConvertir = puntosAConvertir
             };
-            var respuesta = await _api.PostAsync("api/Conversor/convertir", request);
-            return (respuesta.IsSuccessStatusCode, await LeerMensaje(respuesta));
-        }
 
-        public async Task<(bool Exito, string Mensaje)> convertirpoints(
-                      int idJugador,
-                      int puntosconvertidos)
-        {
-            var respuesta = await _api.PutAsync<object>(
-                $"api/Jugador/{idJugador}/convertir-points?puntos={puntosconvertidos}",
-                new { });
-
-            if (!respuesta.IsSuccessStatusCode)
-            {
-                var error = await respuesta.Content.ReadAsStringAsync();
-
-                return (
-                    false,
-                    string.IsNullOrWhiteSpace(error)
-                        ? "No se pudo realizar la conversión."
-                        : error.Trim('"')
-                );
-            }
-
-            var resultado =
-                await respuesta.Content.ReadFromJsonAsync<RespuestaConversion>();
+            var respuesta = await _api.PostAsync(
+                "api/Conversor/convertir",
+                request);
 
             return (
-                true,
-                resultado?.Mensaje ?? "Conversión realizada correctamente."
+                respuesta.IsSuccessStatusCode,
+                await LeerMensaje(respuesta)
             );
         }
-        private class RespuestaConversion
-        {
-            public string? Mensaje { get; set; }
-        }
 
-    private static async Task<string> LeerMensaje(HttpResponseMessage respuesta)
+        // Lee correctamente el mensaje devuelto por el servidor.
+        private static async Task<string> LeerMensaje(
+            HttpResponseMessage respuesta)
         {
             var texto = await respuesta.Content.ReadAsStringAsync();
-            return string.IsNullOrWhiteSpace(texto)
-                ? (respuesta.IsSuccessStatusCode ? "Operación realizada correctamente." : "No se pudo completar la operación.")
-                : texto.Trim('"');
-        }
 
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return respuesta.IsSuccessStatusCode
+                    ? "Operación realizada correctamente."
+                    : "No se pudo completar la operación.";
+            }
+
+            try
+            {
+                using var documento =
+                    JsonDocument.Parse(texto);
+
+                if (documento.RootElement.ValueKind ==
+                    JsonValueKind.Object)
+                {
+                    foreach (var propiedad in
+                        documento.RootElement.EnumerateObject())
+                    {
+                        if (string.Equals(
+                            propiedad.Name,
+                            "mensaje",
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            return propiedad.Value.GetString()
+                                ?? "Operación realizada correctamente.";
+                        }
+                    }
+                }
+            }
+            catch (JsonException)
+            {
+                // La respuesta también puede ser texto simple.
+            }
+
+            return texto.Trim('"');
+        }
     }
 }
